@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>MixIncome - Logo Final</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --primary: #0f62fe;
+                --secondary: #00d4aa;
+                --accent: #ff6b6b;
+                --dark: #0a1929;
+                --light: #f8fafc;
+                --gradient: linear-gradient(135deg, #00d4aa 0%, #0f62fe 100%);
+            }
+
+            body {
+                font-family: "Inter", sans-serif;
+                background: linear-gradient(135deg, #0a1929 0%, #1a2f4a 100%);
+                min-height: 100vh;
+                padding: 3rem 2rem;
+                color: var(--light);
+            }
+
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            h1 {
+                font-family: "Outfit", sans-serif;
+                font-size: 3rem;
+                margin-bottom: 0.5rem;
+                text-align: center;
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .subtitle {
+                text-align: center;
+                font-size: 1.1rem;
+                color: rgba(255, 255, 255, 0.6);
+                margin-bottom: 3rem;
+            }
+
+            /* Main Hero Logo */
+            .hero-logo {
+                background: rgba(255, 255, 255, 0.03);
+                border: 2px solid rgba(0, 212, 170, 0.3);
+                border-radius: 30px;
+                padding: 4rem;
+                margin-bottom: 3rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2rem;
+                backdrop-filter: blur(20px);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero-logo::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(
+                    circle at 50% 50%,
+                    rgba(0, 212, 170, 0.05) 0%,
+                    transparent 70%
+                );
+                pointer-events: none;
+            }
+
+            .main-logo-container {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Main Logo Icon */
+            .logo-icon-main {
+                width: 140px;
+                height: 140px;
+                position: relative;
+                flex-shrink: 0;
+            }
+
+            .rotating-ring {
+                position: absolute;
+                inset: 0;
+                border: 5px solid transparent;
+                border-radius: 50%;
+                border-top-color: var(--primary);
+                border-right-color: var(--secondary);
+                animation: rotate 4s linear infinite;
+            }
+
+            .rotating-ring-inner {
+                position: absolute;
+                inset: 10px;
+                border: 3px solid transparent;
+                border-radius: 50%;
+                border-bottom-color: var(--accent);
+                border-left-color: var(--secondary);
+                animation: rotate-reverse 3s linear infinite;
+                opacity: 0.6;
+            }
+
+            .logo-m {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Outfit", sans-serif;
+                font-size: 5rem;
+                font-weight: 800;
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1;
+            }
+
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes rotate-reverse {
+                from {
+                    transform: rotate(360deg);
+                }
+                to {
+                    transform: rotate(0deg);
+                }
+            }
+
+            .logo-text-main {
+                font-family: "Outfit", sans-serif;
+                font-size: 4rem;
+                font-weight: 700;
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .tagline-main {
+                text-align: center;
+                font-size: 1.3rem;
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 500;
+            }
+
+            /* Variations Grid */
+            .variations-title {
+                font-family: "Outfit", sans-serif;
+                font-size: 1.8rem;
+                margin: 3rem 0 2rem;
+                color: var(--secondary);
+                text-align: center;
+            }
+
+            .variations-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 2rem;
+                margin-bottom: 3rem;
+            }
+
+            .variation-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                padding: 2.5rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1.5rem;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
+
+            .variation-card:hover {
+                transform: translateY(-5px);
+                border-color: var(--primary);
+                box-shadow: 0 20px 40px rgba(15, 98, 254, 0.2);
+            }
+
+            .variation-label {
+                font-family: "Outfit", sans-serif;
+                font-size: 0.85rem;
+                color: var(--secondary);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                font-weight: 600;
+            }
+
+            /* Icon Only - Small */
+            .logo-icon-small {
+                width: 80px;
+                height: 80px;
+                position: relative;
+            }
+
+            .logo-icon-small .rotating-ring {
+                border-width: 4px;
+                animation: rotate 4s linear infinite;
+            }
+
+            .logo-icon-small .rotating-ring-inner {
+                inset: 6px;
+                border-width: 2px;
+            }
+
+            .logo-icon-small .logo-m {
+                font-size: 3rem;
+            }
+
+            /* Icon Only - Medium */
+            .logo-icon-medium {
+                width: 100px;
+                height: 100px;
+                position: relative;
+            }
+
+            .logo-icon-medium .rotating-ring {
+                border-width: 4px;
+            }
+
+            .logo-icon-medium .rotating-ring-inner {
+                inset: 8px;
+                border-width: 2px;
+            }
+
+            .logo-icon-medium .logo-m {
+                font-size: 4rem;
+            }
+
+            /* Horizontal Logo */
+            .horizontal-logo {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .horizontal-logo .logo-icon-small {
+                width: 60px;
+                height: 60px;
+            }
+
+            .horizontal-logo .logo-icon-small .logo-m {
+                font-size: 2.5rem;
+            }
+
+            .horizontal-logo .logo-text {
+                font-family: "Outfit", sans-serif;
+                font-size: 2rem;
+                font-weight: 700;
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            /* Dark Background Version */
+            .dark-bg {
+                background: var(--dark);
+                padding: 2rem;
+                border-radius: 15px;
+            }
+
+            /* Light Background Version */
+            .light-bg {
+                background: white;
+                padding: 2rem;
+                border-radius: 15px;
+            }
+
+            .light-bg .logo-m {
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .light-bg .logo-text {
+                color: var(--dark);
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            /* Monochrome Version */
+            .monochrome .rotating-ring {
+                border-top-color: var(--light);
+                border-right-color: var(--light);
+            }
+
+            .monochrome .rotating-ring-inner {
+                border-bottom-color: rgba(255, 255, 255, 0.5);
+                border-left-color: rgba(255, 255, 255, 0.5);
+            }
+
+            .monochrome .logo-m {
+                background: white;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .monochrome .logo-text {
+                color: white;
+                background: white;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            /* Color Specs */
+            .color-specs {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                padding: 2rem;
+                margin-top: 3rem;
+                backdrop-filter: blur(10px);
+            }
+
+            .color-specs h3 {
+                font-family: "Outfit", sans-serif;
+                color: var(--secondary);
+                margin-bottom: 1.5rem;
+                font-size: 1.3rem;
+            }
+
+            .color-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .color-item {
+                display: flex;
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .color-swatch {
+                height: 80px;
+                border-radius: 12px;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+
+            .color-name {
+                font-weight: 600;
+                font-size: 1rem;
+            }
+
+            .color-code {
+                font-family: "Courier New", monospace;
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.6);
+            }
+
+            /* Instructions */
+            .instructions {
+                background: rgba(0, 212, 170, 0.1);
+                border: 2px solid var(--secondary);
+                border-radius: 20px;
+                padding: 2rem;
+                margin-top: 3rem;
+            }
+
+            .instructions h3 {
+                font-family: "Outfit", sans-serif;
+                color: var(--secondary);
+                margin-bottom: 1.5rem;
+                font-size: 1.5rem;
+            }
+
+            .instructions-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+                margin-top: 1.5rem;
+            }
+
+            .instruction-item {
+                background: rgba(255, 255, 255, 0.05);
+                padding: 1.5rem;
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .instruction-item h4 {
+                color: var(--secondary);
+                margin-bottom: 0.8rem;
+                font-family: "Outfit", sans-serif;
+                font-size: 1.1rem;
+            }
+
+            .instruction-item p {
+                color: rgba(255, 255, 255, 0.8);
+                line-height: 1.6;
+                font-size: 0.95rem;
+            }
+
+            .download-tip {
+                background: rgba(15, 98, 254, 0.1);
+                border: 1px solid var(--primary);
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin-top: 2rem;
+                text-align: center;
+            }
+
+            .download-tip strong {
+                color: var(--primary);
+                font-size: 1.1rem;
+            }
+
+            @media (max-width: 768px) {
+                h1 {
+                    font-size: 2rem;
+                }
+
+                .main-logo-container {
+                    flex-direction: column;
+                }
+
+                .logo-icon-main {
+                    width: 100px;
+                    height: 100px;
+                }
+
+                .logo-m {
+                    font-size: 4rem !important;
+                }
+
+                .logo-text-main {
+                    font-size: 2.5rem;
+                }
+
+                .variations-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>MixIncome - Logo Oficial</h1>
+            <p class="subtitle">
+                Logo con M y círculo giratorio • Versión profesional
+            </p>
+
+            <!-- Hero Logo -->
+            <div class="hero-logo">
+                <div class="main-logo-container">
+                    <div class="logo-icon-main">
+                        <div class="rotating-ring"></div>
+                        <div class="rotating-ring-inner"></div>
+                        <div class="logo-m">M</div>
+                    </div>
+                    <div class="logo-text-main">MixIncome</div>
+                </div>
+                <p class="tagline-main">
+                    Asistente fiscal para nómadas digitales
+                </p>
+            </div>
+
+            <h2 class="variations-title">📦 Variaciones del Logo</h2>
+
+            <!-- Variations Grid -->
+            <div class="variations-grid">
+                <!-- Small Icon -->
+                <div class="variation-card">
+                    <div class="variation-label">Ícono Solo - Pequeño</div>
+                    <div class="logo-icon-small">
+                        <div class="rotating-ring"></div>
+                        <div class="rotating-ring-inner"></div>
+                        <div class="logo-m">M</div>
+                    </div>
+                    <p
+                        style="
+                            text-align: center;
+                            font-size: 0.9rem;
+                            color: rgba(255, 255, 255, 0.6);
+                        "
+                    >
+                        Ideal para favicon, app icon, redes sociales
+                    </p>
+                </div>
+
+                <!-- Medium Icon -->
+                <div class="variation-card">
+                    <div class="variation-label">Ícono Solo - Mediano</div>
+                    <div class="logo-icon-medium">
+                        <div class="rotating-ring"></div>
+                        <div class="rotating-ring-inner"></div>
+                        <div class="logo-m">M</div>
+                    </div>
+                    <p
+                        style="
+                            text-align: center;
+                            font-size: 0.9rem;
+                            color: rgba(255, 255, 255, 0.6);
+                        "
+                    >
+                        Para botones, badges, watermarks
+                    </p>
+                </div>
+
+                <!-- Horizontal Logo -->
+                <div class="variation-card">
+                    <div class="variation-label">Logo Horizontal</div>
+                    <div class="horizontal-logo">
+                        <div class="logo-icon-small">
+                            <div class="rotating-ring"></div>
+                            <div class="rotating-ring-inner"></div>
+                            <div class="logo-m">M</div>
+                        </div>
+                        <div class="logo-text">MixIncome</div>
+                    </div>
+                    <p
+                        style="
+                            text-align: center;
+                            font-size: 0.9rem;
+                            color: rgba(255, 255, 255, 0.6);
+                        "
+                    >
+                        Para headers, firmas de email, presentaciones
+                    </p>
+                </div>
+
+                <!-- Dark Background -->
+                <div class="variation-card dark-bg">
+                    <div class="variation-label">Sobre Fondo Oscuro</div>
+                    <div class="horizontal-logo">
+                        <div class="logo-icon-small">
+                            <div class="rotating-ring"></div>
+                            <div class="rotating-ring-inner"></div>
+                            <div class="logo-m">M</div>
+                        </div>
+                        <div class="logo-text">MixIncome</div>
+                    </div>
+                    <p
+                        style="
+                            text-align: center;
+                            font-size: 0.9rem;
+                            color: rgba(255, 255, 255, 0.6);
+                        "
+                    >
+                        Para fondos oscuros, modo nocturno
+                    </p>
+                </div>
+
+                <!-- Light Background -->
+                <div class="variation-card light-bg">
+                    <div class="variation-label" style="color: var(--primary)">
+                        Sobre Fondo Claro
+                    </div>
+                    <div class="horizontal-logo">
+                        <div class="logo-icon-small">
+                            <div class="rotating-ring"></div>
+                            <div class="rotating-ring-inner"></div>
+                            <div class="logo-m">M</div>
+                        </div>
+                        <div class="logo-text" style="color: var(--dark)">
+                            MixIncome
+                        </div>
+                    </div>
+                    <p
+                        style="
+                            text-align: center;
+                            font-size: 0.9rem;
+                            color: rgba(0, 0, 0, 0.6);
+                        "
+                    >
+                        Para documentos, fondos blancos
+                    </p>
+                </div>
+
+                <!-- Monochrome -->
+                <div class="variation-card monochrome">
+                    <div class="variation-label">Monocromático</div>
+                    <div class="horizontal-logo">
+                        <div class="logo-icon-small">
+                            <div class="rotating-ring"></div>
+                            <div class="rotating-ring-inner"></div>
+                            <div class="logo-m">M</div>
+                        </div>
+                        <div class="logo-text">MixIncome</div>
+                    </div>
+                    <p
+                        style="
+                            text-align: center;
+                            font-size: 0.9rem;
+                            color: rgba(255, 255, 255, 0.6);
+                        "
+                    >
+                        Para impresión B/N, marcas de agua
+                    </p>
+                </div>
+            </div>
+
+            <!-- Color Specs -->
+            <div class="color-specs">
+                <h3>🎨 Paleta de Colores Oficial</h3>
+                <div class="color-grid">
+                    <div class="color-item">
+                        <div
+                            class="color-swatch"
+                            style="background: #0f62fe"
+                        ></div>
+                        <div class="color-name">Azul Primario</div>
+                        <div class="color-code">#0F62FE</div>
+                        <div class="color-code">rgb(15, 98, 254)</div>
+                    </div>
+                    <div class="color-item">
+                        <div
+                            class="color-swatch"
+                            style="background: #00d4aa"
+                        ></div>
+                        <div class="color-name">Verde Agua</div>
+                        <div class="color-code">#00D4AA</div>
+                        <div class="color-code">rgb(0, 212, 170)</div>
+                    </div>
+                    <div class="color-item">
+                        <div
+                            class="color-swatch"
+                            style="background: #ff6b6b"
+                        ></div>
+                        <div class="color-name">Coral Acento</div>
+                        <div class="color-code">#FF6B6B</div>
+                        <div class="color-code">rgb(255, 107, 107)</div>
+                    </div>
+                    <div class="color-item">
+                        <div
+                            class="color-swatch"
+                            style="background: #0a1929"
+                        ></div>
+                        <div class="color-name">Azul Oscuro</div>
+                        <div class="color-code">#0A1929</div>
+                        <div class="color-code">rgb(10, 25, 41)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <h3>📋 Guía de Uso</h3>
+
+                <div class="instructions-grid">
+                    <div class="instruction-item">
+                        <h4>1️⃣ Para Web/Digital</h4>
+                        <p>
+                            • Haz clic derecho → "Guardar como imagen"<br />
+                            • Usa la versión con fondo transparente<br />
+                            • El logo funciona en modo claro y oscuro<br />
+                            • La animación se puede implementar en CSS
+                        </p>
+                    </div>
+
+                    <div class="instruction-item">
+                        <h4>2️⃣ Para Vectorizar</h4>
+                        <p>
+                            • Usa <strong>Figma</strong> (gratis) para
+                            recrear<br />
+                            • O contrata en
+                            <strong>Fiverr</strong> ($20-50)<br />
+                            • Solicita formatos: SVG, AI, EPS, PDF<br />
+                            • Incluye versiones estáticas y animadas
+                        </p>
+                    </div>
+
+                    <div class="instruction-item">
+                        <h4>3️⃣ Para Imprimir</h4>
+                        <p>
+                            • Usa la versión monocromática para B/N<br />
+                            • Versión de fondo claro para tarjetas<br />
+                            • Mínimo 300 DPI para impresión<br />
+                            • Pide vectores para mejor calidad
+                        </p>
+                    </div>
+
+                    <div class="instruction-item">
+                        <h4>4️⃣ Tamaños Recomendados</h4>
+                        <p>
+                            • <strong>Favicon:</strong> 32x32px (ícono solo)<br />
+                            • <strong>Redes sociales:</strong> 500x500px<br />
+                            • <strong>Header web:</strong> 200px alto<br />
+                            • <strong>Firma email:</strong> 150px alto
+                        </p>
+                    </div>
+                </div>
+
+                <div class="download-tip">
+                    <strong>💡 Tip Pro:</strong> Captura esta página completa
+                    para tener todas las variaciones. Luego recorta cada versión
+                    según la necesites.
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>MixIncome - Logo Estático (Versión Recomendada)</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --primary: #0f62fe;
+                --secondary: #00d4aa;
+                --accent: #ff6b6b;
+                --dark: #0a1929;
+                --light: #f8fafc;
+                --gradient: linear-gradient(135deg, #00d4aa 0%, #0f62fe 100%);
+            }
+
+            body {
+                font-family: "Inter", sans-serif;
+                background: linear-gradient(135deg, #0a1929 0%, #1a2f4a 100%);
+                min-height: 100vh;
+                padding: 3rem 2rem;
+                color: var(--light);
+            }
+
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            h1 {
+                font-family: "Outfit", sans-serif;
+                font-size: 3rem;
+                margin-bottom: 0.5rem;
+                text-align: center;
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .subtitle {
+                text-align: center;
+                font-size: 1.1rem;
+                color: rgba(255, 255, 255, 0.6);
+                margin-bottom: 1rem;
+            }
+
+            .recommendation {
+                background: rgba(0, 212, 170, 0.1);
+                border: 2px solid var(--secondary);
+                border-radius: 15px;
+                padding: 1.5rem;
+                margin: 0 auto 3rem;
+                max-width: 800px;
+                text-align: center;
+            }
+
+            .recommendation strong {
+                color: var(--secondary);
+                font-size: 1.1rem;
+            }
+
+            /* Main Static Logo */
+            .hero-section {
+                background: rgba(255, 255, 255, 0.03);
+                border: 2px solid rgba(0, 212, 170, 0.3);
+                border-radius: 30px;
+                padding: 4rem;
+                margin-bottom: 3rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2rem;
+                backdrop-filter: blur(20px);
+            }
+
+            .main-logo {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+
+            /* Static Logo Icon - Position A (Recommended) */
+            .logo-static {
+                width: 140px;
+                height: 140px;
+                position: relative;
+                flex-shrink: 0;
+            }
+
+            .static-ring {
+                position: absolute;
+                inset: 0;
+                border: 5px solid transparent;
+                border-radius: 50%;
+            }
+
+            /* Position A - Diagonal Split (RECOMENDADO) */
+            .position-a .ring-outer {
+                border-top-color: var(--primary);
+                border-right-color: var(--secondary);
+                border-bottom-color: transparent;
+                border-left-color: transparent;
+            }
+
+            .position-a .ring-inner {
+                inset: 10px;
+                border-width: 3px;
+                border-bottom-color: var(--accent);
+                border-left-color: rgba(0, 212, 170, 0.4);
+                border-top-color: transparent;
+                border-right-color: transparent;
+            }
+
+            /* Position B - Top-Bottom */
+            .position-b .ring-outer {
+                border-top-color: var(--primary);
+                border-right-color: var(--primary);
+                border-bottom-color: transparent;
+                border-left-color: transparent;
+            }
+
+            .position-b .ring-inner {
+                inset: 10px;
+                border-width: 3px;
+                border-bottom-color: var(--secondary);
+                border-left-color: var(--secondary);
+                border-top-color: transparent;
+                border-right-color: transparent;
+            }
+
+            /* Position C - Offset Quarters */
+            .position-c .ring-outer {
+                border-top-color: var(--primary);
+                border-right-color: transparent;
+                border-bottom-color: var(--secondary);
+                border-left-color: transparent;
+            }
+
+            .position-c .ring-inner {
+                inset: 10px;
+                border-width: 3px;
+                border-top-color: transparent;
+                border-right-color: var(--accent);
+                border-bottom-color: transparent;
+                border-left-color: rgba(0, 212, 170, 0.4);
+            }
+
+            .logo-m-static {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Outfit", sans-serif;
+                font-size: 5rem;
+                font-weight: 800;
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1;
+            }
+
+            .logo-text {
+                font-family: "Outfit", sans-serif;
+                font-size: 4rem;
+                font-weight: 700;
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .tagline {
+                text-align: center;
+                font-size: 1.3rem;
+                color: rgba(255, 255, 255, 0.7);
+                font-weight: 500;
+            }
+
+            /* Comparison Grid */
+            .comparison-title {
+                font-family: "Outfit", sans-serif;
+                font-size: 1.8rem;
+                margin: 3rem 0 2rem;
+                color: var(--secondary);
+                text-align: center;
+            }
+
+            .comparison-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 2rem;
+                margin-bottom: 3rem;
+            }
+
+            .comparison-card {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                padding: 2.5rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1.5rem;
+                transition: all 0.3s ease;
+            }
+
+            .comparison-card.recommended {
+                border: 2px solid var(--secondary);
+                background: rgba(0, 212, 170, 0.05);
+            }
+
+            .comparison-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px rgba(15, 98, 254, 0.2);
+            }
+
+            .position-label {
+                font-family: "Outfit", sans-serif;
+                font-size: 0.85rem;
+                color: var(--secondary);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                font-weight: 600;
+            }
+
+            .recommended-badge {
+                background: var(--secondary);
+                color: var(--dark);
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            /* Use Cases */
+            .use-cases {
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                padding: 3rem;
+                margin-bottom: 3rem;
+            }
+
+            .use-cases h3 {
+                font-family: "Outfit", sans-serif;
+                color: var(--secondary);
+                margin-bottom: 2rem;
+                font-size: 1.5rem;
+                text-align: center;
+            }
+
+            .use-case-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
+            }
+
+            .use-case {
+                background: rgba(255, 255, 255, 0.05);
+                padding: 2rem;
+                border-radius: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .use-case h4 {
+                color: var(--primary);
+                margin-bottom: 1rem;
+                font-family: "Outfit", sans-serif;
+            }
+
+            .use-case-example {
+                background: rgba(255, 255, 255, 0.03);
+                padding: 1.5rem;
+                border-radius: 10px;
+                margin-top: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .example-icon {
+                width: 50px;
+                height: 50px;
+                position: relative;
+                flex-shrink: 0;
+            }
+
+            .example-icon .static-ring {
+                border-width: 3px;
+            }
+
+            .example-icon .logo-m-static {
+                font-size: 2rem;
+            }
+
+            .example-text {
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            /* White Background Examples */
+            .white-bg-section {
+                background: white;
+                border-radius: 20px;
+                padding: 3rem;
+                margin-bottom: 3rem;
+            }
+
+            .white-bg-section h3 {
+                font-family: "Outfit", sans-serif;
+                color: var(--dark);
+                margin-bottom: 2rem;
+                font-size: 1.5rem;
+                text-align: center;
+            }
+
+            .white-examples {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 2rem;
+            }
+
+            .white-example {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: 1.5rem;
+                background: #f8f9fa;
+                border-radius: 12px;
+            }
+
+            .white-example .example-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .white-example .example-icon .logo-m-static {
+                font-size: 2.5rem;
+            }
+
+            .white-example .logo-text-small {
+                font-family: "Outfit", sans-serif;
+                font-size: 1.5rem;
+                font-weight: 700;
+                background: var(--gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            /* Recommendation Box */
+            .final-recommendation {
+                background: rgba(15, 98, 254, 0.1);
+                border: 2px solid var(--primary);
+                border-radius: 20px;
+                padding: 2.5rem;
+                text-align: center;
+            }
+
+            .final-recommendation h3 {
+                font-family: "Outfit", sans-family;
+                color: var(--primary);
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .final-recommendation p {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                color: rgba(255, 255, 255, 0.9);
+                margin-bottom: 1rem;
+            }
+
+            .final-recommendation ul {
+                list-style: none;
+                padding: 0;
+                margin: 1.5rem 0;
+            }
+
+            .final-recommendation li {
+                padding: 0.8rem;
+                margin: 0.5rem 0;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 8px;
+                font-size: 1rem;
+            }
+
+            .final-recommendation li strong {
+                color: var(--secondary);
+            }
+
+            @media (max-width: 768px) {
+                .main-logo {
+                    flex-direction: column;
+                }
+
+                .logo-text {
+                    font-size: 2.5rem;
+                }
+
+                .comparison-grid,
+                .use-case-grid,
+                .white-examples {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>MixIncome - Logo Estático</h1>
+            <p class="subtitle">
+                Versión recomendada para uso diario en la plataforma
+            </p>
+
+            <div class="recommendation">
+                <strong>✅ Recomendación:</strong> Usa el logo ESTÁTICO en tu
+                app. La animación solo para landing page y loading states.
+            </div>
+
+            <!-- Main Logo - Posición A Recomendada -->
+            <div class="hero-section">
+                <div class="recommended-badge">
+                    ✨ VERSIÓN OFICIAL RECOMENDADA
+                </div>
+                <div class="main-logo">
+                    <div class="logo-static position-a">
+                        <div class="static-ring ring-outer"></div>
+                        <div class="static-ring ring-inner"></div>
+                        <div class="logo-m-static">M</div>
+                    </div>
+                    <div class="logo-text">MixIncome</div>
+                </div>
+                <p class="tagline">Posición A - División diagonal balanceada</p>
+            </div>
+
+            <!-- Comparison of Positions -->
+            <h2 class="comparison-title">📊 Comparación de Posiciones</h2>
+
+            <div class="comparison-grid">
+                <!-- Position A -->
+                <div class="comparison-card recommended">
+                    <div class="recommended-badge">RECOMENDADA</div>
+                    <div class="position-label">Posición A - Diagonal</div>
+                    <div
+                        class="logo-static position-a"
+                        style="width: 100px; height: 100px"
+                    >
+                        <div class="static-ring ring-outer"></div>
+                        <div class="static-ring ring-inner"></div>
+                        <div class="logo-m-static" style="font-size: 4rem">
+                            M
+                        </div>
+                    </div>
+                    <p
+                        style="
+                            text-align: center;
+                            font-size: 0.9rem;
+                            color: rgba(255, 255, 255, 0.8);
+                        "
+                    >
+                        ✅ Más balanceada visualmente<br />
+                        ✅ Sugiere movimiento sin animar<br />
+                        ✅ Moderna y dinámica<br />
+                        ✅ Funciona en todos los tamaños
+                    </p>
+                </div>
+
+                <!-- Position B -->
+                <div class="comparison-card">
+                    <div class="position-label">Posición B - Top-Bottom</div>
+                    <div
+                        class="logo-static position-b"
+                        style="width: 100px; height: 100px"
+                    >
+                        <div class="static-ring ring-outer"></div>
+                        <div class="static-ring ring-inner"></div>
+                        <div class="logo-m-static" style="font-size: 4rem">
+                            M
+                        </div>
+                    </div>
+                    <p
+                        style="
+                            text-align: center;
+                            font-size: 0.9rem;
+                            color: rgba(255, 255, 255, 0.6);
+                        "
+                    >
+                        Divide horizontalmente<br />
+                        Más formal y estable<br />
+                        Menos dinámica
+                    </p>
+                </div>
+
+                <!-- Position C -->
+                <div class="comparison-card">
+                    <div class="position-label">Posición C - Cuartos</div>
+                    <div
+                        class="logo-static position-c"
+                        style="width: 100px; height: 100px"
+                    >
+                        <div class="static-ring ring-outer"></div>
+                        <div class="static-ring ring-inner"></div>
+                        <div class="logo-m-static" style="font-size: 4rem">
+                            M
+                        </div>
+                    </div>
+                    <p
+                        style="
+                            text-align: center;
+                            font-size: 0.9rem;
+                            color: rgba(255, 255, 255, 0.6);
+                        "
+                    >
+                        Asimétrica<br />
+                        Más artística<br />
+                        Puede verse desequilibrada
+                    </p>
+                </div>
+            </div>
+
+            <!-- Use Cases -->
+            <div class="use-cases">
+                <h3>🎯 Casos de Uso - Cuándo usar ESTÁTICO vs ANIMADO</h3>
+                <div class="use-case-grid">
+                    <div class="use-case">
+                        <h4>✅ Logo ESTÁTICO (usa siempre)</h4>
+                        <ul
+                            style="list-style: none; padding: 0; line-height: 2"
+                        >
+                            <li>📱 Header de la app/web</li>
+                            <li>📧 Firma de email</li>
+                            <li>📄 Documentos PDF</li>
+                            <li>🖼️ Favicon (16x16, 32x32)</li>
+                            <li>📊 Presentaciones</li>
+                            <li>💳 Tarjetas de visita</li>
+                            <li>📱 App icon móvil</li>
+                        </ul>
+                    </div>
+
+                    <div class="use-case">
+                        <h4>🎬 Logo ANIMADO (solo en)</h4>
+                        <ul
+                            style="list-style: none; padding: 0; line-height: 2"
+                        >
+                            <li>🏠 Landing page (hero section)</li>
+                            <li>🔄 Loading screens</li>
+                            <li>🔐 Página de login</li>
+                            <li>✨ Hover en header (sutil)</li>
+                            <li>🎥 Videos promocionales</li>
+                            <li>📱 Splash screen app</li>
+                        </ul>
+                    </div>
+
+                    <div class="use-case">
+                        <h4>⚡ Estados de Carga</h4>
+                        <div class="use-case-example">
+                            <div class="example-icon position-a">
+                                <div class="static-ring ring-outer"></div>
+                                <div class="static-ring ring-inner"></div>
+                                <div class="logo-m-static">M</div>
+                            </div>
+                            <div class="example-text">
+                                <strong>Procesando...</strong><br />
+                                El logo puede girar durante operaciones
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- White Background Examples -->
+            <div class="white-bg-section">
+                <h3>
+                    ✨ Así se ve sobre fondo blanco (como dijiste que te gusta)
+                </h3>
+                <div class="white-examples">
+                    <div class="white-example">
+                        <div class="example-icon position-a">
+                            <div class="static-ring ring-outer"></div>
+                            <div class="static-ring ring-inner"></div>
+                            <div class="logo-m-static">M</div>
+                        </div>
+                        <div class="logo-text-small">MixIncome</div>
+                    </div>
+
+                    <div class="white-example">
+                        <div class="example-icon position-a">
+                            <div class="static-ring ring-outer"></div>
+                            <div class="static-ring ring-inner"></div>
+                            <div class="logo-m-static">M</div>
+                        </div>
+                        <span
+                            style="
+                                font-family: &quot;Outfit&quot;, sans-serif;
+                                font-size: 1.2rem;
+                                color: #0a1929;
+                            "
+                        >
+                            Versión compacta
+                        </span>
+                    </div>
+
+                    <div class="white-example">
+                        <div
+                            class="example-icon position-a"
+                            style="width: 40px; height: 40px"
+                        >
+                            <div
+                                class="static-ring ring-outer"
+                                style="border-width: 2px"
+                            ></div>
+                            <div
+                                class="static-ring ring-inner"
+                                style="border-width: 1.5px"
+                            ></div>
+                            <div
+                                class="logo-m-static"
+                                style="font-size: 1.5rem"
+                            >
+                                M
+                            </div>
+                        </div>
+                        <span style="font-size: 0.9rem; color: #666">
+                            Para botones pequeños
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Recommendation -->
+            <div class="final-recommendation">
+                <h3>🎯 Recomendación Final</h3>
+                <p>
+                    <strong>Logo ESTÁTICO con Posición A (diagonal)</strong>
+                    para toda tu plataforma y materiales.
+                </p>
+                <ul>
+                    <li><strong>Header permanente:</strong> Logo estático</li>
+                    <li>
+                        <strong>Hover en logo:</strong> Rotación suave 1 vez
+                        (opcional)
+                    </li>
+                    <li><strong>Loading/Procesando:</strong> Círculos giran</li>
+                    <li><strong>Landing page:</strong> Animación de entrada</li>
+                </ul>
+                <p style="margin-top: 1.5rem">
+                    <strong>💡 Por qué:</strong> Apps financieras serias
+                    (Stripe, Wise, QuickBooks, N26) usan logos estáticos. La
+                    animación constante resta profesionalismo en herramientas de
+                    productividad.
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
