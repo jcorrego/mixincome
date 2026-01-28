@@ -4,19 +4,14 @@
         "codex",
         "copilot",
         "cursor",
-        "gemini",
-        "opencode",
-        "phpstorm"
+        "gemini"
     ],
-    "editors": [
-        "claude_code",
-        "codex",
-        "cursor",
-        "gemini",
-        "opencode",
-        "phpstorm",
-        "vscode"
-    ],
-    "guidelines": [],
-    "herd_mcp": true
+    "guidelines": true,
+    "herd_mcp": true,
+    "mcp": true,
+    "sail": false,
+    "skills": [
+        "pest-testing",
+        "tailwindcss-development"
+    ]
 }
