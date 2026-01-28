@@ -91,6 +91,7 @@
         "test:types": "phpstan --memory-limit=2G",
         "test": [
             "@test:type-coverage",
+            "@test:coverage",
             "@test:unit",
             "@test:lint",
             "@test:types"
