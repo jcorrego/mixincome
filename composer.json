@@ -17,7 +17,7 @@
         "driftingly/rector-laravel": "^2.1.9",
         "fakerphp/faker": "^1.24.1",
         "larastan/larastan": "^3.9.1",
-        "laravel/boost": "^1.8.10",
+        "laravel/boost": "^2.0.4",
         "laravel/pail": "^1.2.4",
         "laravel/pint": "^1.27.0",
         "mockery/mockery": "^1.6.12",
@@ -87,6 +87,7 @@
             "bun run test:lint"
         ],
         "test:unit": "pest --parallel",
+        "test:coverage": "XDEBUG_MODE=\"coverage\" pest --parallel --coverage --exactly=100.0",
         "test:types": "phpstan --memory-limit=2G",
         "test": [
             "@test:type-coverage",
