@@ -2,19 +2,112 @@ schema: spec-driven
 
 # Project context (optional)
 # This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  ## Purpose
+  MixIncome is a multi-jurisdiction tax assistant platform (Spain, USA, Colombia)
+  that centralizes financial data from multiple sources and currencies, maps
+  transactions to tax-relevant categories, and produces summaries, checklists,
+  and exports for tax preparation — without providing formal tax advice.
 
+  ## Tech Stack
+  - Backend: Laravel 12, PHP 8.4, Livewire v4, Flux UI Free v2, Fortify v1, Sanctum v4
+  - Frontend: Blade + Livewire + Volt (single-file components), Tailwind CSS v4, Vite 7
+  - Testing/Quality: Pest v4 (100% type coverage), PHPUnit v12, Laravel Pint, Larastan v3 (level 9), Rector v2, Prettier v3
+  - Tooling/Local: Laravel Boost (MCP), Laravel Herd, Bun (not npm)
+  - Data: MySQL 8 for deployment
+  - Base: nunomaduro/laravel-starter-kit (ultra-strict, type-safe, immutable-first)
+  - Production: Laravel Forge using mixincome.com domain
+
+  ## Project Conventions
+
+  ### Code Style
+  - 100% type coverage enforced (Pest type-coverage plugin)
+  - Format PHP with `vendor/bin/pint`; format JS/CSS with Prettier
+  - PHP 8.4 constructor property promotion; no empty public constructors
+  - Explicit return types and parameter type hints everywhere
+  - Prefer PHPDoc blocks over inline comments; add array shapes when useful
+  - Enum keys in TitleCase
+  - Tailwind v4 CSS-first config (`@import "tailwindcss";` and `@theme`)
+  - Use `bun` instead of `npm` for JS dependencies
+
+  ### Architecture Patterns
+  - Laravel 12 streamlined file structure: middleware in `bootstrap/app.php`
+  - Strict models (via nunomaduro/essentials): auto eager loading, immutable dates
+  - Prefer Eloquent models and relationships; avoid `DB::` when possible
+  - Form Request classes for validation with custom error messages
+  - Queued jobs (`ShouldQueue`) for time-consuming work
+  - Livewire + Volt for UI; state on server, UI reflects it
+  - Reuse components (Flux UI Free first, then Blade)
+
+  ### Testing Strategy
+  - All tests in Pest; browser tests with Playwright (Pest browser plugin)
+  - Cover happy, failure, and edge cases
+  - Run minimal affected tests: `php artisan test --compact`
+  - Use factories for model setup
+  - Full suite: `composer test` (type coverage + unit + lint + static analysis)
+
+  ### Git Workflow
+  - Branch per change (align with OpenSpec change IDs)
+  - PR per branch; small focused commits
+  - Run `composer lint` before finalizing
+
+  ## Domain Context
+  - Single-user MVP for cross-border tax prep: Spain, USA, Colombia
+  - Key outputs: IRPF summaries (Spain), Form 5472/pro-forma 1120 + Schedule E (US), Colombia rental summaries
+  - Organization/calculation helper, NOT tax advice
+  - Multi-currency: USD, EUR, COP (with FX conversion)
+
+  ### Core Domain Hierarchy
+  ```
+  User
+  ├── UserProfiles (jurisdiction-specific)
+  ├── Entities (Individual, LLC)
+  │   ├── Accounts → Transactions, YearEndValues
+  │   ├── Assets → YearEndValues
+  │   └── YearEndValues
+  └── ResidencyPeriods, Filings
+
+  Transaction (multi-currency)
+  ├── Account, TransactionCategory
+  ├── OriginalCurrency / ConvertedCurrency
+  └── Documents (polymorphic)
+
+  CategoryTaxMapping → TaxFormCode + LineItem
+  ```
+
+  ### Key Services (to build)
+  - TransactionImportService: CSV/PDF parsing, duplicate detection, FX conversion
+  - TransactionCategorizationService: rule-based (manual, regex, DB rules)
+  - FxRateService: multi-currency with ECB API, caching, historical rates
+  - UsTaxReportingService: Form 5472, Schedule E, 1040-NR, 1120
+  - SpainTaxReportingService: IRPF, Modelo 720
+  - ColombiaTaxReportingService: rental income summaries
+
+  ## External Dependencies (planned)
+  - YNAB API/CSV
+  - Mercury API/CSV
+  - Banco Santander (CSV; potential PSD2 later)
+  - Bancolombia (CSV; potential API later)
+  - OCR pipeline for documents (smalot/pdfparser + Tesseract)
+  - Algolia for search (planned), with DB FTS fallback
+
+  ## Constraints
+  - Do not change dependencies without approval
+  - Stick to existing directory structure
+  - Laravel Herd for local dev (no manual web server)
+  - Search docs via Boost `search-docs` before Laravel ecosystem changes
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - Keep proposals concise; focus on why and what changes
+    - Mark breaking changes with **BREAKING**
+    - List affected specs
+  tasks:
+    - Break into small, sequential implementation steps
+    - Each task should be completable in under 2 hours
+    - Include test tasks for each functional change
+  spec:
+    - Use SHALL/MUST for normative requirements
+    - Every requirement must have at least one scenario
+    - Use #### Scenario: format (4 hashtags)
