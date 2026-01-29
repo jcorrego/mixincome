@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="100%" height="100%">
+  <!-- MixIncome Icon - Color variant -->
+  <defs>
+    <linearGradient id="m-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D4AA"/>
+      <stop offset="100%" stop-color="#0F62FE"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer ring - Top arc (Primary Blue) -->
+  <path d="M 22.27,22.27 A 67.5,67.5 0 0,1 117.73,22.27"
+        fill="none" stroke="#0F62FE" stroke-width="5" stroke-linecap="butt"/>
+
+  <!-- Outer ring - Right arc (Secondary Green) -->
+  <path d="M 117.73,22.27 A 67.5,67.5 0 0,1 117.73,117.73"
+        fill="none" stroke="#00D4AA" stroke-width="5" stroke-linecap="butt"/>
+
+  <!-- Inner ring - Bottom arc (Accent Coral) -->
+  <path d="M 111.37,111.37 A 58.5,58.5 0 0,1 28.63,111.37"
+        fill="none" stroke="#FF6B6B" stroke-width="3" stroke-linecap="butt"/>
+
+  <!-- Inner ring - Left arc (Secondary Green, 40% opacity) -->
+  <path d="M 28.63,111.37 A 58.5,58.5 0 0,1 28.63,28.63"
+        fill="none" stroke="#00D4AA" stroke-width="3" stroke-linecap="butt" opacity="0.4"/>
+
+  <!-- M Letter -->
+  <path d="M 36,102 L 36,38 L 54,38 L 70,64 L 86,38 L 104,38 L 104,102 L 90,102 L 90,54 L 70,82 L 50,54 L 50,102 Z"
+        fill="url(#m-gradient)"/>
+</svg>
