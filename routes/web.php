@@ -20,3 +20,4 @@ Route::view('dashboard', 'dashboard')
 Route::view('about', 'about');
 
 require __DIR__.'/settings.php';
+require __DIR__.'/management.php';

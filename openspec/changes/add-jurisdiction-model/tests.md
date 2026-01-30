@@ -2,25 +2,25 @@
 
 ## 1. Feature Tests - View Jurisdictions
 
-- [ ] 1.1 Authenticated user can view jurisdictions page and see table
-- [ ] 1.2 Unauthenticated user is redirected to login
+- [x] 1.1 Authenticated user can view jurisdictions page and see table
+- [x] 1.2 Unauthenticated user is redirected to login
 
 ## 2. Feature Tests - Create Jurisdiction
 
-- [ ] 2.1 Can create jurisdiction with valid data (name, iso_code, timezone, currency)
-- [ ] 2.2 Cannot create jurisdiction with duplicate iso_code (unique validation)
-- [ ] 2.3 Cannot create jurisdiction with iso_code length != 3 (size validation)
-- [ ] 2.4 Cannot create jurisdiction with missing required fields (required validation)
+- [x] 2.1 Can create jurisdiction with valid data (name, iso_code, timezone, currency)
+- [x] 2.2 Cannot create jurisdiction with duplicate iso_code (unique validation)
+- [x] 2.3 Cannot create jurisdiction with iso_code length != 3 (size validation)
+- [x] 2.4 Cannot create jurisdiction with missing required fields (required validation)
 
 ## 3. Feature Tests - Update Jurisdiction
 
-- [ ] 3.1 Can update jurisdiction with valid data
-- [ ] 3.2 Cannot update jurisdiction iso_code to duplicate value
-- [ ] 3.3 Cannot update jurisdiction with invalid timezone
+- [x] 3.1 Can update jurisdiction with valid data
+- [x] 3.2 Cannot update jurisdiction iso_code to duplicate value
+- [x] 3.3 Cannot update jurisdiction with invalid timezone
 
 ## 4. Feature Tests - Delete Jurisdiction
 
-- [ ] 4.1 Can delete jurisdiction with no dependencies
+- [x] 4.1 Can delete jurisdiction with no dependencies
 - [ ] 4.2 Cannot delete jurisdiction with dependencies (will test after related models exist)
 
 ## 5. Unit Tests - Model Behavior

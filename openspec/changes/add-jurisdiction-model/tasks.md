@@ -14,23 +14,23 @@
 
 ## 3. Routes
 
-- [ ] 3.1 Create routes/management.php with auth middleware
-- [ ] 3.2 Add route for management.jurisdictions view
-- [ ] 3.3 Register management.php in bootstrap/app.php if needed
+- [x] 3.1 Create routes/management.php with auth middleware
+- [x] 3.2 Add route for management.jurisdictions view
+- [x] 3.3 Register management.php in bootstrap/app.php if needed
 
 ## 4. Livewire Component
 
-- [ ] 4.1 Create Livewire component Management/Jurisdictions
-- [ ] 4.2 Implement table view with all jurisdictions
-- [ ] 4.3 Implement create form with validation rules
-- [ ] 4.4 Implement edit form
-- [ ] 4.5 Implement delete with dependency check (soft validation)
+- [x] 4.1 Create Livewire component Management/Jurisdictions
+- [x] 4.2 Implement table view with all jurisdictions
+- [x] 4.3 Implement create form with validation rules
+- [x] 4.4 Implement edit form
+- [x] 4.5 Implement delete with dependency check (soft validation)
 
 ## 5. Views
 
-- [ ] 5.1 Create management.jurisdictions Blade view
-- [ ] 5.2 Use Flux UI components for table and forms
-- [ ] 5.3 Add navigation link in app sidebar/menu
+- [x] 5.1 Create management.jurisdictions Blade view
+- [x] 5.2 Use Flux UI components for table and forms
+- [x] 5.3 Add navigation link in app sidebar/menu
 
 ## 6. Tests - Feature
 
