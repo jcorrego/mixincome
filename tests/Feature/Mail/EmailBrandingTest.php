@@ -24,7 +24,7 @@ test('verification email contains branded footer', function (): void {
 
     expect($html)->toContain('MixIncome')
         ->and($html)->toContain('©')
-        ->and($html)->toContain((string) date('Y'));
+        ->and($html)->toContain(date('Y'));
 });
 
 test('verification email has branded button color', function (): void {

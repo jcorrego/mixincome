@@ -66,7 +66,7 @@ test('valid recovery code completes login', function (): void {
     $user = $user->fresh();
     $user->forceFill(['two_factor_confirmed_at' => now()])->save();
 
-    $recoveryCodes = json_decode(decrypt($user->two_factor_recovery_codes), true);
+    $recoveryCodes = json_decode((string) decrypt($user->two_factor_recovery_codes), true);
 
     // Logout and login to trigger 2FA
     auth()->logout();

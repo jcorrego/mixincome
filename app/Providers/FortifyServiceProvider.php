@@ -9,6 +9,8 @@ use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -51,13 +53,13 @@ final class FortifyServiceProvider extends ServiceProvider
      */
     private function configureViews(): void
     {
-        Fortify::loginView(fn () => view('livewire.auth.login'));
-        Fortify::registerView(fn () => view('livewire.auth.register'));
-        Fortify::requestPasswordResetLinkView(fn () => view('livewire.auth.forgot-password'));
-        Fortify::resetPasswordView(fn () => view('livewire.auth.reset-password'));
-        Fortify::verifyEmailView(fn () => view('livewire.auth.verify-email'));
-        Fortify::confirmPasswordView(fn () => view('livewire.auth.confirm-password'));
-        Fortify::twoFactorChallengeView(fn () => view('livewire.auth.two-factor-challenge'));
+        Fortify::loginView(fn (): Factory|View => view('livewire.auth.login'));
+        Fortify::registerView(fn (): Factory|View => view('livewire.auth.register'));
+        Fortify::requestPasswordResetLinkView(fn (): Factory|View => view('livewire.auth.forgot-password'));
+        Fortify::resetPasswordView(fn (): Factory|View => view('livewire.auth.reset-password'));
+        Fortify::verifyEmailView(fn (): Factory|View => view('livewire.auth.verify-email'));
+        Fortify::confirmPasswordView(fn (): Factory|View => view('livewire.auth.confirm-password'));
+        Fortify::twoFactorChallengeView(fn (): Factory|View => view('livewire.auth.two-factor-challenge'));
     }
 
     /**
@@ -73,8 +75,6 @@ final class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($throttleKey);
         });
 
-        RateLimiter::for('two-factor', function (Request $request): Limit {
-            return Limit::perMinute(5)->by($request->session()->get('login.id'));
-        });
+        RateLimiter::for('two-factor', fn (Request $request): Limit => Limit::perMinute(5)->by($request->session()->get('login.id')));
     }
 }
