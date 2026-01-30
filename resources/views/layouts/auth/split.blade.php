@@ -8,7 +8,7 @@
             <div class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-e dark:border-white/10">
                 <div class="absolute inset-0 bg-linear-to-br from-slate-950 via-slate-900 to-slate-800"></div>
                 <a href="{{ route('home') }}" class="relative z-20 flex items-center" wire:navigate>
-                    <img src="/images/logo-white.svg" alt="MixIncome" class="h-8" />
+                    <img src="/images/logo-white.svg" alt="MixIncome" class="h-10" />
                 </a>
 
                 <div class="relative z-20 mt-auto">
@@ -47,8 +47,8 @@
             <div class="w-full lg:p-8">
                 <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                     <a href="{{ route('home') }}" class="z-20 flex flex-col items-center gap-2 font-medium lg:hidden" wire:navigate>
-                        <img src="/images/logo-color.svg" alt="MixIncome" class="h-8 dark:hidden" />
-                        <img src="/images/logo-white.svg" alt="MixIncome" class="hidden h-8 dark:block" />
+                        <img src="/images/logo-color.svg" alt="MixIncome" class="h-10 dark:hidden" />
+                        <img src="/images/logo-white.svg" alt="MixIncome" class="hidden h-10 dark:block" />
                     </a>
                     {{ $slot }}
                 </div>
