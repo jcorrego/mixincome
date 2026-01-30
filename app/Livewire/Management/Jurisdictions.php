@@ -7,6 +7,8 @@ namespace App\Livewire\Management;
 use App\Models\Jurisdiction;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -87,26 +89,26 @@ final class Jurisdictions extends Component
     }
 
     /**
-     * @return array<string, array<int, string>>
+     * @return array<string, array<int, Unique|string>>
      */
     private function createRules(): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'iso_code' => ['required', 'string', 'min:2', 'max:3', 'unique:jurisdictions,iso_code'],
+            'iso_code' => ['required', 'string', 'min:2', 'max:3', Rule::unique('jurisdictions', 'iso_code')],
             'timezone' => ['required', 'string', 'timezone'],
             'default_currency' => ['required', 'string', 'size:3'],
         ];
     }
 
     /**
-     * @return array<string, array<int, string>>
+     * @return array<string, array<int, Unique|string>>
      */
     private function updateRules(int $ignoreId): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'iso_code' => ['required', 'string', 'min:2', 'max:3', 'unique:jurisdictions,iso_code,'.$ignoreId],
+            'iso_code' => ['required', 'string', 'min:2', 'max:3', Rule::unique('jurisdictions', 'iso_code')->ignore($ignoreId)],
             'timezone' => ['required', 'string', 'timezone'],
             'default_currency' => ['required', 'string', 'size:3'],
         ];
