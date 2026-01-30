@@ -45,38 +45,27 @@
     $innerLeftColor = $version === 'white' ? 'rgba(255,255,255,0.5)' : '#00d4aa';
 @endphp
 
-<div {{ $attributes->merge(['class' => "relative {$sizeClasses} shrink-0"]) }}>
+<div {{ $attributes->merge(['class' => "relative {$sizeClasses} shrink-0"]) }} role="img" aria-label="MixIncome Logo">
     {{-- Outer rotating ring --}}
     <div class="absolute inset-0 rounded-full"
-         style="border: {{ $ringWidth }}px solid transparent; border-top-color: {{ $outerTopColor }}; border-right-color: {{ $outerRightColor }}; animation: {{ $outerAnimation }};">
+         style="border: {{ $ringWidth }}px solid transparent; border-top-color: {{ $outerTopColor }}; border-right-color: {{ $outerRightColor }}; animation: {{ $outerAnimation }};"
+         aria-hidden="true">
     </div>
 
     {{-- Inner counter-rotating ring --}}
     <div class="absolute rounded-full opacity-60"
-         style="inset: {{ $innerInset }}; border: {{ $innerRingWidth }}px solid transparent; border-bottom-color: {{ $innerBottomColor }}; border-left-color: {{ $innerLeftColor }}; animation: {{ $innerAnimation }};">
+         style="inset: {{ $innerInset }}; border: {{ $innerRingWidth }}px solid transparent; border-bottom-color: {{ $innerBottomColor }}; border-left-color: {{ $innerLeftColor }}; animation: {{ $innerAnimation }};"
+         aria-hidden="true">
     </div>
 
     {{-- Center M --}}
-    <div class="absolute inset-0 flex items-center justify-center font-extrabold font-['Outfit'] {{ $fontSize }}"
+    <div class="absolute inset-0 flex items-center justify-center font-extrabold font-display {{ $fontSize }}"
          @if($version === 'white')
              style="color: #ffffff;"
          @else
              style="background: linear-gradient(135deg, #00d4aa 0%, #0f62fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"
-         @endif>
+         @endif
+         aria-hidden="true">
         M
     </div>
 </div>
-
-@once
-<style>
-    @keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    @keyframes rotate-reverse {
-        from { transform: rotate(360deg); }
-        to { transform: rotate(0deg); }
-    }
-</style>
-@endonce

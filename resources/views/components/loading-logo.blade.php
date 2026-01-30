@@ -42,11 +42,17 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => "fixed inset-0 flex items-center justify-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm z-50"]) }}
-     style="animation: fadeOut {{ $duration }}s ease-in-out forwards;">
+     data-loading-logo
+     role="status"
+     aria-live="polite"
+     aria-label="{{ __('Loading...') }}"
+     style="animation: fadeOut {{ $duration }}s ease-in-out forwards;"
+     x-data
+     x-init="setTimeout(() => $el.remove(), {{ $duration * 1000 }})">
 
     <div class="flex flex-col items-center gap-4">
         {{-- Animated Logo --}}
-        <div class="relative {{ $sizeClasses }} shrink-0">
+        <div class="relative {{ $sizeClasses }} shrink-0" aria-hidden="true">
             {{-- Outer rotating ring --}}
             <div class="absolute inset-0 rounded-full"
                  style="border: {{ $ringWidth }}px solid transparent; border-top-color: {{ $outerTopColor }}; border-right-color: {{ $outerRightColor }}; animation: rotate {{ $duration }}s ease-out;">
@@ -58,7 +64,7 @@
             </div>
 
             {{-- Center M --}}
-            <div class="absolute inset-0 flex items-center justify-center font-extrabold font-['Outfit'] {{ $fontSize }}"
+            <div class="absolute inset-0 flex items-center justify-center font-extrabold font-display {{ $fontSize }}"
                  @if($version === 'white')
                      style="color: #ffffff;"
                  @else
@@ -70,46 +76,12 @@
 
         {{-- Loading Text --}}
         <div class="text-center">
-            <div class="text-lg font-semibold text-gray-900 dark:text-white font-['Outfit']">
+            <div class="text-lg font-semibold text-gray-900 dark:text-white font-display">
                 MixIncome
             </div>
             <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Cargando...
+                {{ __('Loading...') }}
             </div>
         </div>
     </div>
 </div>
-
-@once
-<style>
-    @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        75% { transform: rotate(360deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    @keyframes rotate-reverse {
-        0% { transform: rotate(360deg); }
-        75% { transform: rotate(0deg); }
-        100% { transform: rotate(0deg); }
-    }
-
-    @keyframes fadeOut {
-        0% { opacity: 1; }
-        75% { opacity: 1; }
-        100% { opacity: 0; pointer-events: none; }
-    }
-</style>
-@endonce
-
-<script>
-    // Auto-remove the loading component after animation completes
-    document.addEventListener('DOMContentLoaded', function() {
-        const loadingElement = document.querySelector('[data-loading-logo]');
-        if (loadingElement) {
-            setTimeout(() => {
-                loadingElement.remove();
-            }, {{ $duration * 1000 }});
-        }
-    });
-</script>
