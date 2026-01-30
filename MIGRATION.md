@@ -430,7 +430,7 @@ create_document_tags_table
 
 ---
 
-## Estado Actual (30 Enero 2026)
+## Estado Actual (31 Enero 2026)
 
 ### ✅ Completado
 
@@ -439,19 +439,17 @@ create_document_tags_table
 | **Fase 0: Fundamentos** | ✅ | Auth (Fortify), Sanctum, Livewire, Volt, Flux UI, Tailwind |
 | **Fase 0.5: UI Base** | ✅ | Logo animado, Jurisdictions CRUD |
 | **Fase 1.1: OpenSpec Design** | ✅ | `phase-1-1-user-profiles-entities-addresses` (5/5 artifacts) |
+| **Fase 1.1: Implementation** | ✅ | UserProfile, Entity, Address models + migrations + factories + 151 tests passing |
 
 ### 📋 Próximo Paso
 
-**Fase 1.1 Implementation** → `/opsx:apply phase-1-1-user-profiles-entities-addresses`
+**Fase 1.2 TaxYear Structure** (Después de 1.1)
 
 Esto creará:
-- 3 migrations (user_profiles, entities, addresses)
-- 1 enum (EntityType: LLC, SCorp, CCorp, Partnership, Trust, Other)
-- 3 models (UserProfile, Entity, Address) con relaciones + factories
-- ~75 tests (unit, feature, integration)
-- Validación de 100% type coverage
-
-**Estimado:** 4-6 horas de implementación
+- 1 migration (tax_years)
+- 1 enum (TaxYearStatus)
+- 1 model (TaxYear) con relaciones a UserProfile
+- ~20-30 tests
 
 ---
 

@@ -7,8 +7,8 @@ use App\Models\Address;
 use App\Models\Entity;
 use App\Models\UserProfile;
 
-describe('Factories & Realistic Data', function () {
-    it('21.1 UserProfileFactory generates realistic profile with valid jurisdiction', function () {
+describe('Factories & Realistic Data', function (): void {
+    it('21.1 UserProfileFactory generates realistic profile with valid jurisdiction', function (): void {
         $profile = UserProfile::factory()->create();
 
         expect($profile->user_id)->not->toBeNull()
@@ -16,7 +16,7 @@ describe('Factories & Realistic Data', function () {
             ->and($profile->tax_id)->not->toBeEmpty();
     });
 
-    it('21.1 UserProfileFactory generates jurisdiction-specific tax_id formats', function () {
+    it('21.2 UserProfileFactory generates jurisdiction-specific tax_id formats', function (): void {
         // Create profiles for different jurisdictions
         $profile = UserProfile::factory()->create();
 
@@ -25,14 +25,14 @@ describe('Factories & Realistic Data', function () {
             ->and(mb_strlen($profile->tax_id))->toBeGreaterThan(5);
     });
 
-    it('21.3 EntityFactory generates valid EntityType enum', function () {
+    it('21.3 EntityFactory generates valid EntityType enum', function (): void {
         $entity = Entity::factory()->create();
 
         expect($entity->entity_type)->toBeInstanceOf(EntityType::class)
             ->and($entity->entity_type)->toBeIn(EntityType::cases());
     });
 
-    it('21.4 EntityFactory generates realistic EIN-like tax_id', function () {
+    it('21.4 EntityFactory generates realistic EIN-like tax_id', function (): void {
         $entity = Entity::factory()->create();
 
         // EIN should match pattern XX-XXXXXXX or similar
@@ -40,7 +40,7 @@ describe('Factories & Realistic Data', function () {
             ->and(mb_strlen($entity->tax_id))->toBeGreaterThan(5);
     });
 
-    it('21.5 AddressFactory generates realistic street, city, state, country', function () {
+    it('21.5 AddressFactory generates realistic street, city, state, country', function (): void {
         $address = Address::factory()->create();
 
         expect($address->street)->not->toBeEmpty()
@@ -50,7 +50,7 @@ describe('Factories & Realistic Data', function () {
             ->and(mb_strlen($address->country))->toBe(2); // ISO country code
     });
 
-    it('21.6 Factories can be chained (UserProfile → Entities → Addresses)', function () {
+    it('21.6 Factories can be chained (UserProfile → Entities → Addresses)', function (): void {
         $profile = UserProfile::factory()
             ->has(Entity::factory()->count(2))
             ->create();
