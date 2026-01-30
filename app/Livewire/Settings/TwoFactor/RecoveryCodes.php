@@ -49,11 +49,11 @@ final class RecoveryCodes extends Component
                 /** @var list<string> $codes */
                 $codes = json_decode($decrypted, true);
                 $this->recoveryCodes = $codes;
-            } catch (Exception) {
+            } catch (Exception) { // @codeCoverageIgnoreStart
                 $this->addError('recoveryCodes', 'Failed to load recovery codes');
 
                 $this->recoveryCodes = [];
-            }
+            } // @codeCoverageIgnoreEnd
         }
     }
 

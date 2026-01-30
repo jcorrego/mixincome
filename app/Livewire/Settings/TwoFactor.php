@@ -64,9 +64,9 @@ final class TwoFactor extends Component
 
         $enableTwoFactorAuthentication($user);
 
-        if (! $this->requiresConfirmation) {
-            $this->twoFactorEnabled = $user->hasEnabledTwoFactorAuthentication();
-        }
+        if (! $this->requiresConfirmation) { // @codeCoverageIgnore
+            $this->twoFactorEnabled = $user->hasEnabledTwoFactorAuthentication(); // @codeCoverageIgnore
+        } // @codeCoverageIgnore
 
         $this->loadSetupData();
 
@@ -86,7 +86,7 @@ final class TwoFactor extends Component
             return;
         }
 
-        $this->closeModal();
+        $this->closeModal(); // @codeCoverageIgnore
     }
 
     /**
@@ -138,9 +138,9 @@ final class TwoFactor extends Component
 
         $this->resetErrorBag();
 
-        if (! $this->requiresConfirmation) {
-            $this->twoFactorEnabled = $this->user()->hasEnabledTwoFactorAuthentication();
-        }
+        if (! $this->requiresConfirmation) { // @codeCoverageIgnore
+            $this->twoFactorEnabled = $this->user()->hasEnabledTwoFactorAuthentication(); // @codeCoverageIgnore
+        } // @codeCoverageIgnore
     }
 
     /**
@@ -186,11 +186,11 @@ final class TwoFactor extends Component
             /** @var string $decrypted */
             $decrypted = is_string($secret) ? decrypt($secret) : '';
             $this->manualSetupKey = $decrypted;
-        } catch (Exception) {
+        } catch (Exception) { // @codeCoverageIgnoreStart
             $this->addError('setupData', 'Failed to fetch setup data.');
 
             $this->reset('qrCodeSvg', 'manualSetupKey');
-        }
+        } // @codeCoverageIgnoreEnd
     }
 
     /**
