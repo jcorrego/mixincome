@@ -10,6 +10,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property-read int $id
@@ -18,13 +20,16 @@ use Illuminate\Notifications\Notifiable;
  * @property-read CarbonInterface|null $email_verified_at
  * @property-read string $password
  * @property-read string|null $remember_token
+ * @property-read string|null $two_factor_secret
+ * @property-read string|null $two_factor_recovery_codes
+ * @property-read CarbonInterface|null $two_factor_confirmed_at
  * @property-read CarbonInterface $created_at
  * @property-read CarbonInterface $updated_at
  */
 final class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * @var list<string>
@@ -32,7 +37,20 @@ final class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
+
+    /**
+     * Get the user's initials.
+     */
+    public function initials(): string
+    {
+        return collect(explode(' ', $this->name))
+            ->map(fn (string $segment): string => mb_strtoupper(mb_substr($segment, 0, 1)))
+            ->take(2)
+            ->implode('');
+    }
 
     /**
      * @return array<string, string>
@@ -46,6 +64,7 @@ final class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'remember_token' => 'string',
+            'two_factor_confirmed_at' => 'datetime',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
