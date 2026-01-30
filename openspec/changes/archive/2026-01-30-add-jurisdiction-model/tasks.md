@@ -61,4 +61,4 @@
 - [x] 9.3 Run linter: vendor/bin/pint
 - [x] 9.4 Run static analysis: vendor/bin/phpstan
 - [x] 9.5 Verify type coverage: composer test
-- [ ] 9.6 Test UI manually at /management/jurisdictions
+- [x] 9.6 Test UI manually at /management/jurisdictions
