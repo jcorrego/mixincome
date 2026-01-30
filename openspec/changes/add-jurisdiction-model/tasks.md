@@ -8,9 +8,9 @@
 
 ## 2. Model Layer
 
-- [ ] 2.1 Create Jurisdiction model with declare(strict_types=1)
-- [ ] 2.2 Add fillable attributes and PHPDoc
-- [ ] 2.3 Add relationship method stubs: userProfiles(), entities() (return HasMany with proper types)
+- [x] 2.1 Create Jurisdiction model with declare(strict_types=1)
+- [x] 2.2 Add fillable attributes and PHPDoc
+- [x] 2.3 Add relationship method stubs: userProfiles(), entities() (return HasMany with proper types)
 
 ## 3. Routes
 
