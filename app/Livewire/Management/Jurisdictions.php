@@ -29,7 +29,7 @@ final class Jurisdictions extends Component
 
         Jurisdiction::query()->create($validated);
 
-        $this->modal('create-jurisdiction')->close();
+        $this->dispatch('modal-close', name: 'create-jurisdiction');
         $this->resetForm();
     }
 
@@ -43,7 +43,7 @@ final class Jurisdictions extends Component
         $this->timezone = $jurisdiction->timezone;
         $this->default_currency = $jurisdiction->default_currency;
 
-        $this->modal('edit-jurisdiction')->show();
+        $this->dispatch('modal-show', name: 'edit-jurisdiction');
     }
 
     public function update(): void
@@ -55,7 +55,7 @@ final class Jurisdictions extends Component
 
         $jurisdiction->update($validated);
 
-        $this->modal('edit-jurisdiction')->close();
+        $this->dispatch('modal-close', name: 'edit-jurisdiction');
         $this->resetForm();
     }
 
@@ -68,7 +68,7 @@ final class Jurisdictions extends Component
 
     public function cancelEdit(): void
     {
-        $this->modal('edit-jurisdiction')->close();
+        $this->dispatch('modal-close', name: 'edit-jurisdiction');
         $this->resetForm();
     }
 
