@@ -7,9 +7,8 @@
         <div class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-e dark:border-white/10">
                 <div class="absolute inset-0 bg-linear-to-br from-slate-950 via-slate-900 to-slate-800"></div>
-                <a href="{{ route('home') }}" class="relative z-20 flex items-center gap-2 text-lg font-medium" wire:navigate>
-                    <img src="/images/icon-white.png" alt="MixIncome" class="h-8 w-8" />
-                    {{ config('app.name', 'Laravel') }}
+                <a href="{{ route('home') }}" class="relative z-20 flex items-center" wire:navigate>
+                    <img src="/images/logo-white.svg" alt="MixIncome" class="h-8" />
                 </a>
 
                 <div class="relative z-20 mt-auto">
@@ -30,9 +29,7 @@
                         </div>
                         <div class="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4">
                             <div class="flex items-center gap-3">
-                                <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10">
-                                    <img src="/images/icon-white.png" alt="MixIncome" class="size-6" />
-                                </span>
+                                <img src="/images/logo-white.svg" alt="MixIncome" class="h-6" />
                                 <div>
                                     <p class="text-[10px] uppercase tracking-[0.25em] text-emerald-200">Overview</p>
                                     <flux:heading size="sm" class="text-white">Tax Assistant</flux:heading>
@@ -50,9 +47,8 @@
             <div class="w-full lg:p-8">
                 <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                     <a href="{{ route('home') }}" class="z-20 flex flex-col items-center gap-2 font-medium lg:hidden" wire:navigate>
-                        <img src="/images/icon-dark.png" alt="MixIncome" class="h-9 w-9 dark:hidden" />
-                        <img src="/images/icon-white.png" alt="MixIncome" class="hidden h-9 w-9 dark:block" />
-                        <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+                        <img src="/images/logo-color.svg" alt="MixIncome" class="h-8 dark:hidden" />
+                        <img src="/images/logo-white.svg" alt="MixIncome" class="hidden h-8 dark:block" />
                     </a>
                     {{ $slot }}
                 </div>
