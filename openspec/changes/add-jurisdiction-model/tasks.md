@@ -2,9 +2,9 @@
 
 ## 1. Database Layer
 
-- [ ] 1.1 Create migration `create_jurisdictions_table` with fields: id, name, iso_code (3-char unique), timezone, default_currency (3-char), timestamps
-- [ ] 1.2 Create JurisdictionFactory with realistic faker data
-- [ ] 1.3 Create JurisdictionSeeder with upsert for ES, US, CO jurisdictions
+- [x] 1.1 Create migration `create_jurisdictions_table` with fields: id, name, iso_code (3-char unique), timezone, default_currency (3-char), timestamps
+- [x] 1.2 Create JurisdictionFactory with realistic faker data
+- [x] 1.3 Create JurisdictionSeeder with upsert for ES, US, CO jurisdictions
 
 ## 2. Model Layer
 
@@ -34,25 +34,25 @@
 
 ## 6. Tests - Feature
 
-- [ ] 6.1 Create tests/Feature/Management/JurisdictionTest.php
-- [ ] 6.2 Write auth tests (view page, redirect unauth)
-- [ ] 6.3 Write create tests (valid, duplicate, invalid length, missing fields)
-- [ ] 6.4 Write update tests (valid, duplicate iso_code, invalid timezone)
-- [ ] 6.5 Write delete tests (no dependencies)
+- [x] 6.1 Create tests/Feature/Management/JurisdictionTest.php
+- [x] 6.2 Write auth tests (view page, redirect unauth)
+- [x] 6.3 Write create tests (valid, duplicate, invalid length, missing fields)
+- [x] 6.4 Write update tests (valid, duplicate iso_code, invalid timezone)
+- [x] 6.5 Write delete tests (no dependencies)
 
 ## 7. Tests - Unit
 
-- [ ] 7.1 Create tests/Unit/Models/JurisdictionTest.php
-- [ ] 7.2 Write factory validation test
-- [ ] 7.3 Write fillable attributes test
-- [ ] 7.4 Write unique constraint test
+- [x] 7.1 Create tests/Unit/Models/JurisdictionTest.php
+- [x] 7.2 Write factory validation test
+- [x] 7.3 Write fillable attributes test
+- [x] 7.4 Write unique constraint test
 
 ## 8. Tests - Seeder
 
-- [ ] 8.1 Create tests/Unit/Seeders/JurisdictionSeederTest.php
-- [ ] 8.2 Write seeder creates 3 jurisdictions test
-- [ ] 8.3 Write seeder idempotent test
-- [ ] 8.4 Write seeder data validation tests (ES, US, CO)
+- [x] 8.1 Create tests/Unit/Seeders/JurisdictionSeederTest.php
+- [x] 8.2 Write seeder creates 3 jurisdictions test
+- [x] 8.3 Write seeder idempotent test
+- [x] 8.4 Write seeder data validation tests (ES, US, CO)
 
 ## 9. Quality & Finalization
 

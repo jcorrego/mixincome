@@ -25,14 +25,14 @@
 
 ## 5. Unit Tests - Model Behavior
 
-- [ ] 5.1 Factory creates valid jurisdiction with correct attribute types
-- [ ] 5.2 Fillable attributes work correctly
-- [ ] 5.3 Database enforces unique constraint on iso_code
+- [x] 5.1 Factory creates valid jurisdiction with correct attribute types
+- [x] 5.2 Fillable attributes work correctly
+- [x] 5.3 Database enforces unique constraint on iso_code
 
 ## 6. Unit Tests - Seeder
 
-- [ ] 6.1 Seeder creates 3 initial jurisdictions (ES, US, CO)
-- [ ] 6.2 Seeder is idempotent (can run multiple times without duplicates)
-- [ ] 6.3 Seeder creates correct data for Spain (ES, Europe/Madrid, EUR)
-- [ ] 6.4 Seeder creates correct data for USA (US, America/New_York, USD)
-- [ ] 6.5 Seeder creates correct data for Colombia (CO, America/Bogota, COP)
+- [x] 6.1 Seeder creates 3 initial jurisdictions (ES, US, CO)
+- [x] 6.2 Seeder is idempotent (can run multiple times without duplicates)
+- [x] 6.3 Seeder creates correct data for Spain (ES, Europe/Madrid, EUR)
+- [x] 6.4 Seeder creates correct data for USA (US, America/New_York, USD)
+- [x] 6.5 Seeder creates correct data for Colombia (CO, America/Bogota, COP)
