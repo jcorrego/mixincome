@@ -107,7 +107,7 @@ rules:
     - Break into small, sequential implementation steps
     - Each task should be completable in under 2 hours
     - Include test tasks for each functional change
-  spec:
+  specs:
     - Use SHALL/MUST for normative requirements
     - Every requirement must have at least one scenario
     - Use #### Scenario: format (4 hashtags)
