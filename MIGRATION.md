@@ -144,7 +144,7 @@
 - [x] Configurar `openspec/config.yaml` con contexto del proyecto (migrado de Velor project.md)
 - [x] Instalar paquetes base: Fortify, Sanctum, Livewire, Volt, Flux UI
 - [x] Configurar auth (Fortify) — full auth flows, settings, 2FA, layouts, 60 tests passing
-- [ ] Actualizar CLAUDE.md con architecture overview
+- [x] Actualizar CLAUDE.md con architecture overview
 
 ### Fase 1: Schema y Modelos Core
 - [ ] Migrar migraciones de DB (adaptar a strict types)

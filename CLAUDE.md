@@ -48,8 +48,89 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 ## Application Structure & Architecture
 
+### Project Overview
+
+MixIncome is a multi-jurisdiction tax assistant platform (Spain, USA, Colombia) that centralizes financial data from multiple sources and currencies, maps transactions to tax-relevant categories, and produces summaries, checklists, and exports for tax preparation — without providing formal tax advice.
+
+### Tech Stack Details
+
+- **Base**: nunomaduro/laravel-starter-kit (ultra-strict, type-safe, immutable-first)
+- **Backend**: Laravel 12, PHP 8.4, MySQL 8
+- **Frontend**: Blade + Livewire v4 + Volt v1 (single-file components), Flux UI Free v2, Tailwind CSS v4
+- **Auth**: Fortify v1 + Sanctum v4 (API tokens)
+- **Testing**: Pest v4 (100% type coverage), PHPUnit v12, Playwright (browser tests)
+- **Quality**: Laravel Pint, Larastan v3 (level 9), Rector v2, Prettier v3
+- **Tooling**: Laravel Boost (MCP), Laravel Herd, Bun (not npm)
+- **Production**: Laravel Forge using mixincome.com domain
+
+### Directory Structure Conventions
+
 - Stick to existing directory structure; don't create new base folders without approval.
 - Do not change the application's dependencies without approval.
+- Laravel 12 streamlined structure: middleware in `bootstrap/app.php`, no `app/Console/Kernel.php`
+- Use `bun` instead of `npm` for JS dependencies
+
+### Domain Model Hierarchy
+
+```
+User
+├── UserProfiles (jurisdiction-specific tax profiles)
+├── Entities (Individual, LLC, etc.)
+│   ├── Address (polymorphic)
+│   ├── Accounts → Transactions, YearEndValues
+│   ├── Assets → AssetValuations, YearEndValues
+│   └── Documents (polymorphic)
+├── ResidencyPeriods (tax residency tracking)
+└── Filings (tax year filings per jurisdiction)
+
+Transaction (multi-currency financial transactions)
+├── Account (bank/financial account)
+├── TransactionCategory (tax-relevant categories)
+├── OriginalCurrency / ConvertedCurrency
+├── TransactionImport (batch import tracking)
+└── Documents (receipts, invoices, etc.)
+
+CategoryTaxMapping
+├── TransactionCategory
+├── TaxFormCode (5472, 1120, Schedule E, IRPF, etc.)
+└── LineItem (specific form line numbers)
+
+FxRate (multi-currency exchange rates)
+├── SourceCurrency / TargetCurrency
+└── Date + Rate (historical ECB data)
+```
+
+### Key Services Architecture
+
+**Finance Services** (`App\Finance\Services\`):
+- `TransactionImportService`: CSV/QIF/PDF parsing, duplicate detection, FX conversion
+- `FxRateService`: Multi-currency with ECB API, caching, historical rates
+- `TransactionCategorizationService`: Rule-based categorization (manual, regex, DB rules)
+
+**Tax Reporting Services** (`App\Finance\Services\`):
+- `UsTaxReportingService`: Form 5472, pro-forma 1120, Schedule E, 1040-NR
+- `SpainTaxReportingService`: IRPF summaries, Modelo 720
+- `ColombiaTaxReportingService`: Rental income summaries
+
+**Jobs** (`App\Jobs\`):
+- `SyncEcbExchangeRates`: Daily FX rate synchronization from ECB
+
+**Commands** (`App\Console\Commands\`):
+- `ScheduleFinanceSync`: Scheduled financial data synchronization
+
+### External Integrations (Planned)
+
+- **Financial data sources**: YNAB API/CSV, Mercury API/CSV, Banco Santander CSV (PSD2 later), Bancolombia CSV
+- **OCR pipeline**: smalot/pdfparser + Tesseract for document text extraction
+- **Search**: Algolia (planned), with DB FTS fallback
+- **FX rates**: ECB API for EUR exchange rates
+
+### Multi-Currency Support
+
+- Primary currencies: USD, EUR, COP
+- All transactions stored in original currency + converted to user's base currency
+- Historical FX rates cached from ECB API
+- Configurable base currency per user profile
 
 ## Frontend Bundling
 
