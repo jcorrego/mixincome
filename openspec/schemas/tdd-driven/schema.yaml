@@ -188,34 +188,53 @@ apply:
   instruction: |
     ## Apply: Branch → Red → Green → PR
 
-    Follow this workflow strictly:
+    Follow this workflow strictly. Each phase has a GATE that MUST pass before proceeding.
 
-    ### 1. Branch
-    Create a feature branch for this change:
+    ### 1. Branch (MANDATORY — do this FIRST)
+    Create a feature branch for this change BEFORE writing any code:
     ```bash
     git checkout -b change/<change-id>
     ```
 
+    **🚫 GATE: No branch, no work.**
+    - Verify you are on the correct branch: `git branch --show-current`
+    - The branch name MUST match `change/<change-id>`.
+    - If you are on `main` or any other branch, STOP and create the branch.
+    - Do NOT proceed to Red Phase until the branch exists and is checked out.
+
     ### 2. Red Phase (from tests.md)
-    - Read `tests.md` and create all test files using Pest.
+    - Read `tests.md` and create ALL test files using Pest.
     - Run the tests: `php artisan test --compact`
-    - **Verify they ALL FAIL.** If any pass, the test is not testing new behavior — fix it.
+    - **🚫 GATE: ALL tests MUST FAIL.**
+      - Capture and log the test output showing failures.
+      - If ANY test passes, it's not testing new behavior — fix the test.
+      - Do NOT proceed to Green Phase until every test is RED.
+    - Mark each test in `tests.md` as `[x]` once the test FILE is created (not passing — just exists and fails).
     - Commit: `git commit -m "test: add failing tests for <change-id>"`
 
     ### 3. Green Phase (from tasks.md)
-    - Work through `tasks.md` sequentially.
-    - After each task group, run the associated tests.
-    - Mark tasks as `[x]` when their tests pass.
-    - Do NOT move to the next group until current tests are green.
+    - Work through `tasks.md` sequentially, group by group.
+    - **🚫 GATE per group: Run associated tests after EACH task group.**
+      - Log the test output after each group.
+      - Mark tasks as `[x]` in `tasks.md` only when their tests pass.
+      - Do NOT move to the next group until current group's tests are GREEN.
+    - Also update `tests.md` — mark the corresponding test checkboxes `[x]` as they go green.
     - Commit after each group: `git commit -m "feat: <description>"`
 
     ### 4. Refactor Phase
     - Run full test suite: `composer test`
     - Run linting: `composer lint`
-    - Fix any issues without breaking tests.
+    - **🚫 GATE: `composer test` MUST exit 0 (all tests green, PHPStan clean, lint clean, type coverage 100%).**
+      - If anything fails, fix it without breaking existing green tests.
+      - Re-run `composer test` until fully green.
     - Commit: `git commit -m "refactor: cleanup <change-id>"`
 
-    ### 5. Pull Request
+    ### 5. Finalize Artifacts
+    - Verify ALL checkboxes in `tests.md` are `[x]`.
+    - Verify ALL checkboxes in `tasks.md` are `[x]`.
+    - **🚫 GATE: Both files must be 100% checked before PR or archive.**
+
+    ### 6. Pull Request
     - Push the branch: `git push origin change/<change-id>`
     - Create PR with summary from proposal.md
     - Link to the change directory for reviewers
@@ -224,3 +243,4 @@ apply:
     - Pause if any test fails unexpectedly after going green.
     - Pause if you need to modify a spec (go back to specs artifact).
     - Pause if a dependency or blocker is discovered.
+    - Pause if `composer test` fails and the fix is non-trivial.
