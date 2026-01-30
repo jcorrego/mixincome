@@ -1,1 +1,1 @@
-<img src="/images/icon-dark.svg" alt="MixIncome" {{ $attributes }} />
+<img src="/images/icon-dark.png" alt="MixIncome" {{ $attributes }} />
