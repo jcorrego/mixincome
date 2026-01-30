@@ -24,4 +24,43 @@ final class JurisdictionFactory extends Factory
             'default_currency' => fake()->currencyCode(),
         ];
     }
+
+    /**
+     * Spain jurisdiction state
+     */
+    public function spain(): static
+    {
+        return $this->state([
+            'name' => 'Spain',
+            'iso_code' => 'ES',
+            'timezone' => 'Europe/Madrid',
+            'default_currency' => 'EUR',
+        ]);
+    }
+
+    /**
+     * United States jurisdiction state
+     */
+    public function usa(): static
+    {
+        return $this->state([
+            'name' => 'United States',
+            'iso_code' => 'US',
+            'timezone' => 'America/New_York',
+            'default_currency' => 'USD',
+        ]);
+    }
+
+    /**
+     * Colombia jurisdiction state
+     */
+    public function colombia(): static
+    {
+        return $this->state([
+            'name' => 'Colombia',
+            'iso_code' => 'CO',
+            'timezone' => 'America/Bogota',
+            'default_currency' => 'COP',
+        ]);
+    }
 }

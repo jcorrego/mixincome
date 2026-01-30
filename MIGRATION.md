@@ -140,37 +140,339 @@
 
 ## Plan de migración sugerido
 
-### Fase 0: Fundamentos ✅
+### Fase 0: Fundamentos ✅ COMPLETADA
 - [x] Configurar `openspec/config.yaml` con contexto del proyecto (migrado de Velor project.md)
 - [x] Instalar paquetes base: Fortify, Sanctum, Livewire, Volt, Flux UI
 - [x] Configurar auth (Fortify) — full auth flows, settings, 2FA, layouts, 60 tests passing
 - [x] Actualizar CLAUDE.md con architecture overview
 
-### Fase 1: Schema y Modelos Core
-- [ ] Migrar migraciones de DB (adaptar a strict types)
-- [ ] Migrar modelos con factories y seeders
-- [ ] Migrar Enums
-- [ ] Migrar relaciones y casts
+### Fase 0.5: UI Base ✅ COMPLETADA
+- [x] Migrar logo a animado (spinning arcs)
+- [x] Configura jurisdictions: migration, modelo, interfaz CRUD
 
-### Fase 2: Services Layer
-- [ ] FxRateService
-- [ ] TransactionImportService
-- [ ] TransactionCategorizationService
+### Fase 1: Schema y Modelos Core (Base Domain)
+**Objetivo:** Establecer la estructura base de datos con todos los modelos core y sus relaciones. Sin esta fase, no se pueden hacer otras.
+
+#### 1.1 User Profiles & Entities & Addresses ✅ OPENSPEC DISEÑADO
+Dependencias: User (existe), Jurisdiction (✅ migrado)
+
+**OpenSpec Change:** `phase-1-1-user-profiles-entities-addresses` (5/5 artifacts complete)
+- Location: `openspec/changes/phase-1-1-user-profiles-entities-addresses/`
+- Schema: tdd-driven (proposal → design → specs → tests → tasks)
+- Status: Ready for implementation (`/opsx:apply`) or archive
+
+**Modelos a crear:**
+
+- `UserProfile` — Perfil tax para usuario + jurisdicción
+  - Relaciones: belongsTo(User), belongsTo(Jurisdiction), hasMany(Entity), morphOne(Address)
+  - Campos: user_id, jurisdiction_id, tax_id (SSN, RUT, NIF, etc.), status, timestamps
+  - Factory + Tests
+  - **Nota:** Sin metadata, sin base_currency (derivar de Jurisdiction.default_currency), sin tax_year_start
+
+- `Entity` — Entidades legales ADICIONALES (NO Individual)
+  - Types: LLC, SCorp, CCorp, Partnership, Trust, Other (sin "Individual")
+  - Relaciones: belongsTo(UserProfile), morphOne(Address)
+  - Campos: user_profile_id, name, entity_type (Enum), tax_id, status, timestamps
+  - Factory + Tests
+  - **Nota:** No se crean automáticamente; usuario las crea explícitamente
+
+- `Address` (Polymorphic, Reutilizable, con owner)
+  - Relaciones: morphTo(addressable: UserProfile, Entity, Account, Asset), belongsTo(User as owner)
+  - Campos: addressable_id, addressable_type, user_id (owner), street, city, state, postal_code, country, timestamps
+  - Factory + Tests
+  - **Nota:** Sin tipo (no AddressType enum); una dirección por modelo; reutilizable entre modelos del mismo usuario
+
+**Database Migrations to Create:**
+```
+create_user_profiles_table
+create_entities_table
+create_addresses_table
+```
+
+**Enums to Create:**
+- `EntityType` (LLC, SCorp, CCorp, Partnership, Trust, Other) — NO Individual
+
+#### 1.2 Tax Year Structure (FASE 1.2 - PRÓXIMA)
+Dependencias: UserProfile
+
+**Modelos a crear (cuando Fase 1.1 complete):**
+- `TaxYear` — Año fiscal por UserProfile
+  - Relaciones: belongsTo(UserProfile), hasMany(Filing), hasMany(Transaction) where year=TaxYear.year
+  - Campos: user_profile_id, year (int), status (Enum: Draft, InProgress, Filed, Reviewed)
+  - Factory + Tests
+
+**Enums (Fase 1.2):**
+- `TaxYearStatus` (Draft, InProgress, Filed, Reviewed)
+- `FilingStatus` (Draft, InProgress, Submitted, Accepted, Amended, Archived)
+
+**Nota:** ResidencyPeriod removido (complejidad diferida; implementar si necesario más adelante)
+
+---
+
+### Fase 2: Finance Schema (Cuentas, Transacciones, Divisas)
+**Objetivo:** Sistema completo de finanzas multi-moneda con FX rates históricos.
+
+#### 2.1 Currencies & Exchange Rates (`currencies`, `fx_rates`)
+Dependencias: Ninguna
+
+Modelos a crear:
+- `Currency` — Moneda (USD, EUR, COP, etc.)
+  - Relaciones: hasMany(FxRate as source), hasMany(FxRate as target)
+  - Campos: code (ISO 4217), name, symbol, is_primary
+  - Factory + Seeder (precargado: USD, EUR, COP, CAD, GBP)
+
+- `FxRate` — Tasa de cambio histórica
+  - Relaciones: belongsTo(Currency, 'source_currency_id'), belongsTo(Currency, 'target_currency_id')
+  - Campos: source_currency_id, target_currency_id, date, rate, source (Enum: ECB, Manual, API)
+  - Factory + Tests
+  - Índices: (source_currency_id, target_currency_id, date) unique
+
+**Database Migrations to Create:**
+```
+create_currencies_table
+create_fx_rates_table
+```
+
+**Enums to Create:**
+- `FxRateSource` (ECB, Manual, YNAB, Mercury, BancoSantander, Bancolombia)
+
+---
+
+#### 2.2 Accounts & Transactions (`accounts`, `transactions`, `transaction_categories`, `transaction_imports`)
+Dependencias: Entity, TaxYear, Currency
+
+Modelos a crear:
+- `Account` — Cuenta financiera (Bank, Credit Card, Crypto wallet, etc.)
+  - Relaciones: belongsTo(Entity), hasMany(Transaction), hasMany(YearEndValue)
+  - Campos: entity_id, name, account_type (Enum), currency_id, account_number (encrypted), balance_opening, status
+  - Factory + Tests
+
+- `TransactionCategory` — Categoría tax-relevante (Business Income, Rental Income, Interest Expense, etc.)
+  - Relaciones: hasMany(Transaction), hasMany(CategoryTaxMapping)
+  - Campos: code, name, category_type (Enum: Income, Expense, Transfer, Other), description
+  - Seeder (precargado con ~40 categorías estándar)
+
+- `Transaction` — Transacción financiera
+  - Relaciones: belongsTo(Account), belongsTo(TransactionCategory, nullable), belongsTo(TransactionImport), morphMany(Document)
+  - Campos: account_id, category_id, import_id, date, description, amount_original, currency_original_id, amount_converted, currency_converted_id, exchange_rate, fx_rate_id (nullable), notes, metadata
+  - Factory + Tests
+  - Índices: (account_id, date), (category_id, date)
+
+- `TransactionImport` — Lote de importación (CSV, QIF, API)
+  - Relaciones: belongsTo(Entity), hasMany(Transaction), hasMany(Document)
+  - Campos: entity_id, import_type (Enum), file_name, import_date, row_count, status (Enum: Processing, Imported, Failed, Duplicate), error_message
+  - Factory + Tests
+
+- `ImportBatch` — Batch antiguo si existe, o renombrar a TransactionImport
+  - Deprecated: Mover lógica a TransactionImport
+
+**Database Migrations to Create:**
+```
+create_accounts_table
+create_transaction_categories_table
+create_transactions_table
+create_transaction_imports_table
+```
+
+**Enums to Create:**
+- `AccountType` (Checking, Savings, CreditCard, Investment, Crypto, Cash, Loan, LineOfCredit)
+- `TransactionCategoryType` (Income, Expense, Transfer, Tax, Other)
+- `ImportType` (CSV, QIF, PDF, YNABSync, MercuryAPI, SantanderCSV, BancolombiaSFTP)
+- `ImportStatus` (Processing, Imported, Failed, Duplicate, Review)
+
+---
+
+#### 2.3 Assets & Valuations (`assets`, `asset_valuations`, `year_end_values`)
+Dependencias: Entity, TaxYear, Currency
+
+Modelos a crear:
+- `Asset` — Activo (Real Estate, Investments, Vehicles, etc.)
+  - Relaciones: belongsTo(Entity), hasMany(AssetValuation), hasMany(YearEndValue)
+  - Campos: entity_id, name, asset_type (Enum), acquisition_date, acquisition_cost, currency_id, location, description, status
+  - Factory + Tests
+
+- `AssetValuation` — Valuación de activo en punto en tiempo
+  - Relaciones: belongsTo(Asset), belongsTo(Currency), hasMany(Document)
+  - Campos: asset_id, valuation_date, value, currency_id, valuation_method (Enum: Appraisal, MarketValue, CostBasis, Other), notes
+  - Factory + Tests
+
+- `YearEndValue` — Valor resumido de activo/cuenta al final de año fiscal
+  - Relaciones: belongsTo(TaxYear), morphTo(valueable) [Account o Asset]
+  - Campos: tax_year_id, valueable_id, valueable_type, value, currency_id
+  - Factory + Tests
+  - Índice: (tax_year_id, valueable_id, valueable_type) unique
+
+**Database Migrations to Create:**
+```
+create_assets_table
+create_asset_valuations_table
+create_year_end_values_table
+```
+
+**Enums to Create:**
+- `AssetType` (RealEstate, Stock, Bond, CryptoCurrency, Vehicle, Artwork, Other)
+- `ValuationMethod` (Appraisal, MarketValue, CostBasis, FairMarketValue, Other)
+
+---
+
+### Fase 3: Tax Reporting Schema
+**Objetivo:** Mapeos tax, filings, reglas de categorización.
+
+#### 3.1 Tax Mapping (`category_tax_mappings`, `description_category_rules`)
+Dependencias: TransactionCategory, Jurisdiction, TaxYear
+
+Modelos a crear:
+- `CategoryTaxMapping` — Mapeo: TransactionCategory → Form Code → Line Item
+  - Relaciones: belongsTo(TransactionCategory), belongsTo(Jurisdiction), belongsTo(TaxYear, nullable)
+  - Campos: category_id, jurisdiction_id, tax_year_id, form_code (Enum: F5472, F1120, ScheduleE, IRPF, Modelo720, ColombiaDeclExt), line_item (string), description
+  - Factory + Tests
+  - Índice: (jurisdiction_id, category_id) unique
+
+- `DescriptionCategoryRule` — Regla: patrones de descripción → TransactionCategory
+  - Relaciones: belongsTo(TransactionCategory), belongsTo(Entity)
+  - Campos: entity_id, category_id, pattern (regex), rule_type (Enum: Regex, Contains, Exact), is_active, priority
+  - Factory + Tests
+  - Índice: (entity_id, rule_type)
+
+**Database Migrations to Create:**
+```
+create_category_tax_mappings_table
+create_description_category_rules_table
+```
+
+**Enums to Create:**
+- `TaxFormCode` (F5472, F1120, ScheduleE, F1040NR, F1042, IRPF, Modelo720, DeclaracionRentaColombiana, Other)
+- `CategoryRuleType` (Regex, Contains, Exact, StartsWith, EndsWith)
+
+#### 3.2 Filings (`filings`, `filing_types`)
+Dependencias: TaxYear, Entity, Jurisdiction
+
+Modelos a crear:
+- `FilingType` — Tipo de declaración (Income Tax, Entity Tax, Quarterly Estimated, Amendment)
+  - Campos: code, name, jurisdiction_id, form_code, required_fields
+  - Seeder (precargado por jurisdicción)
+
+- `Filing` — Declaración de impuestos completada
+  - Relaciones: belongsTo(TaxYear), belongsTo(Entity), belongsTo(FilingType), hasMany(Document)
+  - Campos: tax_year_id, entity_id, filing_type_id, status (Enum: Draft, InProgress, Submitted, Accepted, Amended, Archived), submission_date, filing_reference, notes, metadata
+  - Factory + Tests
+
+**Database Migrations to Create:**
+```
+create_filing_types_table
+create_filings_table
+```
+
+---
+
+### Fase 4: Documents & Supporting Artifacts
+**Objetivo:** Sistema de documentos polimórficos (receipts, invoices, appraisals, etc.)
+
+#### 4.1 Documents (`documents`, `document_tags`)
+Dependencias: Polymorphic (Entity, Transaction, AssetValuation, Filing)
+
+Modelos a crear:
+- `Document` (Polymorphic) — Archivo (Recibo, Factura, Valuación, etc.)
+  - Relaciones: morphTo(documentable), hasMany(DocumentTag), belongsTo(DocumentType)
+  - Campos: documentable_id, documentable_type, document_type_id, file_path, original_filename, mime_type, file_size, uploaded_date, extracted_text (para OCR)
+  - Factory + Tests
+
+- `DocumentTag` — Etiqueta de documento (Invoice, Receipt, AppraisalReport, TaxReturn, BankStatement)
+  - Relaciones: hasMany(Document)
+  - Campos: name, description
+
+**Database Migrations to Create:**
+```
+create_documents_table
+create_document_tags_table
+```
+
+---
+
+### Resumen de Orden de Migración Recomendado
+
+```
+1. Jurisdictions        ✅ HECHO
+2. UserProfiles + Entities + Addresses    ✅ DISEÑADO (OpenSpec: phase-1-1-user-profiles-entities-addresses)
+3. TaxYears (Fase 1.2)                    ← PRÓXIMO DESPUÉS DE 1.1
+4. Currencies + FxRates (Fase 2.1)        ← Paralelo con 3
+5. Accounts + TransactionCategories       ← Después de 3 + 4 (Fase 2.2)
+6. Transactions + TransactionImports      ← Después de 5 (Fase 2.2)
+7. Assets + AssetValuations + YearEndValues ← Después de 3 + 4 (Fase 2.3)
+8. CategoryTaxMappings + DescriptionRules ← Después de 5 + 6 (Fase 3.1)
+9. FilingTypes + Filings                  ← Después de 3 + 8 (Fase 3.2)
+10. Documents + DocumentTags              ← Último (polimórfico, Fase 4)
+```
+
+---
+
+### Fase 2: Services Layer (Después de modelos)
+- [ ] FxRateService (cálculo de conversión, sincronización ECB)
+- [ ] TransactionImportService (parseo CSV/PDF/QIF, detección duplicados)
+- [ ] TransactionCategorizationService (rules engine, manual override)
 - [ ] Migrar parsers (CSV/PDF)
 
-### Fase 3: Tax Reporting
-- [ ] UsTaxReportingService
-- [ ] SpainTaxReportingService
-- [ ] ColombiaTaxReportingService
-- [ ] CategoryTaxMapping
+### Fase 3: Tax Reporting Services (Después de tax schema)
+- [ ] UsTaxReportingService (Form 5472, pro-forma 1120, Schedule E, 1040-NR)
+- [ ] SpainTaxReportingService (IRPF summaries, Modelo 720)
+- [ ] ColombiaTaxReportingService (Rental income summaries)
 
-### Fase 4: UI
-- [ ] Migrar Livewire components
-- [ ] Migrar Volt pages
+### Fase 4: UI & Controllers
+- [ ] Migrar Livewire components (Dashboard, Finance, Tax modules)
+- [ ] Migrar Volt pages (Settings, Filings, Reporting)
 - [ ] Adaptar layouts y rutas
-- [ ] Dashboard
+- [ ] Dashboard principal
 
-### Fase 5: OpenSpec
+### Fase 5: OpenSpec & Specs
 - [ ] Migrar specs relevantes al nuevo formato OPSX
-- [ ] Revisar cambios pendientes y decidir cuáles migrar
+- [ ] Revisar cambios pendientes en Velor y decidir cuáles migrar
 - [ ] Configurar schemas personalizados si es necesario
+
+---
+
+## Estado Actual (31 Enero 2026)
+
+### ✅ Completado
+
+| Componente | Status | Detalles |
+|-----------|--------|----------|
+| **Fase 0: Fundamentos** | ✅ | Auth (Fortify), Sanctum, Livewire, Volt, Flux UI, Tailwind |
+| **Fase 0.5: UI Base** | ✅ | Logo animado, Jurisdictions CRUD |
+| **Fase 1.1: OpenSpec Design** | ✅ | `phase-1-1-user-profiles-entities-addresses` (5/5 artifacts) |
+| **Fase 1.1: Implementation** | ✅ | UserProfile, Entity, Address models + migrations + factories + 151 tests passing |
+
+### 📋 Próximo Paso
+
+**Fase 1.2 TaxYear Structure** (Después de 1.1)
+
+Esto creará:
+- 1 migration (tax_years)
+- 1 enum (TaxYearStatus)
+- 1 model (TaxYear) con relaciones a UserProfile
+- ~20-30 tests
+
+---
+
+## Decisiones Finales Fase 1.1
+
+### UserProfile
+- ✅ user_id, jurisdiction_id, tax_id, status
+- ❌ Sin metadata
+- ❌ Sin base_currency (usar Jurisdiction.default_currency)
+- ❌ Sin tax_year_start (diferir a Fase 1.2)
+
+### Entity
+- ✅ Solo para entidades legales (LLC, S-Corp, etc.)
+- ❌ NO "Individual" (eso es UserProfile)
+- ✅ No creadas automáticamente
+- ✅ Pueden tener múltiples por UserProfile
+
+### Address
+- ✅ Polimorfa (UserProfile, Entity, Account, Asset)
+- ✅ Reutilizable entre modelos del mismo usuario
+- ✅ Owner es User (user_id para autorización)
+- ❌ Sin tipo/enum (una dirección por modelo = dirección "oficial")
+
+### Omitido
+- ❌ ResidencyPeriod (diferir a más adelante)
+- ❌ TaxYear (Fase 1.2)
