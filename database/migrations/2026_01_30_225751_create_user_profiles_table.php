@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('user_profiles', function (Blueprint $table) {
+        Schema::create('user_profiles', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('restrict')->onUpdate('cascade');
             $table->foreignId('jurisdiction_id')->constrained()->onDelete('restrict')->onUpdate('cascade');

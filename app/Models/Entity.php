@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\EntityType;
+use Carbon\Carbon;
 use Database\Factories\EntityFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,8 +21,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property EntityType $entity_type
  * @property string $tax_id
  * @property string $status
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property-read UserProfile $userProfile
  * @property-read Address|null $address
  */

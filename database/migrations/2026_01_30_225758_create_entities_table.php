@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('entities', function (Blueprint $table) {
+        Schema::create('entities', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_profile_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->string('name');

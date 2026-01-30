@@ -24,7 +24,7 @@ final class UserProfileFactory extends Factory
         $jurisdiction = Jurisdiction::factory()->create();
 
         // Generate tax ID based on jurisdiction
-        $taxId = match ($jurisdiction->code) {
+        $taxId = match ($jurisdiction->iso_code) {
             'ES' => 'NIF'.$this->faker->numerify('#########'),
             'US' => $this->faker->bothify('??-#######'),
             'CO' => $this->faker->numerify('##########-#'),

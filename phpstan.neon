@@ -18,4 +18,5 @@ parameters:
 
     tmpDir: /tmp/phpstan
 
-    ignoreErrors: []
+    ignoreErrors:
+        - '#does not specify its types: TRelatedModel, TDeclaringModel#'

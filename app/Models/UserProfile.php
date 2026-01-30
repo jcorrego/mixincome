@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Database\Factories\UserProfileFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,11 +21,11 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property int $jurisdiction_id
  * @property string $tax_id
  * @property string $status
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property-read User $user
  * @property-read Jurisdiction $jurisdiction
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Entity> $entities
+ * @property-read Collection<int, Entity> $entities
  * @property-read Address|null $address
  */
 final class UserProfile extends Model

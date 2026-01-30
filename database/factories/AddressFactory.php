@@ -26,7 +26,7 @@ final class AddressFactory extends Factory
             'user_id' => User::factory(),
             'street' => $this->faker->streetAddress(),
             'city' => $this->faker->city(),
-            'state' => $this->faker->state(),
+            'state' => $this->faker->word(),
             'postal_code' => $this->faker->postcode(),
             'country' => $this->faker->countryCode(),
         ];
