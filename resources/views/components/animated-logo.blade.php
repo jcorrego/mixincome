@@ -1,6 +1,7 @@
 @props([
     'version' => 'color', // 'color' or 'white'
     'size' => 'default', // 'small', 'default', 'large'
+    'animate' => true, // Whether to animate the rings
     'loading' => false, // Whether to show as loading animation (2s duration)
 ])
 
@@ -10,61 +11,72 @@
         'default' => 'w-10 h-10',
         'large' => 'w-16 h-16'
     };
-    
+
     $fontSize = match($size) {
         'small' => 'text-lg',
         'default' => 'text-2xl',
         'large' => 'text-4xl'
     };
-    
+
     $ringWidth = match($size) {
-        'small' => '2',
-        'default' => '3',
-        'large' => '4'
+        'small' => 2,
+        'default' => 2,
+        'large' => 4
     };
-    
+
+    $innerRingWidth = match($size) {
+        'small' => 1,
+        'default' => 1,
+        'large' => 2
+    };
+
     $innerInset = match($size) {
-        'small' => 'inset-1',
-        'default' => 'inset-1.5',
-        'large' => 'inset-2'
+        'small' => '3px',
+        'default' => '4px',
+        'large' => '8px'
     };
-    
-    $animationDuration = $loading ? 'animate-[rotate_2s_linear]' : 'animate-[rotate_4s_linear_infinite]';
-    $animationDurationInner = $loading ? 'animate-[rotate-reverse_2s_linear]' : 'animate-[rotate-reverse_3s_linear_infinite]';
+
+    $outerAnimation = !$animate ? 'none' : ($loading ? 'rotate 2s linear' : 'rotate 4s linear infinite');
+    $innerAnimation = !$animate ? 'none' : ($loading ? 'rotate-reverse 2s linear' : 'rotate-reverse 3s linear infinite');
+
+    $outerTopColor = $version === 'white' ? '#ffffff' : '#0f62fe';
+    $outerRightColor = $version === 'white' ? '#ffffff' : '#00d4aa';
+    $innerBottomColor = $version === 'white' ? 'rgba(255,255,255,0.5)' : '#ff6b6b';
+    $innerLeftColor = $version === 'white' ? 'rgba(255,255,255,0.5)' : '#00d4aa';
 @endphp
 
-<div {{ $attributes->merge(['class' => "relative {$sizeClasses} flex-shrink-0"]) }}>
-    <!-- Outer rotating ring -->
-    <div class="absolute inset-0 rounded-full border-transparent {{ $animationDuration }}"
-         style="border-width: {{ $ringWidth }}px; 
-                border-top-color: {{ $version === 'white' ? '#ffffff' : '#0f62fe' }}; 
-                border-right-color: {{ $version === 'white' ? '#ffffff' : '#00d4aa' }};">
+<div {{ $attributes->merge(['class' => "relative {$sizeClasses} shrink-0"]) }}>
+    {{-- Outer rotating ring --}}
+    <div class="absolute inset-0 rounded-full"
+         style="border: {{ $ringWidth }}px solid transparent; border-top-color: {{ $outerTopColor }}; border-right-color: {{ $outerRightColor }}; animation: {{ $outerAnimation }};">
     </div>
-    
-    <!-- Inner rotating ring -->
-    <div class="absolute {{ $innerInset }} rounded-full border-transparent opacity-60 {{ $animationDurationInner }}"
-         style="border-width: {{ max(1, intval($ringWidth) - 1) }}px;
-                border-bottom-color: {{ $version === 'white' ? 'rgba(255,255,255,0.5)' : '#ff6b6b' }}; 
-                border-left-color: {{ $version === 'white' ? 'rgba(255,255,255,0.5)' : '#00d4aa' }};">
+
+    {{-- Inner counter-rotating ring --}}
+    <div class="absolute rounded-full opacity-60"
+         style="inset: {{ $innerInset }}; border: {{ $innerRingWidth }}px solid transparent; border-bottom-color: {{ $innerBottomColor }}; border-left-color: {{ $innerLeftColor }}; animation: {{ $innerAnimation }};">
     </div>
-    
-    <!-- Center M letter -->
-    <div class="absolute inset-0 flex items-center justify-center font-bold font-['Outfit'] {{ $fontSize }}"
-         style="color: {{ $version === 'white' ? '#ffffff' : '#0f62fe' }}; 
-                background: {{ $version === 'white' ? '#ffffff' : 'linear-gradient(135deg, #00d4aa 0%, #0f62fe 100%)' }};
-                {{ $version !== 'white' ? '-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;' : '' }}">
+
+    {{-- Center M --}}
+    <div class="absolute inset-0 flex items-center justify-center font-extrabold font-['Outfit'] {{ $fontSize }}"
+         @if($version === 'white')
+             style="color: #ffffff;"
+         @else
+             style="background: linear-gradient(135deg, #00d4aa 0%, #0f62fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"
+         @endif>
         M
     </div>
 </div>
 
+@once
 <style>
     @keyframes rotate {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
     }
-    
+
     @keyframes rotate-reverse {
         from { transform: rotate(360deg); }
         to { transform: rotate(0deg); }
     }
 </style>
+@endonce

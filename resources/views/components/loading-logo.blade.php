@@ -10,46 +10,65 @@
         'default' => 'w-16 h-16',
         'large' => 'w-24 h-24'
     };
-    
+
+    $ringWidth = match($size) {
+        'small' => 3,
+        'default' => 4,
+        'large' => 5
+    };
+
+    $innerRingWidth = match($size) {
+        'small' => 2,
+        'default' => 3,
+        'large' => 3
+    };
+
+    $innerInset = match($size) {
+        'small' => '4px',
+        'default' => '6px',
+        'large' => '10px'
+    };
+
     $fontSize = match($size) {
         'small' => 'text-xl',
         'default' => 'text-3xl',
         'large' => 'text-5xl'
     };
+
+    $outerTopColor = $version === 'white' ? '#ffffff' : '#0f62fe';
+    $outerRightColor = $version === 'white' ? '#ffffff' : '#00d4aa';
+    $innerBottomColor = $version === 'white' ? 'rgba(255,255,255,0.5)' : '#ff6b6b';
+    $innerLeftColor = $version === 'white' ? 'rgba(255,255,255,0.5)' : '#00d4aa';
 @endphp
 
 <div {{ $attributes->merge(['class' => "fixed inset-0 flex items-center justify-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm z-50"]) }}
      style="animation: fadeOut {{ $duration }}s ease-in-out forwards;">
-    
+
     <div class="flex flex-col items-center gap-4">
-        <!-- Animated Logo -->
-        <div class="relative {{ $sizeClasses }} flex-shrink-0">
-            <!-- Outer rotating ring -->
-            <div class="absolute inset-0 rounded-full border-transparent"
-                 style="border-width: 4px; 
-                        border-top-color: {{ $version === 'white' ? '#ffffff' : '#0f62fe' }}; 
-                        border-right-color: {{ $version === 'white' ? '#ffffff' : '#00d4aa' }};
-                        animation: rotate {{ $duration }}s ease-out;">
+        {{-- Animated Logo --}}
+        <div class="relative {{ $sizeClasses }} shrink-0">
+            {{-- Outer rotating ring --}}
+            <div class="absolute inset-0 rounded-full"
+                 style="border: {{ $ringWidth }}px solid transparent; border-top-color: {{ $outerTopColor }}; border-right-color: {{ $outerRightColor }}; animation: rotate {{ $duration }}s ease-out;">
             </div>
-            
-            <!-- Inner rotating ring -->
-            <div class="absolute inset-2 rounded-full border-transparent opacity-60"
-                 style="border-width: 3px;
-                        border-bottom-color: {{ $version === 'white' ? 'rgba(255,255,255,0.5)' : '#ff6b6b' }}; 
-                        border-left-color: {{ $version === 'white' ? 'rgba(255,255,255,0.5)' : '#00d4aa' }};
-                        animation: rotate-reverse {{ $duration }}s ease-out;">
+
+            {{-- Inner counter-rotating ring --}}
+            <div class="absolute rounded-full opacity-60"
+                 style="inset: {{ $innerInset }}; border: {{ $innerRingWidth }}px solid transparent; border-bottom-color: {{ $innerBottomColor }}; border-left-color: {{ $innerLeftColor }}; animation: rotate-reverse {{ $duration }}s ease-out;">
             </div>
-            
-            <!-- Center M letter -->
-            <div class="absolute inset-0 flex items-center justify-center font-bold font-['Outfit'] {{ $fontSize }}"
-                 style="color: {{ $version === 'white' ? '#ffffff' : '#0f62fe' }}; 
-                        background: {{ $version === 'white' ? '#ffffff' : 'linear-gradient(135deg, #00d4aa 0%, #0f62fe 100%)' }};
-                        {{ $version !== 'white' ? '-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;' : '' }}">
+
+            {{-- Center M --}}
+            <div class="absolute inset-0 flex items-center justify-center font-extrabold font-['Outfit'] {{ $fontSize }}"
+                 @if($version === 'white')
+                     style="color: #ffffff;"
+                 @else
+                     style="background: linear-gradient(135deg, #00d4aa 0%, #0f62fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"
+                 @endif>
                 M
             </div>
         </div>
-        
-        <!-- Loading Text -->
+
+        {{-- Loading Text --}}
         <div class="text-center">
             <div class="text-lg font-semibold text-gray-900 dark:text-white font-['Outfit']">
                 MixIncome
@@ -61,25 +80,27 @@
     </div>
 </div>
 
+@once
 <style>
     @keyframes rotate {
         0% { transform: rotate(0deg); }
         75% { transform: rotate(360deg); }
         100% { transform: rotate(360deg); }
     }
-    
+
     @keyframes rotate-reverse {
         0% { transform: rotate(360deg); }
         75% { transform: rotate(0deg); }
         100% { transform: rotate(0deg); }
     }
-    
+
     @keyframes fadeOut {
         0% { opacity: 1; }
         75% { opacity: 1; }
         100% { opacity: 0; pointer-events: none; }
     }
 </style>
+@endonce
 
 <script>
     // Auto-remove the loading component after animation completes

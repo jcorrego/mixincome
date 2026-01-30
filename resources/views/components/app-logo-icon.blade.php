@@ -1,19 +1,16 @@
 @props([
-    'animate' => true, // Whether to use animated or static icon
+    'animate' => true, // Whether to animate the rings
 ])
 
-@if($animate)
-    <x-animated-logo 
-        version="color"
-        size="small"
-        {{ $attributes->merge(['class' => 'dark:hidden']) }}
-    />
-    <x-animated-logo 
-        version="white"
-        size="small"
-        {{ $attributes->merge(['class' => 'hidden dark:block']) }}
-    />
-@else
-    <img src="/images/icon-color.svg" alt="MixIncome" {{ $attributes->merge(['class' => 'dark:hidden']) }} />
-    <img src="/images/icon-white.svg" alt="MixIncome" {{ $attributes->merge(['class' => 'hidden dark:block']) }} />
-@endif
+<x-animated-logo
+    version="color"
+    size="small"
+    :animate="$animate"
+    {{ $attributes->merge(['class' => 'dark:hidden']) }}
+/>
+<x-animated-logo
+    version="white"
+    size="small"
+    :animate="$animate"
+    {{ $attributes->merge(['class' => 'hidden dark:block']) }}
+/>
