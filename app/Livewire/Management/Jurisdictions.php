@@ -29,6 +29,7 @@ final class Jurisdictions extends Component
 
         Jurisdiction::query()->create($validated);
 
+        $this->modal('create-jurisdiction')->close();
         $this->resetForm();
     }
 
