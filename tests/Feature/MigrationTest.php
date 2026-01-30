@@ -3,12 +3,13 @@
 declare(strict_types=1);
 
 use App\Models\Entity;
+use App\Models\Jurisdiction;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\Schema;
 
-describe('Database Constraints & Indexes', function () {
-    it('20.1 migration creates user_profiles table with correct columns', function () {
+describe('Database Constraints & Indexes', function (): void {
+    it('20.1 migration creates user_profiles table with correct columns', function (): void {
         expect(Schema::hasTable('user_profiles'))->toBeTrue();
         expect(Schema::hasColumns('user_profiles', [
             'id',
@@ -21,12 +22,12 @@ describe('Database Constraints & Indexes', function () {
         ]))->toBeTrue();
     });
 
-    it('20.2 migration creates unique index on (user_id, jurisdiction_id)', function () {
+    it('20.2 migration creates unique index on (user_id, jurisdiction_id)', function (): void {
         // This would be tested by attempting duplicate insertion
         $user = User::factory()->create();
-        $jurisdiction = App\Models\Jurisdiction::factory()->create();
+        $jurisdiction = Jurisdiction::factory()->create();
 
-        UserProfile::create([
+        UserProfile::query()->create([
             'user_id' => $user->id,
             'jurisdiction_id' => $jurisdiction->id,
             'tax_id' => 'NIF123456789',
@@ -34,7 +35,7 @@ describe('Database Constraints & Indexes', function () {
         ]);
 
         // Try to create duplicate
-        expect(fn () => UserProfile::create([
+        expect(fn () => UserProfile::query()->create([
             'user_id' => $user->id,
             'jurisdiction_id' => $jurisdiction->id,
             'tax_id' => 'NIF999999999',
@@ -42,7 +43,7 @@ describe('Database Constraints & Indexes', function () {
         ]))->toThrow(Exception::class);
     })->skip();
 
-    it('20.3 migration creates entities table with correct columns', function () {
+    it('20.3 migration creates entities table with correct columns', function (): void {
         expect(Schema::hasTable('entities'))->toBeTrue();
         expect(Schema::hasColumns('entities', [
             'id',
@@ -56,7 +57,7 @@ describe('Database Constraints & Indexes', function () {
         ]))->toBeTrue();
     });
 
-    it('20.4 migration creates addresses table with polymorphic columns', function () {
+    it('20.4 migration creates addresses table with polymorphic columns', function (): void {
         expect(Schema::hasTable('addresses'))->toBeTrue();
         expect(Schema::hasColumns('addresses', [
             'id',
@@ -73,12 +74,12 @@ describe('Database Constraints & Indexes', function () {
         ]))->toBeTrue();
     });
 
-    it('20.5 foreign keys are correctly configured (cascade deletes)', function () {
+    it('20.5 foreign keys are correctly configured (cascade deletes)', function (): void {
         $profile = UserProfile::factory()->create();
         $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
 
         $profile->delete();
 
-        expect(Entity::find($entity->id))->toBeNull();
+        expect(Entity::query()->find($entity->id))->toBeNull();
     })->skip();
 });

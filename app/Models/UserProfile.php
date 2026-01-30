@@ -47,9 +47,12 @@ final class UserProfile extends Model
     public function casts(): array
     {
         return [
+            'id' => 'int',
             'user_id' => 'int',
             'jurisdiction_id' => 'int',
             'status' => 'string',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

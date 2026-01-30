@@ -47,6 +47,7 @@ final class Address extends Model
     public function casts(): array
     {
         return [
+            'id' => 'int',
             'addressable_id' => 'int',
             'user_id' => 'int',
             'street' => 'string',
@@ -54,6 +55,8 @@ final class Address extends Model
             'state' => 'string',
             'postal_code' => 'string',
             'country' => 'string',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

@@ -46,9 +46,12 @@ final class Entity extends Model
     public function casts(): array
     {
         return [
+            'id' => 'int',
             'user_profile_id' => 'int',
             'entity_type' => EntityType::class,
             'status' => 'string',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

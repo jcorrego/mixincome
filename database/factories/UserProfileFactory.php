@@ -21,21 +21,44 @@ final class UserProfileFactory extends Factory
      */
     public function definition(): array
     {
-        $jurisdiction = Jurisdiction::factory()->create();
-
-        // Generate tax ID based on jurisdiction
-        $taxId = match ($jurisdiction->iso_code) {
-            'ES' => 'NIF'.$this->faker->numerify('#########'),
-            'US' => $this->faker->bothify('??-#######'),
-            'CO' => $this->faker->numerify('##########-#'),
-            default => $this->faker->numerify('##########'),
-        };
-
         return [
             'user_id' => User::factory(),
-            'jurisdiction_id' => $jurisdiction->id,
-            'tax_id' => $taxId,
+            'jurisdiction_id' => Jurisdiction::factory(),
+            'tax_id' => $this->faker->numerify('##########'),
             'status' => 'Active',
         ];
+    }
+
+    /**
+     * Spanish profile with NIF tax ID
+     */
+    public function spain(): static
+    {
+        return $this->state([
+            'jurisdiction_id' => Jurisdiction::factory()->spain(),
+            'tax_id' => 'NIF'.$this->faker->numerify('#########'),
+        ]);
+    }
+
+    /**
+     * US profile with EIN-style tax ID
+     */
+    public function usa(): static
+    {
+        return $this->state([
+            'jurisdiction_id' => Jurisdiction::factory()->usa(),
+            'tax_id' => $this->faker->bothify('??-#######'),
+        ]);
+    }
+
+    /**
+     * Colombian profile with RUT-style tax ID
+     */
+    public function colombia(): static
+    {
+        return $this->state([
+            'jurisdiction_id' => Jurisdiction::factory()->colombia(),
+            'tax_id' => $this->faker->numerify('##########-#'),
+        ]);
     }
 }

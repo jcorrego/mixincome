@@ -3,14 +3,15 @@
 declare(strict_types=1);
 
 use App\Enums\EntityType;
+use App\Models\Address;
 use App\Models\Entity;
 use App\Models\UserProfile;
 
-describe('Entity Creation', function () {
-    it('6.1 can create Entity with user_profile_id, name, entity_type, tax_id', function () {
+describe('Entity Creation', function (): void {
+    it('6.1 can create Entity with user_profile_id, name, entity_type, tax_id', function (): void {
         $profile = UserProfile::factory()->create();
 
-        $entity = Entity::create([
+        $entity = Entity::query()->create([
             'user_profile_id' => $profile->id,
             'name' => 'My LLC',
             'entity_type' => 'LLC',
@@ -24,10 +25,10 @@ describe('Entity Creation', function () {
             ->and($entity->tax_id)->toBe('12-3456789');
     });
 
-    it('6.2 Entity.entity_type is cast to EntityType enum', function () {
+    it('6.2 Entity.entity_type is cast to EntityType enum', function (): void {
         $profile = UserProfile::factory()->create();
 
-        $entity = Entity::create([
+        $entity = Entity::query()->create([
             'user_profile_id' => $profile->id,
             'name' => 'My LLC',
             'entity_type' => EntityType::LLC,
@@ -39,10 +40,10 @@ describe('Entity Creation', function () {
             ->and($entity->entity_type->name)->toBe('LLC');
     });
 
-    it('6.3 Entity status defaults to Active', function () {
+    it('6.3 Entity status defaults to Active', function (): void {
         $profile = UserProfile::factory()->create();
 
-        $entity = Entity::create([
+        $entity = Entity::query()->create([
             'user_profile_id' => $profile->id,
             'name' => 'My LLC',
             'entity_type' => EntityType::LLC,
@@ -52,11 +53,11 @@ describe('Entity Creation', function () {
         expect($entity->status)->toBe('Active');
     });
 
-    it('6.4 cannot create Entity with entity_type=Individual (enum rejects it)', function () {
+    it('6.4 cannot create Entity with entity_type=Individual (enum rejects it)', function (): void {
         $profile = UserProfile::factory()->create();
 
         // Entity does not have Individual case, so this should fail
-        expect(fn () => Entity::create([
+        expect(fn () => Entity::query()->create([
             'user_profile_id' => $profile->id,
             'name' => 'My Individual',
             'entity_type' => 'Individual',
@@ -65,7 +66,7 @@ describe('Entity Creation', function () {
         ]))->toThrow(Exception::class);
     })->skip();
 
-    it('6.5 multiple entities can exist under same UserProfile', function () {
+    it('6.5 multiple entities can exist under same UserProfile', function (): void {
         $profile = UserProfile::factory()->create();
 
         Entity::factory(3)->create(['user_profile_id' => $profile->id]);
@@ -74,24 +75,24 @@ describe('Entity Creation', function () {
     })->skip();
 });
 
-describe('Entity Retrieval', function () {
-    it('7.1 can retrieve Entity by ID', function () {
+describe('Entity Retrieval', function (): void {
+    it('7.1 can retrieve Entity by ID', function (): void {
         $entity = Entity::factory()->create();
 
-        $retrieved = Entity::find($entity->id);
+        $retrieved = Entity::query()->find($entity->id);
 
         expect($retrieved)->not->toBeNull()
             ->and($retrieved->id)->toBe($entity->id);
     });
 
-    it('7.2 Entity has eager-loaded relationship to UserProfile', function () {
+    it('7.2 Entity has eager-loaded relationship to UserProfile', function (): void {
         $entity = Entity::factory()->create();
 
         expect($entity->userProfile)->not->toBeNull()
             ->and($entity->userProfile)->toBeInstanceOf(UserProfile::class);
     });
 
-    it('7.6 no N+1 queries when loading entities with profile', function () {
+    it('7.6 no N+1 queries when loading entities with profile', function (): void {
         Entity::factory(5)->create();
 
         $entities = Entity::with('userProfile')->get();
@@ -100,8 +101,8 @@ describe('Entity Retrieval', function () {
     })->skip();
 });
 
-describe('Entity Updates', function () {
-    it('8.1 can update Entity.name', function () {
+describe('Entity Updates', function (): void {
+    it('8.1 can update Entity.name', function (): void {
         $entity = Entity::factory()->create(['name' => 'Old Name']);
 
         $entity->update(['name' => 'New Name']);
@@ -109,7 +110,7 @@ describe('Entity Updates', function () {
         expect($entity->refresh()->name)->toBe('New Name');
     });
 
-    it('8.2 can update Entity.status (Active → Inactive)', function () {
+    it('8.2 can update Entity.status (Active → Inactive)', function (): void {
         $entity = Entity::factory()->create(['status' => 'Active']);
 
         $entity->update(['status' => 'Inactive']);
@@ -117,7 +118,7 @@ describe('Entity Updates', function () {
         expect($entity->refresh()->status)->toBe('Inactive');
     });
 
-    it('8.3 can update Entity.tax_id', function () {
+    it('8.3 can update Entity.tax_id', function (): void {
         $entity = Entity::factory()->create(['tax_id' => '11-1111111']);
 
         $entity->update(['tax_id' => '22-2222222']);
@@ -126,10 +127,10 @@ describe('Entity Updates', function () {
     });
 });
 
-describe('Entity Deletion', function () {
-    it('9.2 deleting Entity cascades to related Address if exists', function () {
+describe('Entity Deletion', function (): void {
+    it('9.2 deleting Entity cascades to related Address if exists', function (): void {
         $entity = Entity::factory()->create();
-        $address = App\Models\Address::factory()->create([
+        $address = Address::factory()->create([
             'addressable_id' => $entity->id,
             'addressable_type' => Entity::class,
         ]);
@@ -137,28 +138,28 @@ describe('Entity Deletion', function () {
         $addressId = $address->id;
         $entity->delete();
 
-        expect(App\Models\Address::find($addressId))->toBeNull();
+        expect(Address::query()->find($addressId))->toBeNull();
     })->skip();
 
-    it('9.4 deleting Entity does NOT cascade to UserProfile (parent not affected)', function () {
+    it('9.4 deleting Entity does NOT cascade to UserProfile (parent not affected)', function (): void {
         $profile = UserProfile::factory()->create();
         $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
 
         $entity->delete();
 
-        expect(UserProfile::find($profile->id))->not->toBeNull();
+        expect(UserProfile::query()->find($profile->id))->not->toBeNull();
     });
 });
 
-describe('Entity-UserProfile Relationship', function () {
-    it('10.1 Entity.userProfile returns correct UserProfile', function () {
+describe('Entity-UserProfile Relationship', function (): void {
+    it('10.1 Entity.userProfile returns correct UserProfile', function (): void {
         $profile = UserProfile::factory()->create();
         $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
 
         expect($entity->userProfile->id)->toBe($profile->id);
     });
 
-    it('10.2 Entity inherits jurisdiction via Entity.userProfile.jurisdiction', function () {
+    it('10.2 Entity inherits jurisdiction via Entity.userProfile.jurisdiction', function (): void {
         $profile = UserProfile::factory()->create();
         $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
 
@@ -166,8 +167,8 @@ describe('Entity-UserProfile Relationship', function () {
     });
 });
 
-describe('Model Relationships - Entity', function () {
-    it('23.6 Entity.userProfile returns belongsTo(UserProfile)', function () {
+describe('Model Relationships - Entity', function (): void {
+    it('23.6 Entity.userProfile returns belongsTo(UserProfile)', function (): void {
         $profile = UserProfile::factory()->create();
         $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
 
@@ -175,14 +176,14 @@ describe('Model Relationships - Entity', function () {
             ->and($entity->userProfile)->toBeInstanceOf(UserProfile::class);
     });
 
-    it('23.7 Entity.address returns morphOne(Address)', function () {
+    it('23.7 Entity.address returns morphOne(Address)', function (): void {
         $entity = Entity::factory()->create();
-        $address = App\Models\Address::factory()->create([
+        $address = Address::factory()->create([
             'addressable_id' => $entity->id,
             'addressable_type' => Entity::class,
         ]);
 
         expect($entity->address->id)->toBe($address->id)
-            ->and($entity->address)->toBeInstanceOf(App\Models\Address::class);
+            ->and($entity->address)->toBeInstanceOf(Address::class);
     })->skip();
 });
