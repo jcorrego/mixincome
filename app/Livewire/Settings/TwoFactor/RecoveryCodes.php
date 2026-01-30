@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Settings\TwoFactor;
 
+use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -28,7 +30,7 @@ final class RecoveryCodes extends Component
      */
     public function regenerateRecoveryCodes(GenerateNewRecoveryCodes $generateNewRecoveryCodes): void
     {
-        $generateNewRecoveryCodes(auth()->user());
+        $generateNewRecoveryCodes($this->user());
 
         $this->loadRecoveryCodes();
     }
@@ -38,16 +40,29 @@ final class RecoveryCodes extends Component
      */
     private function loadRecoveryCodes(): void
     {
-        $user = auth()->user();
+        $user = $this->user();
 
-        if ($user->hasEnabledTwoFactorAuthentication() && $user->two_factor_recovery_codes) {
+        if ($user->hasEnabledTwoFactorAuthentication() && is_string($user->two_factor_recovery_codes)) {
             try {
-                $this->recoveryCodes = json_decode(decrypt($user->two_factor_recovery_codes), true);
+                /** @var string $decrypted */
+                $decrypted = decrypt($user->two_factor_recovery_codes);
+                /** @var list<string> $codes */
+                $codes = json_decode($decrypted, true);
+                $this->recoveryCodes = $codes;
             } catch (Exception) {
                 $this->addError('recoveryCodes', 'Failed to load recovery codes');
 
                 $this->recoveryCodes = [];
             }
         }
+    }
+
+    /**
+     * Get the authenticated user.
+     */
+    private function user(): User
+    {
+        /** @var User */
+        return Auth::user();
     }
 }

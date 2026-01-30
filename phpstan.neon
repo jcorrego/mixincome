@@ -17,3 +17,8 @@ parameters:
     level: max
 
     tmpDir: /tmp/phpstan
+
+    ignoreErrors:
+        -
+            message: '#Parameter .* of function explode expects string, bool\|string given#'
+            path: config/sanctum.php

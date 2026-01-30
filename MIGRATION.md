@@ -140,10 +140,10 @@
 
 ## Plan de migración sugerido
 
-### Fase 0: Fundamentos
+### Fase 0: Fundamentos ✅
 - [x] Configurar `openspec/config.yaml` con contexto del proyecto (migrado de Velor project.md)
-- [ ] Instalar paquetes base: Fortify, Sanctum, Livewire, Volt, Flux UI
-- [ ] Configurar auth (Fortify)
+- [x] Instalar paquetes base: Fortify, Sanctum, Livewire, Volt, Flux UI
+- [x] Configurar auth (Fortify) — full auth flows, settings, 2FA, layouts, 60 tests passing
 - [ ] Actualizar CLAUDE.md con architecture overview
 
 ### Fase 1: Schema y Modelos Core
