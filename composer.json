@@ -16,7 +16,8 @@
         "livewire/flux": "^2.11.1",
         "livewire/livewire": "^4.1",
         "livewire/volt": "^1.10.2",
-        "nunomaduro/essentials": "^1.0.1"
+        "nunomaduro/essentials": "^1.0.1",
+        "resend/resend-php": "^1.1"
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.1.9",
