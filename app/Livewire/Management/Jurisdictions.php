@@ -41,6 +41,8 @@ final class Jurisdictions extends Component
         $this->iso_code = $jurisdiction->iso_code;
         $this->timezone = $jurisdiction->timezone;
         $this->default_currency = $jurisdiction->default_currency;
+
+        $this->modal('edit-jurisdiction')->show();
     }
 
     public function update(): void
@@ -52,6 +54,7 @@ final class Jurisdictions extends Component
 
         $jurisdiction->update($validated);
 
+        $this->modal('edit-jurisdiction')->close();
         $this->resetForm();
     }
 
@@ -64,6 +67,7 @@ final class Jurisdictions extends Component
 
     public function cancelEdit(): void
     {
+        $this->modal('edit-jurisdiction')->close();
         $this->resetForm();
     }
 

@@ -61,7 +61,7 @@
     </flux:modal>
 
     {{-- Edit Modal --}}
-    <flux:modal wire:model.self="editingId" class="md:w-96">
+    <flux:modal name="edit-jurisdiction" class="md:w-96">
         <form wire:submit="update" class="space-y-6">
             <div>
                 <flux:heading size="lg">{{ __('Edit Jurisdiction') }}</flux:heading>
