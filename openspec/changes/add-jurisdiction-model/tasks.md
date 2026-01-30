@@ -56,9 +56,9 @@
 
 ## 9. Quality & Finalization
 
-- [ ] 9.1 Run migration and seeder locally
-- [ ] 9.2 Run all tests: php artisan test --compact
-- [ ] 9.3 Run linter: vendor/bin/pint
-- [ ] 9.4 Run static analysis: vendor/bin/phpstan
-- [ ] 9.5 Verify type coverage: composer test
+- [x] 9.1 Run migration and seeder locally
+- [x] 9.2 Run all tests: php artisan test --compact
+- [x] 9.3 Run linter: vendor/bin/pint
+- [x] 9.4 Run static analysis: vendor/bin/phpstan
+- [x] 9.5 Verify type coverage: composer test
 - [ ] 9.6 Test UI manually at /management/jurisdictions

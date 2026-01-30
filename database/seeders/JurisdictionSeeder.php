@@ -14,7 +14,7 @@ final class JurisdictionSeeder extends Seeder
      */
     public function run(): void
     {
-        Jurisdiction::upsert([
+        Jurisdiction::query()->upsert([
             ['iso_code' => 'ES', 'name' => 'Spain', 'timezone' => 'Europe/Madrid', 'default_currency' => 'EUR'],
             ['iso_code' => 'US', 'name' => 'United States', 'timezone' => 'America/New_York', 'default_currency' => 'USD'],
             ['iso_code' => 'CO', 'name' => 'Colombia', 'timezone' => 'America/Bogota', 'default_currency' => 'COP'],

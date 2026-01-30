@@ -8,20 +8,20 @@ use Database\Seeders\JurisdictionSeeder;
 test('seeder creates 3 initial jurisdictions', function (): void {
     $this->seed(JurisdictionSeeder::class);
 
-    expect(Jurisdiction::count())->toBe(3);
+    expect(Jurisdiction::query()->count())->toBe(3);
 });
 
 test('seeder is idempotent', function (): void {
     $this->seed(JurisdictionSeeder::class);
     $this->seed(JurisdictionSeeder::class);
 
-    expect(Jurisdiction::count())->toBe(3);
+    expect(Jurisdiction::query()->count())->toBe(3);
 });
 
 test('seeder creates correct data for Spain', function (): void {
     $this->seed(JurisdictionSeeder::class);
 
-    $spain = Jurisdiction::where('iso_code', 'ES')->first();
+    $spain = Jurisdiction::query()->where('iso_code', 'ES')->first();
 
     expect($spain)->not->toBeNull()
         ->and($spain->name)->toBe('Spain')
@@ -32,7 +32,7 @@ test('seeder creates correct data for Spain', function (): void {
 test('seeder creates correct data for USA', function (): void {
     $this->seed(JurisdictionSeeder::class);
 
-    $usa = Jurisdiction::where('iso_code', 'US')->first();
+    $usa = Jurisdiction::query()->where('iso_code', 'US')->first();
 
     expect($usa)->not->toBeNull()
         ->and($usa->name)->toBe('United States')
@@ -43,7 +43,7 @@ test('seeder creates correct data for USA', function (): void {
 test('seeder creates correct data for Colombia', function (): void {
     $this->seed(JurisdictionSeeder::class);
 
-    $colombia = Jurisdiction::where('iso_code', 'CO')->first();
+    $colombia = Jurisdiction::query()->where('iso_code', 'CO')->first();
 
     expect($colombia)->not->toBeNull()
         ->and($colombia->name)->toBe('Colombia')

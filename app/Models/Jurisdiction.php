@@ -8,7 +8,6 @@ use Carbon\CarbonInterface;
 use Database\Factories\JurisdictionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property-read int $id
@@ -48,21 +47,5 @@ final class Jurisdiction extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
-    }
-
-    /**
-     * @return HasMany<UserProfile, $this>
-     */
-    public function userProfiles(): HasMany
-    {
-        return $this->hasMany(UserProfile::class);
-    }
-
-    /**
-     * @return HasMany<Entity, $this>
-     */
-    public function entities(): HasMany
-    {
-        return $this->hasMany(Entity::class);
     }
 }

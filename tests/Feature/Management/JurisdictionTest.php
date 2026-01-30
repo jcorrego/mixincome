@@ -35,7 +35,7 @@ test('can create jurisdiction with valid data', function (): void {
         ->call('create')
         ->assertHasNoErrors();
 
-    expect(Jurisdiction::where('iso_code', 'DE')->exists())->toBeTrue();
+    expect(Jurisdiction::query()->where('iso_code', 'DE')->exists())->toBeTrue();
 });
 
 test('cannot create jurisdiction with duplicate iso_code', function (): void {
@@ -122,6 +122,21 @@ test('cannot update jurisdiction with invalid timezone', function (): void {
         ->assertHasErrors(['timezone']);
 });
 
+// --- Cancel Edit ---
+
+test('can cancel editing a jurisdiction', function (): void {
+    $user = User::factory()->create();
+    $jurisdiction = Jurisdiction::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test(Jurisdictions::class)
+        ->call('edit', $jurisdiction->id)
+        ->assertSet('editingId', $jurisdiction->id)
+        ->call('cancelEdit')
+        ->assertSet('editingId', null)
+        ->assertSet('name', '');
+});
+
 // --- Delete Jurisdiction ---
 
 test('can delete jurisdiction with no dependencies', function (): void {
@@ -133,5 +148,5 @@ test('can delete jurisdiction with no dependencies', function (): void {
         ->call('delete', $jurisdiction->id)
         ->assertHasNoErrors();
 
-    expect(Jurisdiction::find($jurisdiction->id))->toBeNull();
+    expect(Jurisdiction::query()->find($jurisdiction->id))->toBeNull();
 });

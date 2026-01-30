@@ -24,16 +24,17 @@ final class Jurisdictions extends Component
 
     public function create(): void
     {
+        /** @var array<string, mixed> $validated */
         $validated = $this->validate($this->createRules());
 
-        Jurisdiction::create($validated);
+        Jurisdiction::query()->create($validated);
 
         $this->resetForm();
     }
 
     public function edit(int $id): void
     {
-        $jurisdiction = Jurisdiction::findOrFail($id);
+        $jurisdiction = Jurisdiction::query()->findOrFail($id);
 
         $this->editingId = $jurisdiction->id;
         $this->name = $jurisdiction->name;
@@ -44,8 +45,9 @@ final class Jurisdictions extends Component
 
     public function update(): void
     {
-        $jurisdiction = Jurisdiction::findOrFail($this->editingId);
+        $jurisdiction = Jurisdiction::query()->findOrFail($this->editingId);
 
+        /** @var array<string, mixed> $validated */
         $validated = $this->validate($this->updateRules($jurisdiction->id));
 
         $jurisdiction->update($validated);
@@ -55,7 +57,7 @@ final class Jurisdictions extends Component
 
     public function delete(int $id): void
     {
-        $jurisdiction = Jurisdiction::findOrFail($id);
+        $jurisdiction = Jurisdiction::query()->findOrFail($id);
 
         $jurisdiction->delete();
     }

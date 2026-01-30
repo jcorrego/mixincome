@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jurisdictions', function (Blueprint $table) {
+        Schema::create('jurisdictions', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->string('iso_code', 3)->unique();
