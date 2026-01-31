@@ -4,107 +4,85 @@ User profile management enables users to establish and manage their legal tax id
 
 ## ADDED Requirements
 
-### Requirement: Create User Profile
+### Requirement: User Profile CRUD Operations
 
-A user SHALL be able to create a tax profile for a jurisdiction, establishing their legal identity in that country.
+The system SHALL provide a complete CRUD interface for managing tax profiles (UserProfile). A user can create, read, update, and delete their own profiles. Each profile is tied to a jurisdiction.
 
-**Details**:
-- One UserProfile per (user, jurisdiction) pair — no duplicates
-- Requires user_id, jurisdiction_id, and tax_id (jurisdiction-specific identifier like SSN, RUT, NIF)
-- Status defaults to 'Active'
-- Timestamps (created_at, updated_at) auto-managed
+#### Scenario: List all user profiles
+- **WHEN** user navigates to `/management/profiles`
+- **THEN** system displays a table of all profiles for the current user, grouped by jurisdiction, showing: jurisdiction name, tax_id, status, created_at
 
-#### Scenario: Create first profile for Spain
-- **WHEN** User "Juan" creates a profile for Spain with tax_id="NIF123456789"
-- **THEN** UserProfile is created with user_id=1, jurisdiction_id=2, tax_id="NIF123456789", status="Active"
+#### Scenario: Create a new profile
+- **WHEN** user clicks "Create Profile" and submits the form with: jurisdiction (required, dropdown), tax_id (required, string), status (optional, defaults to "Active")
+- **THEN** system validates the form (jurisdiction exists, tax_id is unique per user+jurisdiction), creates the profile, displays success message, updates the profile list
 
-#### Scenario: Prevent duplicate profile
-- **WHEN** User tries to create a second profile for Spain (same user, same jurisdiction)
-- **THEN** Validation fails with unique constraint error
+#### Scenario: Create profile fails on invalid data
+- **WHEN** user submits profile creation form with missing jurisdiction or duplicate tax_id
+- **THEN** system displays form validation errors (custom messages for each field) and does not create the profile
 
-#### Scenario: Create second profile for different jurisdiction
-- **WHEN** User "Juan" creates a profile for USA with tax_id="SSN987654321"
-- **THEN** Both profiles coexist; user now has 2 UserProfiles
+#### Scenario: Edit an existing profile
+- **WHEN** user clicks "Edit" on a profile and submits updated data (jurisdiction, tax_id, status)
+- **THEN** system validates the form, updates the profile, displays success message, refreshes the profile list
 
----
-
-### Requirement: Retrieve User Profile
-
-A user or admin SHALL be able to retrieve their profile details (or all profiles for a user).
-
-#### Scenario: Get single profile by ID
-- **WHEN** Profile ID is queried
-- **THEN** Returns UserProfile with all fields: user_id, jurisdiction_id, tax_id, status, timestamps
-
-#### Scenario: List all profiles for user
-- **WHEN** User ID is queried
-- **THEN** Returns collection of all UserProfiles for that user, with eager-loaded jurisdiction
-
-#### Scenario: Get profile with related entities
-- **WHEN** Profile is loaded with entities
-- **THEN** Returns profile with entities array (no N+1 queries)
+#### Scenario: Delete a profile
+- **WHEN** user clicks "Delete" on a profile and confirms the deletion
+- **THEN** system checks if profile has associated entities; if yes, displays error "Cannot delete profile with entities"; if no, deletes the profile, displays success message, refreshes the profile list
 
 ---
 
-### Requirement: Update User Profile Tax ID
+### Requirement: Address Association for Profiles
 
-A user SHALL be able to update their tax_id if it changes (e.g., new SSN, name change).
+When creating or editing a profile, the user SHALL select an address (existing or create new). Each profile can have one address.
 
-**Note**: Update implies replacement, not append. Only one tax_id per profile.
+#### Scenario: Create profile with existing address
+- **WHEN** user creates a profile and selects an existing address from the "Address" dropdown
+- **THEN** system associates the address to the profile (sets address_id), creates profile successfully
 
-#### Scenario: Update tax_id
-- **WHEN** User updates their profile tax_id to "NIF999999999"
-- **THEN** Profile.tax_id changes; timestamps updated; no duplicate profiles created
+#### Scenario: Create profile without address
+- **WHEN** user creates a profile and leaves the "Address" dropdown empty
+- **THEN** system creates the profile with address_id = NULL (address is optional)
 
-#### Scenario: Update status
-- **WHEN** User changes profile status from "Active" to "Inactive"
-- **THEN** Status changes; related entities inherit no status impact (independent)
+#### Scenario: Navigate to address management
+- **WHEN** user clicks "Create new address" link in the profile form
+- **THEN** system navigates to `/management/addresses` page (no profile creation happens, form is abandoned)
 
----
-
-### Requirement: Delete User Profile
-
-A user SHALL be able to delete their profile (cascade deletes related entities).
-
-**Implications**: Deleting a profile cascades to all related entities and their data.
-
-#### Scenario: Delete profile with entities
-- **WHEN** User deletes a UserProfile that has 2 related Entities
-- **THEN** Profile + all 2 Entities are deleted; no orphans remain
-
-#### Scenario: Delete profile without entities
-- **WHEN** User deletes a UserProfile with no entities
-- **THEN** Profile is deleted cleanly
+#### Scenario: Edit profile and change address
+- **WHEN** user edits a profile and changes the address (selects a different address from dropdown)
+- **THEN** system updates the profile.address_id to the new address, displays success message
 
 ---
 
-### Requirement: Profile-Jurisdiction Relationship
+### Requirement: Authorization for Profile Management
 
-A UserProfile SHALL maintain a relationship with exactly one Jurisdiction (cannot change after creation).
+Users SHALL only be able to view, edit, and delete their own profiles. System SHALL enforce this via Authorization Policies.
 
-#### Scenario: Access profile's jurisdiction
-- **WHEN** Profile.jurisdiction is accessed
-- **THEN** Returns Jurisdiction model with code, name, default_currency, timezone
+#### Scenario: User cannot view another user's profile
+- **WHEN** user attempts to access/edit/delete a profile owned by another user (different user_id)
+- **THEN** system returns 403 Forbidden
 
-#### Scenario: Default currency from jurisdiction
-- **WHEN** Determining user's base currency for a profile
-- **THEN** Use Profile.jurisdiction.default_currency (not a separate profile field)
+#### Scenario: User can view own profile
+- **WHEN** authenticated user lists profiles or views a profile they own
+- **THEN** system displays the profile successfully
 
 ---
 
-### Requirement: Unique (user_id, jurisdiction_id) Constraint
+### Requirement: Dependency Checks
 
-The database SHALL enforce uniqueness at (user_id, jurisdiction_id) level.
+If the system has no profiles, the Entity management page SHALL display a warning message and disable the "Create Entity" button.
 
-#### Scenario: Constraint enforced at migration
-- **WHEN** Migration runs
-- **THEN** Unique index exists on (user_id, jurisdiction_id)
+#### Scenario: Entity page warns when no profiles exist
+- **WHEN** user navigates to `/management/entities` and no profiles exist for this user
+- **THEN** system displays: "No tax profiles exist. [Link: Create a UserProfile] Create a profile first to add entities."
+
+#### Scenario: Entity page allows creation when profiles exist
+- **WHEN** user navigates to `/management/entities` and at least one profile exists
+- **THEN** system displays the entity list normally and the "Create Entity" button is enabled
 
 ---
 
 ## Capabilities Enabled by These Requirements
 
 - Entity management can reference a specific UserProfile
-- Address system can associate addresses to UserProfiles (polymorphic)
+- Address system can associate addresses to UserProfiles (foreign key)
 - Future Fase 2 (Accounts, Transactions) can hang off UserProfile
-- Future Fase 1.2 (TaxYear) can organize by UserProfile
+- Future phases can organize by UserProfile

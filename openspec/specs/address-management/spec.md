@@ -4,153 +4,100 @@ Address management enables users to create and reuse addresses across multiple m
 
 ## ADDED Requirements
 
-### Requirement: Create Address
+### Requirement: Address CRUD Operations (Independent)
 
-A user SHALL be able to create an address and associate it with a model (UserProfile, Entity, Account, or Asset).
+The system SHALL provide a complete CRUD interface for managing addresses (Address). Addresses are independent entities that can be reused across UserProfiles, Entities, Accounts, and Assets. A user can create, read, update, and delete addresses.
 
-**Details**:
-- Address is polymorphic (morphTo): can belong to UserProfile, Entity, Account, Asset
-- All addresses are owned by a User (user_id) for authorization/privacy
-- Fields: street, city, state, postal_code, country (required), timestamps
-- No "type" field — each model has one "official" address
-- Address can be created standalone and later reused
+#### Scenario: List all user addresses
+- **WHEN** user navigates to `/management/addresses`
+- **THEN** system displays a table of all addresses for the current user (owned by user_id), showing: street, city, state, postal_code, country, association_status (text or badge), created_at
 
-#### Scenario: Create address for UserProfile
-- **WHEN** User creates address "Calle Mayor 1, Madrid, Spain" for their Spain UserProfile
-- **THEN** Address is created with addressable_type='App\Models\UserProfile', addressable_id=1, user_id=1
+#### Scenario: Address association status
+- **WHEN** user views the address list
+- **THEN** for each address, system displays the association status:
+  - "Associated to: UserProfile #5, Entity #3" (if used by multiple models)
+  - "Associated to: UserProfile #1" (if used by one model)
+  - "(Unassociated)" (if not used by any model yet)
 
-#### Scenario: Create address for Entity
-- **WHEN** User creates address for their LLC
-- **THEN** Address is created with addressable_type='App\Models\Entity', addressable_id=2, user_id=1
+#### Scenario: Create a new address
+- **WHEN** user clicks "Create Address" and submits the form with: street (required, string), city (required, string), state (required, string), postal_code (required, string), country (required, string - ISO code)
+- **THEN** system validates the form (all fields required), creates the address with user_id = current user, displays success message, updates the address list
 
-#### Scenario: Required fields
-- **WHEN** User tries to create address without country
-- **THEN** Validation fails; country is required
+#### Scenario: Create address fails on invalid data
+- **WHEN** user submits address creation form with missing required fields
+- **THEN** system displays form validation errors (custom messages for each field) and does not create the address
 
----
+#### Scenario: Edit an existing address
+- **WHEN** user clicks "Edit" on an address and submits updated data (street, city, state, postal_code, country)
+- **THEN** system validates the form, updates the address, displays success message, refreshes the address list
 
-### Requirement: Reuse Address
-
-A user SHALL be able to reuse the same address for multiple models (e.g., UserProfile and Entity share same address).
-
-**Details**:
-- Same Address row can be referenced by multiple models (via polymorphic relationship)
-- Avoids data duplication
-- User_id ensures all references belong to same user
-
-#### Scenario: Reuse address between profile and entity
-- **WHEN** User creates LLC with same address as their UserProfile
-- **THEN** Both UserProfile and Entity reference the same Address row (same address_id)
-
-#### Scenario: Query all addresses for user
-- **WHEN** User.addresses is queried (via polymorphic inverse relation)
-- **THEN** Returns all addresses owned by that user (no matter if profile, entity, account, etc.)
+#### Scenario: Delete an address
+- **WHEN** user clicks "Delete" on an address and confirms the deletion
+- **THEN** system checks if address is associated to any models (user_profile_id, entity_id, account_id, asset_id NOT NULL); if yes, displays error "Cannot delete address in use" with model details; if no, deletes the address, displays success message, refreshes the address list
 
 ---
 
-### Requirement: Retrieve Address
+### Requirement: Address Reusability
 
-A user SHALL be able to retrieve address details and list addresses.
+The same address resource SHALL be selectable and usable across multiple models (UserProfile, Entity, Account, Asset). Users can create one address and assign it to multiple models.
 
-#### Scenario: Get address by ID
-- **WHEN** Address ID is queried
-- **THEN** Returns Address with all fields: street, city, state, postal_code, country, addressable_id, addressable_type, user_id
+#### Scenario: Address used by multiple models
+- **WHEN** address "123 Main St" has address_id = 5, and both UserProfile #1 and Entity #2 have address_id = 5
+- **THEN** system displays in the address list: "Associated to: UserProfile #1, Entity #2"
 
-#### Scenario: Get model's address
-- **WHEN** UserProfile.address is accessed
-- **THEN** Returns the associated Address (morphOne relationship)
+#### Scenario: Address can be reassigned
+- **WHEN** user edits UserProfile #1 and changes the address to address_id = 6
+- **THEN** the old address (5) is no longer associated to UserProfile #1, but still associated to Entity #2
+- **THEN** when user deletes address #5 now, system allows deletion because it's only used by Entity #2... wait, no. If Entity #2 still uses it, deletion is blocked.
 
-#### Scenario: List user's addresses
-- **WHEN** Querying all addresses for a user
-- **THEN** Returns collection of all Address rows with user_id=X (used by any model type)
-
----
-
-### Requirement: Update Address
-
-A user SHALL be able to update address fields after creation.
-
-#### Scenario: Update street address
-- **WHEN** User updates address street from "Calle Mayor 1" to "Calle Mayor 2"
-- **THEN** Address.street changes; timestamps updated
-
-#### Scenario: Update all fields
-- **WHEN** User updates city, state, postal_code, country
-- **THEN** All fields change; no duplicate creation
+#### Scenario: Prevent deletion of in-use address
+- **WHEN** address #5 is assigned to Entity #2 (entity.address_id = 5)
+- **AND** user attempts to delete address #5
+- **THEN** system displays error: "Cannot delete address. In use by: Entity 'My LLC' (#2)" and prevents deletion
 
 ---
 
-### Requirement: Delete Address
+### Requirement: Address Ownership
 
-A user SHALL be able to delete an address (soft-delete or hard-delete per implementation).
+Each address has an owner (user_id) who created it. Users SHALL only be able to view, edit, and delete their own addresses.
 
-**Note**: Deletion impacts all models referencing that address. Consider implications before deletion.
+#### Scenario: User can manage own addresses
+- **WHEN** user navigates to `/management/addresses`
+- **THEN** system displays only addresses where user_id = current user's id
 
-#### Scenario: Delete shared address
-- **WHEN** User deletes an address used by both UserProfile and Entity
-- **THEN** Address is deleted; both models lose their address reference (or show null)
-
-#### Scenario: Cleanup after entity deletion
-- **WHEN** Entity is deleted
-- **THEN** Related Address MAY be deleted if not shared; behavior TBD (see Open Questions)
+#### Scenario: User cannot view another user's address
+- **WHEN** user attempts to access/edit/delete an address owned by another user
+- **THEN** system returns 403 Forbidden
 
 ---
 
-### Requirement: Polymorphic Association
+### Requirement: Address Structure (FK-based, not Polymorphic)
 
-Address SHALL support polymorphic association with UserProfile, Entity, Account, and Asset.
+Address table SHALL be an independent resource with `user_id` (for ownership). Other models (UserProfile, Entity, Account, Asset) have `address_id` FK pointing to addresses. Each model can have one address, but an address can be used by multiple models.
 
-#### Scenario: Morphable models
-- **WHEN** Address is created with addressable_type
-- **THEN** addressable_type can be: 'App\Models\UserProfile', 'App\Models\Entity', 'App\Models\Account', 'App\Models\Asset' (Fase 2+)
+#### Scenario: Address structure validation
+- **WHEN** system stores an address with user_id = 3, street = "123 Main St", city = "New York"
+- **THEN** the address is valid and owned by User #3
+- **WHEN** UserProfile #5 has address_id = 10 pointing to Address #10
+- **THEN** UserProfile #5 is associated to Address #10
 
-#### Scenario: Access polymorphic model
-- **WHEN** Address.addressable is accessed
-- **THEN** Returns the actual model (UserProfile, Entity, etc.) — type preserved
-
----
-
-### Requirement: User Ownership
-
-All addresses SHALL be owned by a User (user_id field) to enforce authorization boundaries.
-
-#### Scenario: Address owner isolation
-- **WHEN** User 1's address is queried
-- **THEN** User 2 cannot access it (authorization check in controller, not DB-enforced in Phase 1)
-
-#### Scenario: Cascade delete on user deletion
-- **WHEN** User is deleted (if ever)
-- **THEN** All addresses with that user_id are deleted
+#### Scenario: Address reusability across model types
+- **WHEN** multiple models (UserProfile, Entity) have address_id = 5
+- **THEN** they all reference the same Address #5 (no duplication)
 
 ---
 
-### Requirement: One Address Per Model (Phase 1.1)
+### Requirement: Address Display in Profile/Entity Forms
 
-In Phase 1.1, each model (UserProfile, Entity) SHALL have at most one address.
+When users create or edit a UserProfile or Entity, they can select an existing address from a dropdown. System SHALL display available addresses in a user-friendly way.
 
-**Note**: This is not enforced at DB level (no unique constraint yet); enforced by app logic (UI will have 1 address field per model).
+#### Scenario: Address dropdown shows available addresses
+- **WHEN** user opens the profile/entity creation form and views the "Address" dropdown
+- **THEN** system displays: "(None)", then all available unassociated addresses (where all FK fields are NULL), then separators or disabled options for associated addresses (grayed out, with "used by..." tooltip)
 
-#### Scenario: Profile with one address
-- **WHEN** UserProfile is created
-- **THEN** Profile can have 0 or 1 address (not 2)
-
-#### Scenario: Later phases (Fase 2+)
-- **WHEN** Accounts and Assets are added
-- **THEN** Each also has 0 or 1 address; same polymorphic table supports all
-
----
-
-### Requirement: Address Fields Validation
-
-Address fields SHALL be validated before persistence.
-
-#### Scenario: Country required
-- **WHEN** User tries to save address without country
-- **THEN** Validation fails
-
-#### Scenario: Valid country format
-- **WHEN** Address country is provided
-- **THEN** Accept ISO code (e.g., "ES", "US", "CO") or full name (validation rules TBD)
+#### Scenario: User can leave address empty
+- **WHEN** user submits a profile/entity creation form without selecting an address
+- **THEN** system creates the model with address_id = NULL
 
 ---
 

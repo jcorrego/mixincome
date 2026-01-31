@@ -4,121 +4,93 @@ Entity management enables users to create and manage additional legal entities (
 
 ## ADDED Requirements
 
-### Requirement: Create Entity
+### Requirement: Entity CRUD Operations
 
-A user SHALL be able to create a legal entity (non-individual) under one of their UserProfiles.
+The system SHALL provide a complete CRUD interface for managing legal entities (Entity). A user can create, read, update, and delete entities. Each entity must belong to a user profile.
 
-**Details**:
-- Entity belongs to exactly one UserProfile
-- entity_type MUST be one of: LLC, SCorp, CCorp, Partnership, Trust, Other (NO "Individual")
-- Requires name (company name) and tax_id (EIN, registration number, etc.)
-- Status defaults to 'Active'
-- Timestamps auto-managed
-- Entities are NOT auto-created; user must explicitly create them
+#### Scenario: List all user entities
+- **WHEN** user navigates to `/management/entities`
+- **THEN** system displays a table of all entities for the current user (across all profiles), showing: user_profile_id (with profile context), name, entity_type, tax_id, status, created_at
 
-#### Scenario: Create LLC under USA profile
-- **WHEN** User creates Entity with name="My Tech LLC", entity_type=LLC, tax_id="EIN123456789" under USA profile
-- **THEN** Entity is created with user_profile_id=1, entity_type=LLC, status="Active"
+#### Scenario: Create a new entity
+- **WHEN** user clicks "Create Entity" and submits the form with: user_profile_id (required, dropdown), name (required, string), entity_type (required, enum: LLC, SCorp, CCorp, Partnership, Trust, Other), tax_id (required, string), status (optional, defaults to "Active")
+- **THEN** system validates the form (profile exists, entity_type is valid, tax_id is unique per entity), creates the entity, displays success message, updates the entity list
 
-#### Scenario: Prevent individual entity
-- **WHEN** User tries to create Entity with entity_type="Individual"
-- **THEN** Validation fails; enum only accepts LLC, SCorp, CCorp, Partnership, Trust, Other
+#### Scenario: Create entity fails on invalid data
+- **WHEN** user submits entity creation form with missing user_profile_id, invalid entity_type, or missing name
+- **THEN** system displays form validation errors (custom messages for each field) and does not create the entity
 
-#### Scenario: Create multiple entities under same profile
-- **WHEN** User creates Entity A (LLC) and Entity B (SCorp) under same USA profile
-- **THEN** Both entities coexist; profile has 2 entities
+#### Scenario: Edit an existing entity
+- **WHEN** user clicks "Edit" on an entity and submits updated data (user_profile_id, name, entity_type, tax_id, status)
+- **THEN** system validates the form, updates the entity, displays success message, refreshes the entity list
 
-#### Scenario: Entity NOT auto-created with profile
-- **WHEN** User creates a new UserProfile
-- **THEN** No entities are automatically created; profile.entities = []
+#### Scenario: Delete an entity
+- **WHEN** user clicks "Delete" on an entity and confirms the deletion
+- **THEN** system checks if entity has associated accounts/transactions/filings; if yes, displays error "Cannot delete entity with related data"; if no, deletes the entity, displays success message, refreshes the entity list
 
 ---
 
-### Requirement: Retrieve Entity
+### Requirement: Address Association for Entities
 
-A user SHALL be able to retrieve entity details and list entities under a profile.
+When creating or editing an entity, the user SHALL select an address (existing or create new). Each entity can have one address.
 
-#### Scenario: Get entity by ID
-- **WHEN** Entity ID is queried
-- **THEN** Returns Entity with all fields: user_profile_id, name, entity_type, tax_id, status, timestamps
+#### Scenario: Create entity with existing address
+- **WHEN** user creates an entity and selects an existing address from the "Address" dropdown
+- **THEN** system associates the address to the entity (sets address_id), creates entity successfully
 
-#### Scenario: List entities for profile
-- **WHEN** UserProfile entities are queried
-- **THEN** Returns collection of all entities under that profile
+#### Scenario: Create entity without address
+- **WHEN** user creates an entity and leaves the "Address" dropdown empty
+- **THEN** system creates the entity with address_id = NULL (address is optional)
 
-#### Scenario: Get entity with profile context
-- **WHEN** Entity is loaded with its profile
-- **THEN** Returns entity with eager-loaded profile (no N+1)
+#### Scenario: Navigate to address management from entity form
+- **WHEN** user clicks "Create new address" link in the entity form
+- **THEN** system navigates to `/management/addresses` page (no entity creation happens, form is abandoned)
 
----
-
-### Requirement: Update Entity
-
-A user SHALL be able to update entity details (name, status, tax_id).
-
-#### Scenario: Update entity name
-- **WHEN** User updates Entity name to "New LLC Name"
-- **THEN** Entity.name changes; timestamps updated
-
-#### Scenario: Change entity status
-- **WHEN** User deactivates entity (status → "Inactive")
-- **THEN** Status changes; related accounts/assets remain (independent status)
-
-#### Scenario: Update tax_id
-- **WHEN** User updates tax_id after registration change
-- **THEN** tax_id is updated; no duplicates created
+#### Scenario: Edit entity and change address
+- **WHEN** user edits an entity and changes the address (selects a different address from dropdown)
+- **THEN** system updates the entity.address_id to the new address, displays success message
 
 ---
 
-### Requirement: Delete Entity
+### Requirement: User Profile Selection for Entity
 
-A user SHALL be able to delete an entity (cascade deletes related accounts, assets, documents).
+When creating an entity, the user MUST select an existing user profile. The dropdown SHALL show all active profiles for the current user.
 
-#### Scenario: Delete entity with accounts
-- **WHEN** User deletes Entity with related Accounts
-- **THEN** Entity + all related Accounts are deleted
+#### Scenario: Create entity shows available profiles
+- **WHEN** user clicks "Create Entity" and views the "User Profile" dropdown
+- **THEN** system displays all active profiles for the current user (with jurisdiction and tax_id for context)
 
-#### Scenario: Delete entity with address
-- **WHEN** User deletes Entity that has an Address
-- **THEN** Entity is deleted; Address is deleted (or soft-deleted if audit needed later)
-
----
-
-### Requirement: Entity-UserProfile Relationship
-
-An Entity SHALL belong to exactly one UserProfile and cannot change that relationship.
-
-#### Scenario: Access entity's profile
-- **WHEN** Entity.userProfile is accessed
-- **THEN** Returns UserProfile model with user_id, jurisdiction_id, tax_id
-
-#### Scenario: Entity inherits jurisdiction via profile
-- **WHEN** Determining entity's jurisdiction
-- **THEN** Use Entity.userProfile.jurisdiction (entity has no direct jurisdiction field)
+#### Scenario: Create entity requires profile selection
+- **WHEN** user submits entity creation form without selecting a profile
+- **THEN** system displays validation error: "User profile is required" and does not create the entity
 
 ---
 
-### Requirement: Entity Tax ID Requirement
+### Requirement: Authorization for Entity Management
 
-An Entity SHALL require a tax_id at creation (cannot be null).
+Users SHALL only be able to view, edit, and delete entities they own (via their profile). System SHALL enforce this via Authorization Policies.
 
-#### Scenario: Create without tax_id
-- **WHEN** User tries to create Entity without tax_id
-- **THEN** Validation fails; tax_id is required
+#### Scenario: User cannot view another user's entity
+- **WHEN** user attempts to access/edit/delete an entity belonging to another user's profile
+- **THEN** system returns 403 Forbidden
+
+#### Scenario: User can view own entity
+- **WHEN** authenticated user lists entities or edits an entity they own
+- **THEN** system displays the entity successfully
 
 ---
 
-### Requirement: Entity Types (Enum)
+### Requirement: Dependency on User Profiles
 
-The system SHALL support the following entity types: LLC, SCorp, CCorp, Partnership, Trust, Other.
+If no user profiles exist, the Entity management page SHALL display a warning and disable entity creation.
 
-#### Scenario: List available entity types
-- **WHEN** Entity.entity_type values are enumerated
-- **THEN** Returns: LLC, SCorp, CCorp, Partnership, Trust, Other (no Individual)
+#### Scenario: Entity page warns when no profiles exist
+- **WHEN** user navigates to `/management/entities` and no profiles exist
+- **THEN** system displays: "No tax profiles exist. [Link: Create a UserProfile] Create a profile first to add entities." and "Create Entity" button is disabled
 
-#### Scenario: Enum cast in model
-- **WHEN** Entity is instantiated with entity_type="LLC"
-- **THEN** entity_type is cast to EntityType enum (type-safe)
+#### Scenario: Entity creation enabled when profiles exist
+- **WHEN** at least one profile exists
+- **THEN** system enables the "Create Entity" button and allows entity creation
 
 ---
 
@@ -127,4 +99,4 @@ The system SHALL support the following entity types: LLC, SCorp, CCorp, Partners
 - Accounts and Assets can hang off Entities (Fase 2)
 - Documents can be associated with Entities (Fase 4)
 - Tax reporting can target specific entities (Fase 3)
-- Address system can attach addresses to Entities (polymorphic)
+- Address system can attach addresses to Entities (foreign key)
