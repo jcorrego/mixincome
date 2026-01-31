@@ -56,8 +56,4 @@ final class UpdateEntityRequest extends FormRequest
     /**
      * @return array<string, mixed>
      */
-    public function validated(): array
-    {
-        return parent::validated();
-    }
 }
