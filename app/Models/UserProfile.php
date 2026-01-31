@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * User's tax profile for a specific jurisdiction.
@@ -19,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property-read int $id
  * @property int $user_id
  * @property int $jurisdiction_id
+ * @property int|null $address_id
  * @property string $tax_id
  * @property string $status
  * @property Carbon $created_at
@@ -40,6 +40,7 @@ final class UserProfile extends Model
     protected $fillable = [
         'user_id',
         'jurisdiction_id',
+        'address_id',
         'tax_id',
         'status',
     ];
@@ -50,6 +51,7 @@ final class UserProfile extends Model
             'id' => 'int',
             'user_id' => 'int',
             'jurisdiction_id' => 'int',
+            'address_id' => 'int',
             'status' => 'string',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
@@ -71,8 +73,8 @@ final class UserProfile extends Model
         return $this->hasMany(Entity::class);
     }
 
-    public function address(): MorphOne
+    public function address(): BelongsTo
     {
-        return $this->morphOne(Address::class, 'addressable');
+        return $this->belongsTo(Address::class);
     }
 }

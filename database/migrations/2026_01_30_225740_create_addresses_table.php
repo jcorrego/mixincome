@@ -12,8 +12,6 @@ return new class extends Migration
     {
         Schema::create('addresses', function (Blueprint $table): void {
             $table->id();
-            $table->unsignedBigInteger('addressable_id')->nullable();
-            $table->string('addressable_type')->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->string('street');
             $table->string('city');
@@ -22,8 +20,7 @@ return new class extends Migration
             $table->string('country');
             $table->timestamps();
 
-            // Indexes for polymorphic relationship
-            $table->index(['addressable_id', 'addressable_type']);
+            // Index for user ownership
             $table->index('user_id');
         });
     }

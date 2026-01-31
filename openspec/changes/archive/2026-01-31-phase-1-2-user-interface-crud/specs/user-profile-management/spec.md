@@ -1,11 +1,8 @@
 # Specification: User Profile Management
 
-User profile management enables users to establish and manage their legal tax identity in multiple jurisdictions.
-
 ## ADDED Requirements
 
 ### Requirement: User Profile CRUD Operations
-
 The system SHALL provide a complete CRUD interface for managing tax profiles (UserProfile). A user can create, read, update, and delete their own profiles. Each profile is tied to a jurisdiction.
 
 #### Scenario: List all user profiles
@@ -31,7 +28,6 @@ The system SHALL provide a complete CRUD interface for managing tax profiles (Us
 ---
 
 ### Requirement: Address Association for Profiles
-
 When creating or editing a profile, the user SHALL select an address (existing or create new). Each profile can have one address.
 
 #### Scenario: Create profile with existing address
@@ -53,7 +49,6 @@ When creating or editing a profile, the user SHALL select an address (existing o
 ---
 
 ### Requirement: Authorization for Profile Management
-
 Users SHALL only be able to view, edit, and delete their own profiles. System SHALL enforce this via Authorization Policies.
 
 #### Scenario: User cannot view another user's profile
@@ -67,7 +62,6 @@ Users SHALL only be able to view, edit, and delete their own profiles. System SH
 ---
 
 ### Requirement: Dependency Checks
-
 If the system has no profiles, the Entity management page SHALL display a warning message and disable the "Create Entity" button.
 
 #### Scenario: Entity page warns when no profiles exist
@@ -77,12 +71,3 @@ If the system has no profiles, the Entity management page SHALL display a warnin
 #### Scenario: Entity page allows creation when profiles exist
 - **WHEN** user navigates to `/management/entities` and at least one profile exists
 - **THEN** system displays the entity list normally and the "Create Entity" button is enabled
-
----
-
-## Capabilities Enabled by These Requirements
-
-- Entity management can reference a specific UserProfile
-- Address system can associate addresses to UserProfiles (foreign key)
-- Future Fase 2 (Accounts, Transactions) can hang off UserProfile
-- Future phases can organize by UserProfile

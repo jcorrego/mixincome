@@ -1,11 +1,8 @@
 # Specification: Address Management
 
-Address management enables users to create and reuse addresses across multiple models (UserProfile, Entity, Account, Asset) within their jurisdiction.
-
 ## ADDED Requirements
 
 ### Requirement: Address CRUD Operations (Independent)
-
 The system SHALL provide a complete CRUD interface for managing addresses (Address). Addresses are independent entities that can be reused across UserProfiles, Entities, Accounts, and Assets. A user can create, read, update, and delete addresses.
 
 #### Scenario: List all user addresses
@@ -38,7 +35,6 @@ The system SHALL provide a complete CRUD interface for managing addresses (Addre
 ---
 
 ### Requirement: Address Reusability
-
 The same address resource SHALL be selectable and usable across multiple models (UserProfile, Entity, Account, Asset). Users can create one address and assign it to multiple models.
 
 #### Scenario: Address used by multiple models
@@ -58,7 +54,6 @@ The same address resource SHALL be selectable and usable across multiple models 
 ---
 
 ### Requirement: Address Ownership
-
 Each address has an owner (user_id) who created it. Users SHALL only be able to view, edit, and delete their own addresses.
 
 #### Scenario: User can manage own addresses
@@ -72,7 +67,6 @@ Each address has an owner (user_id) who created it. Users SHALL only be able to 
 ---
 
 ### Requirement: Address Structure (FK-based, not Polymorphic)
-
 Address table SHALL be an independent resource with `user_id` (for ownership). Other models (UserProfile, Entity, Account, Asset) have `address_id` FK pointing to addresses. Each model can have one address, but an address can be used by multiple models.
 
 #### Scenario: Address structure validation
@@ -88,7 +82,6 @@ Address table SHALL be an independent resource with `user_id` (for ownership). O
 ---
 
 ### Requirement: Address Display in Profile/Entity Forms
-
 When users create or edit a UserProfile or Entity, they can select an existing address from a dropdown. System SHALL display available addresses in a user-friendly way.
 
 #### Scenario: Address dropdown shows available addresses
@@ -98,13 +91,3 @@ When users create or edit a UserProfile or Entity, they can select an existing a
 #### Scenario: User can leave address empty
 - **WHEN** user submits a profile/entity creation form without selecting an address
 - **THEN** system creates the model with address_id = NULL
-
----
-
-## Capabilities Enabled by These Requirements
-
-- UserProfile can have address (fiscal address)
-- Entity can have address (registered office)
-- Future Accounts/Assets can have addresses (Fase 2)
-- Address reuse prevents duplication across user's models
-- Foundation for document associations (receipts, invoices linked to addresses)

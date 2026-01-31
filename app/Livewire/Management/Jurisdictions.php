@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Management;
 
+use App\Http\Requests\StoreJurisdictionRequest;
+use App\Http\Requests\UpdateJurisdictionRequest;
 use App\Models\Jurisdiction;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Unique;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -26,8 +26,10 @@ final class Jurisdictions extends Component
 
     public function create(): void
     {
+        $storeRequest = new StoreJurisdictionRequest();
+
         /** @var array<string, mixed> $validated */
-        $validated = $this->validate($this->createRules());
+        $validated = $this->validate($storeRequest->rules(), $storeRequest->messages());
 
         Jurisdiction::query()->create($validated);
 
@@ -52,8 +54,12 @@ final class Jurisdictions extends Component
     {
         $jurisdiction = Jurisdiction::query()->findOrFail($this->editingId);
 
+        $updateRequest = new UpdateJurisdictionRequest();
+        // Set jurisdiction_id in the request for validation rules
+        $updateRequest->merge(['jurisdiction_id' => $jurisdiction->id]);
+
         /** @var array<string, mixed> $validated */
-        $validated = $this->validate($this->updateRules($jurisdiction->id));
+        $validated = $this->validate($updateRequest->rules(), $updateRequest->messages());
 
         $jurisdiction->update($validated);
 
@@ -86,32 +92,6 @@ final class Jurisdictions extends Component
     public function render(): View
     {
         return view('livewire.management.jurisdictions');
-    }
-
-    /**
-     * @return array<string, array<int, Unique|string>>
-     */
-    private function createRules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'iso_code' => ['required', 'string', 'min:2', 'max:3', Rule::unique('jurisdictions', 'iso_code')],
-            'timezone' => ['required', 'string', 'timezone'],
-            'default_currency' => ['required', 'string', 'size:3'],
-        ];
-    }
-
-    /**
-     * @return array<string, array<int, Unique|string>>
-     */
-    private function updateRules(int $ignoreId): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'iso_code' => ['required', 'string', 'min:2', 'max:3', Rule::unique('jurisdictions', 'iso_code')->ignore($ignoreId)],
-            'timezone' => ['required', 'string', 'timezone'],
-            'default_currency' => ['required', 'string', 'size:3'],
-        ];
     }
 
     private function resetForm(): void

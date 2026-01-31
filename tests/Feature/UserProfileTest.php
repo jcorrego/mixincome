@@ -72,7 +72,7 @@ describe('UserProfile Creation', function (): void {
             'tax_id' => 'NIF999999999',
             'status' => 'Active',
         ]))->toThrow(Exception::class);
-    })->skip();
+    });
 });
 
 describe('UserProfile Retrieval', function (): void {
@@ -98,7 +98,7 @@ describe('UserProfile Retrieval', function (): void {
         $profiles = UserProfile::with('jurisdiction')->get();
 
         expect($profiles)->toHaveCount(5);
-    })->skip();
+    });
 });
 
 describe('UserProfile Updates', function (): void {
@@ -133,7 +133,7 @@ describe('UserProfile Deletion', function (): void {
         $profile->delete();
 
         expect(Entity::query()->whereIn('id', $entityIds)->count())->toBe(0);
-    })->skip();
+    });
 
     it('4.2 deleting UserProfile without entities works cleanly', function (): void {
         $profile = UserProfile::factory()->create();
@@ -168,7 +168,7 @@ describe('Model Relationships - UserProfile', function (): void {
 
         expect($user->userProfiles)->toHaveCount(3)
             ->and($user->userProfiles[0])->toBeInstanceOf(UserProfile::class);
-    })->skip();
+    });
 
     it('23.2 UserProfile.user returns belongsTo(User)', function (): void {
         $user = User::factory()->create();
@@ -193,16 +193,13 @@ describe('Model Relationships - UserProfile', function (): void {
 
         expect($profile->entities)->toHaveCount(2)
             ->and($profile->entities[0])->toBeInstanceOf(Entity::class);
-    })->skip();
+    });
 
-    it('23.5 UserProfile.address returns morphOne(Address)', function (): void {
-        $profile = UserProfile::factory()->create();
-        $address = Address::factory()->create([
-            'addressable_id' => $profile->id,
-            'addressable_type' => UserProfile::class,
-        ]);
+    it('23.5 UserProfile.address returns belongsTo(Address)', function (): void {
+        $address = Address::factory()->create();
+        $profile = UserProfile::factory()->create(['address_id' => $address->id]);
 
         expect($profile->address->id)->toBe($address->id)
             ->and($profile->address)->toBeInstanceOf(Address::class);
-    })->skip();
+    });
 });

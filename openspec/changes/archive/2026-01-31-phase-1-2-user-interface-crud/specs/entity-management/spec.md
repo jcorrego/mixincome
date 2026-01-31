@@ -1,11 +1,8 @@
 # Specification: Entity Management
 
-Entity management enables users to create and manage additional legal entities (LLC, S-Corp, Corporation, Partnership, Trust) under their tax profiles.
-
 ## ADDED Requirements
 
 ### Requirement: Entity CRUD Operations
-
 The system SHALL provide a complete CRUD interface for managing legal entities (Entity). A user can create, read, update, and delete entities. Each entity must belong to a user profile.
 
 #### Scenario: List all user entities
@@ -31,7 +28,6 @@ The system SHALL provide a complete CRUD interface for managing legal entities (
 ---
 
 ### Requirement: Address Association for Entities
-
 When creating or editing an entity, the user SHALL select an address (existing or create new). Each entity can have one address.
 
 #### Scenario: Create entity with existing address
@@ -53,7 +49,6 @@ When creating or editing an entity, the user SHALL select an address (existing o
 ---
 
 ### Requirement: User Profile Selection for Entity
-
 When creating an entity, the user MUST select an existing user profile. The dropdown SHALL show all active profiles for the current user.
 
 #### Scenario: Create entity shows available profiles
@@ -67,7 +62,6 @@ When creating an entity, the user MUST select an existing user profile. The drop
 ---
 
 ### Requirement: Authorization for Entity Management
-
 Users SHALL only be able to view, edit, and delete entities they own (via their profile). System SHALL enforce this via Authorization Policies.
 
 #### Scenario: User cannot view another user's entity
@@ -81,7 +75,6 @@ Users SHALL only be able to view, edit, and delete entities they own (via their 
 ---
 
 ### Requirement: Dependency on User Profiles
-
 If no user profiles exist, the Entity management page SHALL display a warning and disable entity creation.
 
 #### Scenario: Entity page warns when no profiles exist
@@ -91,12 +84,3 @@ If no user profiles exist, the Entity management page SHALL display a warning an
 #### Scenario: Entity creation enabled when profiles exist
 - **WHEN** at least one profile exists
 - **THEN** system enables the "Create Entity" button and allows entity creation
-
----
-
-## Capabilities Enabled by These Requirements
-
-- Accounts and Assets can hang off Entities (Fase 2)
-- Documents can be associated with Entities (Fase 4)
-- Tax reporting can target specific entities (Fase 3)
-- Address system can attach addresses to Entities (foreign key)

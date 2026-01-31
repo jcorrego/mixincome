@@ -56,10 +56,11 @@ describe('Full Type Coverage', function (): void {
         expect($address->casts())->toBeArray();
 
         // Access all relationships
-        $address->addressable();
         $address->user();
+        $address->userProfiles();
+        $address->entities();
 
-        // Verify required attributes (addressable_id and addressable_type can be null)
+        // Verify required attributes
         expect($address->user_id)->not->toBeNull();
         expect($address->street)->not->toBeNull();
         expect($address->city)->not->toBeNull();

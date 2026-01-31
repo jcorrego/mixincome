@@ -13,11 +13,15 @@ return new class extends Migration
         Schema::create('entities', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_profile_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('address_id')->nullable()->constrained()->onDelete('set null')->onUpdate('cascade');
             $table->string('name');
             $table->string('entity_type');
             $table->string('tax_id');
             $table->string('status')->default('Active');
             $table->timestamps();
+
+            // Index for address lookup
+            $table->index('address_id');
         });
     }
 
