@@ -6,9 +6,11 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Database\Factories\AddressFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Independent address resource that can be reused by users, entities, accounts, and assets.
@@ -23,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User $user
+ * @property-read Collection<int, UserProfile> $userProfiles
+ * @property-read Collection<int, Entity> $entities
  */
 final class Address extends Model
 {
@@ -56,5 +60,21 @@ final class Address extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return HasMany<UserProfile>
+     */
+    public function userProfiles(): HasMany
+    {
+        return $this->hasMany(UserProfile::class);
+    }
+
+    /**
+     * @return HasMany<Entity>
+     */
+    public function entities(): HasMany
+    {
+        return $this->hasMany(Entity::class);
     }
 }
