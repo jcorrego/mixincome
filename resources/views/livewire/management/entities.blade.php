@@ -88,7 +88,7 @@
             <flux:select wire:model="address_id" :label="__('Address')" placeholder="{{ __('No address') }}">
                 <flux:select.option value="">{{ __('No address') }}</flux:select.option>
                 @foreach ($this->addresses as $address)
-                    <flux:select.option :value="$address->id">{{ $address->display_label }}</flux:select.option>
+                    <flux:select.option :value="$address->id">{{ $address->displayLabel() }}</flux:select.option>
                 @endforeach
             </flux:select>
 
@@ -126,7 +126,7 @@
             <flux:select wire:model="address_id" :label="__('Address')" placeholder="{{ __('No address') }}">
                 <flux:select.option value="">{{ __('No address') }}</flux:select.option>
                 @foreach ($this->addresses as $address)
-                    <flux:select.option :value="$address->id">{{ $address->display_label }}</flux:select.option>
+                    <flux:select.option :value="$address->id">{{ $address->displayLabel() }}</flux:select.option>
                 @endforeach
             </flux:select>
 

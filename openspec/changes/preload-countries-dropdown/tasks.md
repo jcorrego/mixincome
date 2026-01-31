@@ -43,8 +43,9 @@
 
 ## 6. Existing Tests & Quality
 
-- [ ] 6.1 Update existing `AddressTest.php` feature tests to use valid Country enum codes instead of free-text country values
-- [ ] 6.2 Run full address test suite: `php artisan test --compact tests/Feature/Management/AddressTest.php`
-- [ ] 6.3 Run `vendor/bin/pint --dirty` to fix formatting
-- [ ] 6.4 Run `composer lint` for full quality check (Pint + Rector + Larastan)
-- [ ] 6.5 Verify all tests pass: `php artisan test --compact`
+- [x] 6.1 Update existing `AddressTest.php` feature tests to use valid Country enum codes instead of free-text country values
+- [x] 6.2 Run full address test suite: `php artisan test --compact tests/Feature/Management/AddressTest.php`
+- [x] 6.3 Run `vendor/bin/pint --dirty` to fix formatting
+- [x] 6.4 Run `composer lint` for full quality check (Pint + Rector + Larastan)
+- [x] 6.5 Verify all tests pass: `php artisan test --compact`
+      → All 241 tests passing (509 assertions)

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Country;
 use App\Enums\EntityType;
 use App\Models\Address;
 use App\Models\Entity;
@@ -46,8 +47,8 @@ describe('Factories & Realistic Data', function (): void {
         expect($address->street)->not->toBeEmpty()
             ->and($address->city)->not->toBeEmpty()
             ->and($address->state)->not->toBeEmpty()
-            ->and($address->country)->not->toBeEmpty()
-            ->and(mb_strlen($address->country))->toBe(2); // ISO country code
+            ->and($address->country)->toBeInstanceOf(Country::class)
+            ->and(mb_strlen($address->country->value))->toBe(2); // ISO country code
     });
 
     it('21.6 Factories can be chained (UserProfile → Entities → Addresses)', function (): void {

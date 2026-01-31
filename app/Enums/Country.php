@@ -260,6 +260,43 @@ enum Country: string
     case Zimbabwe = 'ZW';
 
     /**
+     * Get options suitable for dropdown selects.
+     *
+     * @param  array<int, string>  $priority  ISO alpha-2 codes to show first
+     * @return array<int, array{value: string, label: string}>
+     */
+    public static function options(array $priority = []): array
+    {
+        $allOptions = array_map(
+            fn (self $case): array => ['value' => $case->value, 'label' => $case->label()],
+            self::cases()
+        );
+
+        usort($allOptions, fn (array $a, array $b): int => strcmp($a['label'], $b['label']));
+
+        if ($priority === []) {
+            return $allOptions;
+        }
+
+        $priorityOptions = [];
+        $remainingOptions = [];
+
+        $priorityMap = array_flip($priority);
+
+        foreach ($allOptions as $option) {
+            if (isset($priorityMap[$option['value']])) {
+                $priorityOptions[$priorityMap[$option['value']]] = $option;
+            } else {
+                $remainingOptions[] = $option;
+            }
+        }
+
+        ksort($priorityOptions);
+
+        return array_values([...$priorityOptions, ...$remainingOptions]);
+    }
+
+    /**
      * Get the human-readable English name for this country.
      */
     public function label(): string
@@ -515,42 +552,5 @@ enum Country: string
             self::Zambia => 'Zambia',
             self::Zimbabwe => 'Zimbabwe',
         };
-    }
-
-    /**
-     * Get options suitable for dropdown selects.
-     *
-     * @param  array<int, string>  $priority  ISO alpha-2 codes to show first
-     * @return array<int, array{value: string, label: string}>
-     */
-    public static function options(array $priority = []): array
-    {
-        $allOptions = array_map(
-            fn (self $case): array => ['value' => $case->value, 'label' => $case->label()],
-            self::cases()
-        );
-
-        usort($allOptions, fn (array $a, array $b): int => strcmp($a['label'], $b['label']));
-
-        if ($priority === []) {
-            return $allOptions;
-        }
-
-        $priorityOptions = [];
-        $remainingOptions = [];
-
-        $priorityMap = array_flip($priority);
-
-        foreach ($allOptions as $option) {
-            if (isset($priorityMap[$option['value']])) {
-                $priorityOptions[$priorityMap[$option['value']]] = $option;
-            } else {
-                $remainingOptions[] = $option;
-            }
-        }
-
-        ksort($priorityOptions);
-
-        return array_values([...$priorityOptions, ...$remainingOptions]);
     }
 }
