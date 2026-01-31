@@ -200,6 +200,41 @@ test('other user cannot delete profile', function (): void {
         ->assertForbidden();
 });
 
+// --- Address Dropdown Display Format ---
+
+test('profile create form shows addresses with country in dropdown', function (): void {
+    $user = User::factory()->create();
+    $address = Address::factory()->create([
+        'user_id' => $user->id,
+        'street' => '789 Gran Via',
+        'city' => 'Madrid',
+        'country' => 'ES',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(UserProfiles::class)
+        ->assertSee('789 Gran Via, Madrid (ES)');
+});
+
+test('profile edit form shows addresses with country in dropdown', function (): void {
+    $user = User::factory()->create();
+    $address = Address::factory()->create([
+        'user_id' => $user->id,
+        'street' => '321 Elm St',
+        'city' => 'Denver',
+        'country' => 'US',
+    ]);
+    $profile = UserProfile::factory()->create([
+        'user_id' => $user->id,
+        'address_id' => $address->id,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(UserProfiles::class)
+        ->call('edit', $profile->id)
+        ->assertSee('321 Elm St, Denver (US)');
+});
+
 // --- API Endpoint Tests (for Controller Coverage) ---
 
 test('api index returns user profiles', function (): void {

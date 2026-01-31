@@ -57,6 +57,11 @@ final class Address extends Model
         ];
     }
 
+    public function displayLabel(): string
+    {
+        return "{$this->street}, {$this->city} ({$this->country})";
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
