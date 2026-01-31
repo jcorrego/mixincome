@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Country;
 use Carbon\Carbon;
 use Database\Factories\AddressFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +23,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $city
  * @property string $state
  * @property string $postal_code
- * @property string $country
+ * @property Country $country
+ * @property-read string $display_label
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User $user
@@ -51,15 +54,20 @@ final class Address extends Model
             'city' => 'string',
             'state' => 'string',
             'postal_code' => 'string',
-            'country' => 'string',
+            'country' => Country::class,
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
     }
 
-    public function displayLabel(): string
+    /**
+     * @return Attribute<string, never>
+     */
+    protected function displayLabel(): Attribute
     {
-        return "{$this->street}, {$this->city} ({$this->country})";
+        return Attribute::make(
+            get: fn (): string => "{$this->street}, {$this->city} ({$this->country->label()})",
+        );
     }
 
     public function user(): BelongsTo

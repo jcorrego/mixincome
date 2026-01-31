@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\Country;
 use App\Models\Address;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -26,7 +27,7 @@ final class AddressFactory extends Factory
             'city' => $this->faker->city(),
             'state' => $this->faker->word(),
             'postal_code' => $this->faker->postcode(),
-            'country' => $this->faker->countryCode(),
+            'country' => fake()->randomElement(Country::cases()),
         ];
     }
 }

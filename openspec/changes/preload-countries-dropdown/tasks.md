@@ -8,12 +8,12 @@
 
 ## 2. Address Model Updates
 
-- [ ] 2.1 Update Address model: cast `country` to `Country` enum in `casts()` method
-- [ ] 2.2 Add `display_label` attribute accessor to Address model: `"{street}, {city} ({country_label})"`
-- [ ] 2.3 Update Address model PHPDoc `@property` for `country` to reflect `Country` type
-- [ ] 2.4 Update `AddressFactory` to use `Country` enum (e.g., `fake()->randomElement(Country::cases())`)
-- [ ] 2.5 Write failing tests for model cast and accessor (tests 2.1–2.2) in `tests/Unit/Models/AddressTest.php`
-- [ ] 2.6 Run tests, confirm green for group 2
+- [x] 2.1 Update Address model: cast `country` to `Country` enum in `casts()` method
+- [x] 2.2 Add `display_label` attribute accessor to Address model: `"{street}, {city} ({country_label})"`
+- [x] 2.3 Update Address model PHPDoc `@property` for `country` to reflect `Country` type
+- [x] 2.4 Update `AddressFactory` to use `Country` enum (e.g., `fake()->randomElement(Country::cases())`)
+- [x] 2.5 Write failing tests for model cast and accessor (tests 2.1–2.2) in `tests/Unit/Models/AddressTest.php`
+- [x] 2.6 Run tests, confirm green for group 2
       → Tests passing: 2.1, 2.2
 
 ## 3. Validation Rules Update
