@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Country;
 use App\Livewire\Management\Addresses;
 use App\Models\Address;
 use App\Models\Entity;
@@ -241,4 +242,102 @@ test('api unauthorized user cannot destroy address', function (): void {
     $this->actingAs($otherUser)
         ->deleteJson("/api/management/addresses/{$address->id}")
         ->assertForbidden();
+});
+
+// --- 3.1 Address list displays country as full name from enum ---
+
+test('address list displays country as full name from enum', function (): void {
+    $user = User::factory()->create();
+    Address::factory()->create([
+        'user_id' => $user->id,
+        'country' => 'US',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Addresses::class)
+        ->assertSee('United States');
+});
+
+// --- 3.2 Creating address with valid Country enum code succeeds ---
+
+test('creating address with valid Country enum code succeeds', function (): void {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test(Addresses::class)
+        ->set('street', '100 Elm St')
+        ->set('city', 'Denver')
+        ->set('state', 'Colorado')
+        ->set('postal_code', '80201')
+        ->set('country', 'ES')
+        ->call('create')
+        ->assertHasNoErrors();
+
+    $address = Address::query()->where('user_id', $user->id)->where('street', '100 Elm St')->first();
+
+    expect($address)->not->toBeNull()
+        ->and($address->country)->toBe(Country::Spain);
+});
+
+// --- 3.3 Creating address with invalid country code fails validation ---
+
+test('creating address with invalid country code fails validation', function (): void {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test(Addresses::class)
+        ->set('street', '100 Elm St')
+        ->set('city', 'Denver')
+        ->set('state', 'Colorado')
+        ->set('postal_code', '80201')
+        ->set('country', 'INVALID')
+        ->call('create')
+        ->assertHasErrors(['country']);
+});
+
+// --- 3.4 Creating address with missing required fields fails validation ---
+
+test('creating address with missing fields fails validation with enum', function (): void {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test(Addresses::class)
+        ->set('street', '')
+        ->set('city', '')
+        ->set('state', '')
+        ->set('postal_code', '')
+        ->set('country', '')
+        ->call('create')
+        ->assertHasErrors(['street', 'city', 'state', 'postal_code', 'country']);
+});
+
+// --- 3.5 Editing address with valid Country enum code succeeds ---
+
+test('editing address with valid Country enum code succeeds', function (): void {
+    $user = User::factory()->create();
+    $address = Address::factory()->create([
+        'user_id' => $user->id,
+        'country' => 'US',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Addresses::class)
+        ->call('edit', $address->id)
+        ->set('country', 'ES')
+        ->call('update')
+        ->assertHasNoErrors();
+
+    expect($address->fresh()->country)->toBe(Country::Spain);
+});
+
+// --- 3.6 Address form renders country as searchable dropdown ---
+
+test('address form renders country as searchable dropdown', function (): void {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test(Addresses::class)
+        ->assertSee('United States')
+        ->assertSee('Spain')
+        ->assertSee('Colombia');
 });

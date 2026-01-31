@@ -200,9 +200,9 @@ test('other user cannot delete profile', function (): void {
         ->assertForbidden();
 });
 
-// --- Address Dropdown Display Format ---
+// --- 5.2 Address Dropdown Display Format (Country Name) ---
 
-test('profile create form shows addresses with country in dropdown', function (): void {
+test('profile form address dropdown displays display_label with country name', function (): void {
     $user = User::factory()->create();
     $address = Address::factory()->create([
         'user_id' => $user->id,
@@ -213,10 +213,10 @@ test('profile create form shows addresses with country in dropdown', function ()
 
     Livewire::actingAs($user)
         ->test(UserProfiles::class)
-        ->assertSee('789 Gran Via, Madrid (ES)');
+        ->assertSee('789 Gran Via, Madrid (Spain)');
 });
 
-test('profile edit form shows addresses with country in dropdown', function (): void {
+test('profile edit form address dropdown displays display_label with country name', function (): void {
     $user = User::factory()->create();
     $address = Address::factory()->create([
         'user_id' => $user->id,
@@ -232,7 +232,7 @@ test('profile edit form shows addresses with country in dropdown', function (): 
     Livewire::actingAs($user)
         ->test(UserProfiles::class)
         ->call('edit', $profile->id)
-        ->assertSee('321 Elm St, Denver (US)');
+        ->assertSee('321 Elm St, Denver (United States)');
 });
 
 // --- API Endpoint Tests (for Controller Coverage) ---
