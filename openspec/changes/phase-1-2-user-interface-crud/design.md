@@ -66,7 +66,7 @@ Asset: address_id (FK to addresses, nullable) — Fase 2
 - Junction table (AddressAssignment): Over-engineered for current MVP scope
 - **CHOSEN**: Simple FK on each model (chosen)
 
-**Breaking change:** Yes — existing addresses must be restructured. Rollback plan: keep old migration, create new one that drops polymorphic columns and adds FK columns.
+**Breaking change:** Yes — existing addresses must be restructured. Migration approach: edit existing `create_addresses_table` migration to remove polymorphic columns. Rollback: `php artisan migrate:rollback` reverts naturally.
 
 ---
 
