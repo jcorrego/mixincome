@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Management;
 use App\Http\Requests\StoreEntityRequest;
 use App\Http\Requests\UpdateEntityRequest;
 use App\Models\Entity;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -31,8 +32,8 @@ final class EntityController
         $this->authorize('viewAny', Entity::class);
 
         $entities = Entity::query()
-            ->whereHas('userProfile', function ($query) {
-                $query->where('user_id', auth()->id());
+            ->whereHas('userProfile', function (Builder $query): Builder {
+                return $query->where('user_id', auth()->id());
             })
             ->with(['userProfile', 'address'])
             ->get();
