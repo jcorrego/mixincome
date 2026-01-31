@@ -192,25 +192,65 @@ create_addresses_table
 **Enums to Create:**
 - `EntityType` (LLC, SCorp, CCorp, Partnership, Trust, Other) — NO Individual
 
-#### 1.2 Tax Year Structure (FASE 1.2 - PRÓXIMA)
-Dependencias: UserProfile
+#### 1.2 User Interface — UserProfile, Entity, Address CRUD (FASE 1.2 - PRÓXIMA)
+Dependencias: UserProfile, Entity, Address models (✅ Fase 1.1)
 
-**Modelos a crear (cuando Fase 1.1 complete):**
-- `TaxYear` — Año fiscal por UserProfile
-  - Relaciones: belongsTo(UserProfile), hasMany(Filing), hasMany(Transaction) where year=TaxYear.year
-  - Campos: user_profile_id, year (int), status (Enum: Draft, InProgress, Filed, Reviewed)
-  - Factory + Tests
+**Objetivo:** Validar modelos en contexto real, proporcionar interfaz para gestionar perfiles, entidades y direcciones.
 
-**Enums (Fase 1.2):**
-- `TaxYearStatus` (Draft, InProgress, Filed, Reviewed)
-- `FilingStatus` (Draft, InProgress, Submitted, Accepted, Amended, Archived)
+**OpenSpec Change:** TBD (crear con `/opsx:new`)
 
-**Nota:** ResidencyPeriod removido (complejidad diferida; implementar si necesario más adelante)
+**Rutas & Páginas a crear:**
+- UserProfile Management
+  - `GET /settings/profiles` → Lista de perfiles por jurisdicción
+  - `GET /settings/profiles/{id}` → Detalle + editar
+  - `POST /settings/profiles` → Crear nuevo perfil
+  - `PATCH /settings/profiles/{id}` → Actualizar
+  - `DELETE /settings/profiles/{id}` → Eliminar
+
+- Entity Management (dentro de un UserProfile)
+  - `GET /settings/profiles/{profileId}/entities` → Lista de entidades
+  - `GET /settings/profiles/{profileId}/entities/{id}` → Detalle + editar
+  - `POST /settings/profiles/{profileId}/entities` → Crear nueva entidad
+  - `PATCH /settings/profiles/{profileId}/entities/{id}` → Actualizar
+  - `DELETE /settings/profiles/{profileId}/entities/{id}` → Eliminar
+
+- Address Management (polimórfico)
+  - Forms embebidos en UserProfile & Entity detail pages
+  - Crear, editar, eliminar direcciones asociadas
+
+**Componentes Livewire/Volt:**
+- `UserProfileForm` (create/edit)
+- `EntityForm` (create/edit)
+- `AddressForm` (polymorphic)
+- `ProfileList` (tabla con acciones)
+- `EntityList` (tabla con acciones)
+
+**Controllers & Form Requests:**
+- `UserProfileController` (CRUD)
+- `EntityController` (CRUD)
+- `AddressController` (CRUD)
+- `StoreUserProfileRequest`, `UpdateUserProfileRequest`
+- `StoreEntityRequest`, `UpdateEntityRequest`
+- `StoreAddressRequest`, `UpdateAddressRequest`
+
+**Testing:**
+- Feature tests para cada ruta
+- Component tests para Livewire forms
+- Authorization tests (user can only manage own profiles)
+
+**UI/Styling:**
+- Flux UI Free components
+- Tailwind CSS v4 responsive layout
+- Form validation & error handling
+
+**Nota:** TaxYear eliminado (no necesario; Filing va directo a UserProfile/Entity con campo year)
 
 ---
 
 ### Fase 2: Finance Schema (Cuentas, Transacciones, Divisas)
 **Objetivo:** Sistema completo de finanzas multi-moneda con FX rates históricos.
+
+**Nota sobre TaxYear:** Eliminado del roadmap. Filing (Fase 3.2) apunta directamente a UserProfile/Entity con campo `year` (int). No hay tabla TaxYear intermedia.
 
 #### 2.1 Currencies & Exchange Rates (`currencies`, `fx_rates`)
 Dependencias: Ninguna
@@ -393,15 +433,17 @@ create_document_tags_table
 
 ```
 1. Jurisdictions        ✅ HECHO
-2. UserProfiles + Entities + Addresses    ✅ DISEÑADO (OpenSpec: phase-1-1-user-profiles-entities-addresses)
-3. TaxYears (Fase 1.2)                    ← PRÓXIMO DESPUÉS DE 1.1
-4. Currencies + FxRates (Fase 2.1)        ← Paralelo con 3
-5. Accounts + TransactionCategories       ← Después de 3 + 4 (Fase 2.2)
+2. UserProfiles + Entities + Addresses    ✅ IMPLEMENTADO (Fase 1.1)
+3. UserInterface (CRUD + Forms)           ← PRÓXIMO (Fase 1.2)
+4. Currencies + FxRates                   ← Después de 3 (Fase 2.1)
+5. Accounts + TransactionCategories       ← Después de 4 (Fase 2.2)
 6. Transactions + TransactionImports      ← Después de 5 (Fase 2.2)
-7. Assets + AssetValuations + YearEndValues ← Después de 3 + 4 (Fase 2.3)
-8. CategoryTaxMappings + DescriptionRules ← Después de 5 + 6 (Fase 3.1)
-9. FilingTypes + Filings                  ← Después de 3 + 8 (Fase 3.2)
+7. Assets + AssetValuations + YearEndValues ← Después de 4 (Fase 2.3)
+8. CategoryTaxMappings + DescriptionRules ← Después de 6 (Fase 3.1)
+9. FilingTypes + Filings                  ← Después de 8 (Fase 3.2, sin TaxYear)
 10. Documents + DocumentTags              ← Último (polimórfico, Fase 4)
+
+NOTA: TaxYear eliminado. Filing apunta directamente a UserProfile/Entity con campo year.
 ```
 
 ---
@@ -443,13 +485,16 @@ create_document_tags_table
 
 ### 📋 Próximo Paso
 
-**Fase 1.2 TaxYear Structure** (Después de 1.1)
+**Fase 1.2: User Interface — UserProfile, Entity, Address CRUD** (Después de 1.1)
 
 Esto creará:
-- 1 migration (tax_years)
-- 1 enum (TaxYearStatus)
-- 1 model (TaxYear) con relaciones a UserProfile
-- ~20-30 tests
+- Rutas y Controllers (CRUD para UserProfile, Entity, Address)
+- Livewire/Volt components (Forms, Lists)
+- Form Requests (validation)
+- Feature & component tests
+- Flux UI components + Tailwind styling
+
+**Objetivo:** Validar modelos en contexto real y proporcionar interfaz funcional antes de continuar con Finance Schema (Fase 2).
 
 ---
 
@@ -475,4 +520,4 @@ Esto creará:
 
 ### Omitido
 - ❌ ResidencyPeriod (diferir a más adelante)
-- ❌ TaxYear (Fase 1.2)
+- ❌ TaxYear (eliminado; Filing apunta directamente a UserProfile/Entity con campo year)
