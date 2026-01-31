@@ -198,6 +198,43 @@ test('other user cannot delete entity', function (): void {
         ->assertForbidden();
 });
 
+// --- Address Dropdown Display Format ---
+
+test('entity create form shows addresses with country in dropdown', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+    $address = Address::factory()->create([
+        'user_id' => $user->id,
+        'street' => '123 Main St',
+        'city' => 'Miami',
+        'country' => 'US',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Entities::class)
+        ->assertSee('123 Main St, Miami (US)');
+});
+
+test('entity edit form shows addresses with country in dropdown', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+    $address = Address::factory()->create([
+        'user_id' => $user->id,
+        'street' => '456 Calle Real',
+        'city' => 'Bogota',
+        'country' => 'CO',
+    ]);
+    $entity = Entity::factory()->create([
+        'user_profile_id' => $profile->id,
+        'address_id' => $address->id,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Entities::class)
+        ->call('edit', $entity->id)
+        ->assertSee('456 Calle Real, Bogota (CO)');
+});
+
 // --- API Endpoint Tests (for Controller Coverage) ---
 
 test('api index returns user entities', function (): void {
