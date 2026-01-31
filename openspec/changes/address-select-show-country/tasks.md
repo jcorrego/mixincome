@@ -12,9 +12,9 @@
 
 - [x] 2.1 Add `display_label` attribute accessor to `app/Models/Address.php` returning `"{street}, {city} ({country})"`
       → Tests passing: 1.1, 1.2
-- [ ] 2.2 Update `resources/views/livewire/management/entities.blade.php` — replace inline `{{ $address->street }}, {{ $address->city }}` with `{{ $address->display_label }}` in both create and edit form dropdowns
+- [x] 2.2 Update `resources/views/livewire/management/entities.blade.php` — replace inline `{{ $address->street }}, {{ $address->city }}` with `{{ $address->display_label }}` in both create and edit form dropdowns
       → Tests passing: 2.1, 2.2
-- [ ] 2.3 Update `resources/views/livewire/management/user-profiles.blade.php` — replace inline `{{ $address->street }}, {{ $address->city }}` with `{{ $address->display_label }}` in both create and edit form dropdowns
+- [x] 2.3 Update `resources/views/livewire/management/user-profiles.blade.php` — replace inline `{{ $address->street }}, {{ $address->city }}` with `{{ $address->display_label }}` in both create and edit form dropdowns
       → Tests passing: 3.1, 3.2
 
 ## 3. Verify & Cleanup
