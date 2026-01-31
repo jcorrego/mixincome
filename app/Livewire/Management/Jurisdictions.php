@@ -26,16 +26,10 @@ final class Jurisdictions extends Component
 
     public function create(): void
     {
-        $request = new StoreJurisdictionRequest();
-        $request->merge([
-            'name' => $this->name,
-            'iso_code' => $this->iso_code,
-            'timezone' => $this->timezone,
-            'default_currency' => $this->default_currency,
-        ]);
+        $storeRequest = new StoreJurisdictionRequest();
 
         /** @var array<string, mixed> $validated */
-        $validated = $this->validate($request->rules(), $request->messages());
+        $validated = $this->validate($storeRequest->rules(), $storeRequest->messages());
 
         Jurisdiction::query()->create($validated);
 
@@ -60,17 +54,12 @@ final class Jurisdictions extends Component
     {
         $jurisdiction = Jurisdiction::query()->findOrFail($this->editingId);
 
-        $request = new UpdateJurisdictionRequest();
-        $request->merge([
-            'name' => $this->name,
-            'iso_code' => $this->iso_code,
-            'timezone' => $this->timezone,
-            'default_currency' => $this->default_currency,
-            'jurisdiction_id' => $jurisdiction->id,
-        ]);
+        $updateRequest = new UpdateJurisdictionRequest();
+        // Set jurisdiction_id in the request for validation rules
+        $updateRequest->merge(['jurisdiction_id' => $jurisdiction->id]);
 
         /** @var array<string, mixed> $validated */
-        $validated = $this->validate($request->rules(), $request->messages());
+        $validated = $this->validate($updateRequest->rules(), $updateRequest->messages());
 
         $jurisdiction->update($validated);
 
