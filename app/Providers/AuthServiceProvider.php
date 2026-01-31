@@ -26,7 +26,7 @@ final class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
     }
 
-    private function registerPolicies(): void
+    public function registerPolicies(): void
     {
         foreach ($this->policies as $model => $policy) {
             Gate::policy($model, $policy);
