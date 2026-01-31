@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Enums\Country;
 use App\Models\Address;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 final class UpdateAddressRequest extends FormRequest
 {
@@ -27,7 +29,7 @@ final class UpdateAddressRequest extends FormRequest
             'city' => ['required', 'string', 'max:255'],
             'state' => ['required', 'string', 'max:255'],
             'postal_code' => ['required', 'string', 'max:255'],
-            'country' => ['required', 'string', 'max:255'],
+            'country' => ['required', new Enum(Country::class)],
         ];
     }
 

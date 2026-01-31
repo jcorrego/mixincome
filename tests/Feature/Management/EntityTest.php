@@ -198,9 +198,9 @@ test('other user cannot delete entity', function (): void {
         ->assertForbidden();
 });
 
-// --- Address Dropdown Display Format ---
+// --- 5.1 Address Dropdown Display Format (Country Name) ---
 
-test('entity create form shows addresses with country in dropdown', function (): void {
+test('entity form address dropdown displays display_label with country name', function (): void {
     $user = User::factory()->create();
     $profile = UserProfile::factory()->create(['user_id' => $user->id]);
     $address = Address::factory()->create([
@@ -212,10 +212,10 @@ test('entity create form shows addresses with country in dropdown', function ():
 
     Livewire::actingAs($user)
         ->test(Entities::class)
-        ->assertSee('123 Main St, Miami (US)');
+        ->assertSee('123 Main St, Miami (United States)');
 });
 
-test('entity edit form shows addresses with country in dropdown', function (): void {
+test('entity edit form address dropdown displays display_label with country name', function (): void {
     $user = User::factory()->create();
     $profile = UserProfile::factory()->create(['user_id' => $user->id]);
     $address = Address::factory()->create([
@@ -232,7 +232,7 @@ test('entity edit form shows addresses with country in dropdown', function (): v
     Livewire::actingAs($user)
         ->test(Entities::class)
         ->call('edit', $entity->id)
-        ->assertSee('456 Calle Real, Bogota (CO)');
+        ->assertSee('456 Calle Real, Bogota (Colombia)');
 });
 
 // --- API Endpoint Tests (for Controller Coverage) ---

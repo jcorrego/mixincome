@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Country;
 use Carbon\Carbon;
 use Database\Factories\AddressFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $city
  * @property string $state
  * @property string $postal_code
- * @property string $country
+ * @property Country $country
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User $user
@@ -51,15 +52,10 @@ final class Address extends Model
             'city' => 'string',
             'state' => 'string',
             'postal_code' => 'string',
-            'country' => 'string',
+            'country' => Country::class,
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
-    }
-
-    public function displayLabel(): string
-    {
-        return "{$this->street}, {$this->city} ({$this->country})";
     }
 
     public function user(): BelongsTo
@@ -75,5 +71,10 @@ final class Address extends Model
     public function entities(): HasMany
     {
         return $this->hasMany(Entity::class);
+    }
+
+    public function displayLabel(): string
+    {
+        return "{$this->street}, {$this->city} ({$this->country->label()})";
     }
 }
