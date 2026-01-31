@@ -9,14 +9,11 @@ use Database\Factories\AddressFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
- * Polymorphic address for users, entities, accounts, and assets.
+ * Independent address resource that can be reused by users, entities, accounts, and assets.
  *
  * @property-read int $id
- * @property int|null $addressable_id
- * @property string|null $addressable_type
  * @property int $user_id
  * @property string $street
  * @property string $city
@@ -25,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $country
  * @property Carbon $created_at
  * @property Carbon $updated_at
- * @property-read Model $addressable
  * @property-read User $user
  */
 final class Address extends Model
@@ -34,8 +30,6 @@ final class Address extends Model
     use HasFactory;
 
     protected $fillable = [
-        'addressable_id',
-        'addressable_type',
         'user_id',
         'street',
         'city',
@@ -48,7 +42,6 @@ final class Address extends Model
     {
         return [
             'id' => 'int',
-            'addressable_id' => 'int',
             'user_id' => 'int',
             'street' => 'string',
             'city' => 'string',
@@ -58,11 +51,6 @@ final class Address extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
-    }
-
-    public function addressable(): MorphTo
-    {
-        return $this->morphTo();
     }
 
     public function user(): BelongsTo

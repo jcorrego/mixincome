@@ -14,12 +14,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('restrict')->onUpdate('cascade');
             $table->foreignId('jurisdiction_id')->constrained()->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignId('address_id')->nullable()->constrained()->onDelete('set null')->onUpdate('cascade');
             $table->string('tax_id');
             $table->string('status')->default('Active');
             $table->timestamps();
 
             // Unique constraint: a user can have at most one profile per jurisdiction
             $table->unique(['user_id', 'jurisdiction_id']);
+            // Index for address lookup
+            $table->index('address_id');
         });
     }
 

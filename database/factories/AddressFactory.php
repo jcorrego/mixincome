@@ -21,8 +21,6 @@ final class AddressFactory extends Factory
     public function definition(): array
     {
         return [
-            'addressable_id' => null,
-            'addressable_type' => null,
             'user_id' => User::factory(),
             'street' => $this->faker->streetAddress(),
             'city' => $this->faker->city(),

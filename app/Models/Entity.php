@@ -10,13 +10,13 @@ use Database\Factories\EntityFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * Legal entity (LLC, Corp, Partnership, etc.) belonging to a user profile.
  *
  * @property-read int $id
  * @property int $user_profile_id
+ * @property int|null $address_id
  * @property string $name
  * @property EntityType $entity_type
  * @property string $tax_id
@@ -37,6 +37,7 @@ final class Entity extends Model
 
     protected $fillable = [
         'user_profile_id',
+        'address_id',
         'name',
         'entity_type',
         'tax_id',
@@ -48,6 +49,7 @@ final class Entity extends Model
         return [
             'id' => 'int',
             'user_profile_id' => 'int',
+            'address_id' => 'int',
             'entity_type' => EntityType::class,
             'status' => 'string',
             'created_at' => 'datetime',
@@ -60,8 +62,8 @@ final class Entity extends Model
         return $this->belongsTo(UserProfile::class);
     }
 
-    public function address(): MorphOne
+    public function address(): BelongsTo
     {
-        return $this->morphOne(Address::class, 'addressable');
+        return $this->belongsTo(Address::class);
     }
 }
