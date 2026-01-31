@@ -28,6 +28,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property-read CarbonInterface $created_at
  * @property-read CarbonInterface $updated_at
  * @property-read Collection<int, UserProfile> $userProfiles
+ * @property-read Collection<int, Address> $addresses
  */
 final class User extends Authenticatable implements MustVerifyEmail
 {
@@ -47,6 +48,11 @@ final class User extends Authenticatable implements MustVerifyEmail
     public function userProfiles(): HasMany
     {
         return $this->hasMany(UserProfile::class);
+    }
+
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
     }
 
     /**
