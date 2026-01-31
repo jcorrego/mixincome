@@ -14,30 +14,30 @@ describe('Integration Tests (End-to-End)', function (): void {
         $user = User::factory()->create();
         $jurisdiction = Jurisdiction::factory()->create();
 
-        $profile = UserProfile::query()->create([
-            'user_id' => $user->id,
-            'jurisdiction_id' => $jurisdiction->id,
-            'tax_id' => 'NIF123456789',
-            'status' => 'Active',
-        ]);
-
-        $entity = Entity::query()->create([
-            'user_profile_id' => $profile->id,
-            'name' => 'My LLC',
-            'entity_type' => EntityType::LLC,
-            'tax_id' => '12-3456789',
-            'status' => 'Active',
-        ]);
-
         $address = Address::query()->create([
-            'addressable_id' => $entity->id,
-            'addressable_type' => Entity::class,
             'user_id' => $user->id,
             'street' => '123 Main St',
             'city' => 'Madrid',
             'state' => 'Madrid',
             'postal_code' => '28001',
             'country' => 'ES',
+        ]);
+
+        $profile = UserProfile::query()->create([
+            'user_id' => $user->id,
+            'jurisdiction_id' => $jurisdiction->id,
+            'address_id' => $address->id,
+            'tax_id' => 'NIF123456789',
+            'status' => 'Active',
+        ]);
+
+        $entity = Entity::query()->create([
+            'user_profile_id' => $profile->id,
+            'address_id' => $address->id,
+            'name' => 'My LLC',
+            'entity_type' => EntityType::LLC,
+            'tax_id' => '12-3456789',
+            'status' => 'Active',
         ]);
 
         expect($user->id)->not->toBeNull()
@@ -67,23 +67,22 @@ describe('Integration Tests (End-to-End)', function (): void {
         ]);
 
         // Spain: 1 entity with address
-        $spainEntity = Entity::query()->create([
-            'user_profile_id' => $spainProfile->id,
-            'name' => 'Spain LLC',
-            'entity_type' => EntityType::LLC,
-            'tax_id' => '11-1111111',
-            'status' => 'Active',
-        ]);
-
-        Address::query()->create([
-            'addressable_id' => $spainEntity->id,
-            'addressable_type' => Entity::class,
+        $spainAddress = Address::query()->create([
             'user_id' => $user->id,
             'street' => 'Calle Principal',
             'city' => 'Madrid',
             'state' => 'Madrid',
             'postal_code' => '28001',
             'country' => 'ES',
+        ]);
+
+        $spainEntity = Entity::query()->create([
+            'user_profile_id' => $spainProfile->id,
+            'address_id' => $spainAddress->id,
+            'name' => 'Spain LLC',
+            'entity_type' => EntityType::LLC,
+            'tax_id' => '11-1111111',
+            'status' => 'Active',
         ]);
 
         // USA: 2 entities

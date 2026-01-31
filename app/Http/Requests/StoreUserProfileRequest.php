@@ -20,7 +20,13 @@ final class StoreUserProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jurisdiction_id' => ['required', 'integer', 'exists:jurisdictions,id'],
+            'jurisdiction_id' => [
+                'required',
+                'integer',
+                'exists:jurisdictions,id',
+                Rule::unique('user_profiles')
+                    ->where('user_id', auth()->id()),
+            ],
             'tax_id' => [
                 'required',
                 'string',
@@ -39,6 +45,7 @@ final class StoreUserProfileRequest extends FormRequest
         return [
             'jurisdiction_id.required' => 'Jurisdiction is required.',
             'jurisdiction_id.exists' => 'The selected jurisdiction does not exist.',
+            'jurisdiction_id.unique' => 'You already have a profile for this jurisdiction.',
             'tax_id.required' => 'Tax ID is required.',
             'tax_id.unique' => 'A tax profile for this jurisdiction already exists with this tax ID.',
         ];

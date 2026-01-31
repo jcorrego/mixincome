@@ -21,6 +21,15 @@
                     <flux:sidebar.item icon="globe-alt" :href="route('management.jurisdictions')" :current="request()->routeIs('management.jurisdictions')" wire:navigate>
                         {{ __('Jurisdictions') }}
                     </flux:sidebar.item>
+                    <flux:sidebar.item icon="identification" :href="route('management.profiles')" :current="request()->routeIs('management.profiles')" wire:navigate>
+                        {{ __('Tax Profiles') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="building-office" :href="route('management.entities')" :current="request()->routeIs('management.entities')" wire:navigate>
+                        {{ __('Entities') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="map-pin" :href="route('management.addresses')" :current="request()->routeIs('management.addresses')" wire:navigate>
+                        {{ __('Addresses') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

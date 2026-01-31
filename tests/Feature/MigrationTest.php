@@ -15,6 +15,7 @@ describe('Database Constraints & Indexes', function (): void {
             'id',
             'user_id',
             'jurisdiction_id',
+            'address_id',
             'tax_id',
             'status',
             'created_at',
@@ -48,6 +49,7 @@ describe('Database Constraints & Indexes', function (): void {
         expect(Schema::hasColumns('entities', [
             'id',
             'user_profile_id',
+            'address_id',
             'name',
             'entity_type',
             'tax_id',
@@ -57,12 +59,10 @@ describe('Database Constraints & Indexes', function (): void {
         ]))->toBeTrue();
     });
 
-    it('20.4 migration creates addresses table with polymorphic columns', function (): void {
+    it('20.4 migration creates addresses table with user_id foreign key', function (): void {
         expect(Schema::hasTable('addresses'))->toBeTrue();
         expect(Schema::hasColumns('addresses', [
             'id',
-            'addressable_id',
-            'addressable_type',
             'user_id',
             'street',
             'city',
