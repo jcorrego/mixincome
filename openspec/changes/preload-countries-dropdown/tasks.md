@@ -18,10 +18,10 @@
 
 ## 3. Validation Rules Update
 
-- [ ] 3.1 Update `StoreAddressRequest`: change country rule from `['required', 'string', 'max:255']` to `['required', Rule::enum(Country::class)]`
-- [ ] 3.2 Update `UpdateAddressRequest`: same country rule change
-- [ ] 3.3 Write failing tests for validation rules (tests 4.1–4.2)
-- [ ] 3.4 Run tests, confirm green for group 4
+- [x] 3.1 Update `StoreAddressRequest`: change country rule from `['required', 'string', 'max:255']` to `['required', Rule::enum(Country::class)]`
+- [x] 3.2 Update `UpdateAddressRequest`: same country rule change
+- [x] 3.3 Write failing tests for validation rules (tests 4.1–4.2)
+- [x] 3.4 Run tests, confirm green for group 4
       → Tests passing: 4.1, 4.2
 
 ## 4. Address CRUD Livewire Component
