@@ -89,6 +89,24 @@ test('cannot create entity for another user profile', function (): void {
         ->assertForbidden();
 });
 
+test('can create entity with address', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+    $address = Address::factory()->create(['user_id' => $user->id]);
+
+    Livewire::actingAs($user)
+        ->test(Entities::class)
+        ->set('user_profile_id', $profile->id)
+        ->set('name', 'My LLC')
+        ->set('entity_type', EntityType::LLC->value)
+        ->set('tax_id', '12-3456789')
+        ->set('address_id', (string) $address->id)
+        ->call('create')
+        ->assertHasNoErrors();
+
+    expect(Entity::query()->where('name', 'My LLC')->where('address_id', $address->id)->exists())->toBeTrue();
+});
+
 // --- Update Entity ---
 
 test('can update entity with valid data', function (): void {

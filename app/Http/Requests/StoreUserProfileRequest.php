@@ -11,7 +11,7 @@ final class StoreUserProfileRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     /**
@@ -32,7 +32,7 @@ final class StoreUserProfileRequest extends FormRequest
                 'string',
                 Rule::unique('user_profiles')
                     ->where('user_id', auth()->id())
-                    ->where('jurisdiction_id', $this->input('jurisdiction_id')),
+                    ->where('jurisdiction_id', $this->integer('jurisdiction_id')),
             ],
         ];
     }

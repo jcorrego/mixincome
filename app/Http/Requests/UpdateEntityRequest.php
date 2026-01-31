@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Enums\EntityType;
+use App\Models\Entity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
@@ -12,17 +13,10 @@ final class UpdateEntityRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        if (! auth()->check()) {
-            return false;
-        }
-
+        /** @var Entity $entity */
         $entity = $this->route('entity');
-        if ($entity) {
-            return auth()->user()->id === $entity->userProfile->user_id;
-        }
 
-        // For Livewire usage, authorization will be handled separately
-        return true;
+        return auth()->id() === $entity->userProfile->user_id;
     }
 
     /**

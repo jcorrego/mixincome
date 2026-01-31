@@ -62,17 +62,11 @@ final class Address extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * @return HasMany<UserProfile>
-     */
     public function userProfiles(): HasMany
     {
         return $this->hasMany(UserProfile::class);
     }
 
-    /**
-     * @return HasMany<Entity>
-     */
     public function entities(): HasMany
     {
         return $this->hasMany(Entity::class);

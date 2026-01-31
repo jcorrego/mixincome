@@ -19,10 +19,9 @@ final class AddressPolicy
     /**
      * Allow all authenticated users to view any address (list).
      *
-     * @param  User  $user  The authenticated user
      * @return bool Always true for authenticated users
      */
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         return true;
     }
@@ -42,10 +41,9 @@ final class AddressPolicy
     /**
      * Allow all authenticated users to create addresses.
      *
-     * @param  User  $user  The authenticated user
      * @return bool Always true for authenticated users
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
         return true;
     }

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Management;
 
 use App\Http\Requests\StoreUserProfileRequest;
 use App\Http\Requests\UpdateUserProfileRequest;
+use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -32,7 +33,10 @@ final class UserProfileController extends Controller
     {
         $this->authorize('viewAny', UserProfile::class);
 
-        $profiles = auth()->user()->userProfiles()
+        /** @var User $user */
+        $user = auth()->user();
+
+        $profiles = $user->userProfiles()
             ->with(['jurisdiction', 'address', 'entities'])
             ->get();
 
@@ -49,7 +53,10 @@ final class UserProfileController extends Controller
     {
         $this->authorize('create', UserProfile::class);
 
-        $profile = auth()->user()->userProfiles()->create($request->validated());
+        /** @var User $user */
+        $user = auth()->user();
+
+        $profile = $user->userProfiles()->create($request->validated());
 
         return response()->json($profile->load(['jurisdiction', 'address', 'entities']), 201);
     }

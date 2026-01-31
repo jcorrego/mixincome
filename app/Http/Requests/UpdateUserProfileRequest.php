@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\UserProfile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -11,17 +12,10 @@ final class UpdateUserProfileRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        if (! auth()->check()) {
-            return false;
-        }
+        /** @var UserProfile $profile */
+        $profile = $this->route('user_profile');
 
-        $profile = $this->route('userProfile');
-        if ($profile) {
-            return auth()->user()->id === $profile->user_id;
-        }
-
-        // For Livewire usage, authorization will be handled separately
-        return true;
+        return auth()->id() === $profile->user_id;
     }
 
     /**
@@ -29,8 +23,8 @@ final class UpdateUserProfileRequest extends FormRequest
      */
     public function rules(): array
     {
-        $profile = $this->route('userProfile');
-        $profileId = $profile?->id ?? $this->input('user_profile_id');
+        $profile = $this->route('user_profile');
+        $profileId = $profile instanceof UserProfile ? $profile->id : $this->input('user_profile_id');
 
         return [
             'jurisdiction_id' => ['required', 'integer', 'exists:jurisdictions,id'],
@@ -40,7 +34,7 @@ final class UpdateUserProfileRequest extends FormRequest
                 Rule::unique('user_profiles')
                     ->ignore($profileId)
                     ->where('user_id', auth()->id())
-                    ->where('jurisdiction_id', $this->input('jurisdiction_id')),
+                    ->where('jurisdiction_id', $this->integer('jurisdiction_id')),
             ],
         ];
     }

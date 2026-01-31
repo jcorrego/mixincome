@@ -23,8 +23,8 @@ describe('Enum Tests', function (): void {
 
     it('25.3 EntityType cannot be instantiated with Individual (throws error or validation fails)', function (): void {
         // Individual is not a case in EntityType, so trying to use it should fail
-        expect(fn () => EntityType::from('Individual'))->toThrow(Exception::class);
-    })->skip();
+        expect(fn () => EntityType::from('Individual'))->toThrow(ValueError::class);
+    });
 
     it('25.4 EntityType.cases() returns all valid types', function (): void {
         $cases = EntityType::cases();

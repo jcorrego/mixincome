@@ -8,6 +8,7 @@ use App\Http\Requests\StoreUserProfileRequest;
 use App\Http\Requests\UpdateUserProfileRequest;
 use App\Models\Address;
 use App\Models\Jurisdiction;
+use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -31,8 +32,16 @@ final class UserProfiles extends Component
         /** @var array<string, mixed> $validated */
         $validated = $this->validate($storeRequest->rules(), $storeRequest->messages());
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = auth()->user();
+
+        if ($this->address_id !== '') {
+            $address = Address::query()->findOrFail($this->address_id);
+            $this->authorize('view', $address);
+            $validated['address_id'] = (int) $this->address_id;
+        } else {
+            $validated['address_id'] = null;
+        }
 
         $user->userProfiles()->create($validated);
 
@@ -67,6 +76,8 @@ final class UserProfiles extends Component
         $validated = $this->validate($updateRequest->rules(), $updateRequest->messages());
 
         if ($this->address_id !== '') {
+            $address = Address::query()->findOrFail($this->address_id);
+            $this->authorize('view', $address);
             $validated['address_id'] = (int) $this->address_id;
         } else {
             $validated['address_id'] = null;
@@ -99,10 +110,10 @@ final class UserProfiles extends Component
     #[Computed]
     public function profiles(): Collection
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = auth()->user();
 
-        return $user->userProfiles()->with(['jurisdiction', 'address'])->orderBy('id')->get();
+        return $user->userProfiles()->with(['jurisdiction', 'address', 'entities'])->orderBy('id')->get();
     }
 
     /**
@@ -120,7 +131,7 @@ final class UserProfiles extends Component
     #[Computed]
     public function addresses(): Collection
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = auth()->user();
 
         return Address::query()->where('user_id', $user->id)->orderBy('street')->get();

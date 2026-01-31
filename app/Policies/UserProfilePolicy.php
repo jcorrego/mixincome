@@ -18,10 +18,9 @@ final class UserProfilePolicy
     /**
      * Allow all authenticated users to view any profile (list).
      *
-     * @param  User  $user  The authenticated user
      * @return bool Always true for authenticated users
      */
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         return true;
     }
@@ -41,10 +40,9 @@ final class UserProfilePolicy
     /**
      * Allow all authenticated users to create profiles.
      *
-     * @param  User  $user  The authenticated user
      * @return bool Always true for authenticated users
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
         return true;
     }

@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\Address;
 use Illuminate\Foundation\Http\FormRequest;
 
 final class UpdateAddressRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        if (! auth()->check()) {
-            return false;
-        }
-
+        /** @var Address $address */
         $address = $this->route('address');
-        if ($address) {
-            return auth()->user()->id === $address->user_id;
-        }
 
-        // For Livewire usage, authorization will be handled separately
-        return true;
+        return auth()->id() === $address->user_id;
     }
 
     /**

@@ -18,10 +18,9 @@ final class EntityPolicy
     /**
      * Allow all authenticated users to view any entity (list).
      *
-     * @param  User  $user  The authenticated user
      * @return bool Always true for authenticated users
      */
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         return true;
     }
@@ -41,10 +40,9 @@ final class EntityPolicy
     /**
      * Allow all authenticated users to create entities.
      *
-     * @param  User  $user  The authenticated user
      * @return bool Always true for authenticated users
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
         return true;
     }
@@ -72,12 +70,8 @@ final class EntityPolicy
      */
     public function delete(User $user, Entity $entity): bool
     {
-        if ($user->id !== $entity->userProfile->user_id) {
-            return false;
-        }
-
         // Prevent deletion if entity has associated data (deferred to Fase 2 for complex logic)
-        // For now, allow deletion
-        return true;
+        // For now, allow deletion based on ownership
+        return $user->id === $entity->userProfile->user_id;
     }
 }

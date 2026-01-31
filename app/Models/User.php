@@ -45,11 +45,13 @@ final class User extends Authenticatable implements MustVerifyEmail
         'two_factor_recovery_codes',
     ];
 
+    /** @return HasMany<UserProfile, $this> */
     public function userProfiles(): HasMany
     {
         return $this->hasMany(UserProfile::class);
     }
 
+    /** @return HasMany<Address, $this> */
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);

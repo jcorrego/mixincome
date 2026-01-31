@@ -94,7 +94,7 @@
             "bun run test:lint"
         ],
         "test:unit": "pest --parallel",
-        "test:coverage": "XDEBUG_MODE=\"coverage\" pest --parallel --coverage --min=98.0",
+        "test:coverage": "XDEBUG_MODE=\"coverage\" pest --parallel --coverage --exactly=100.0",
         "test:types": "phpstan --memory-limit=2G",
         "test": [
             "@test:type-coverage",

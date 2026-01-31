@@ -9,11 +9,6 @@ use Illuminate\Validation\Rule;
 
 final class StoreJurisdictionRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return auth()->check();
-    }
-
     /**
      * @return array<string, array<int|string, mixed>>
      */

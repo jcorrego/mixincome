@@ -80,6 +80,22 @@ test('cannot create duplicate profile for same jurisdiction', function (): void 
         ->assertHasErrors(['jurisdiction_id']);
 });
 
+test('can create profile with address', function (): void {
+    $user = User::factory()->create();
+    $jurisdiction = Jurisdiction::factory()->create();
+    $address = Address::factory()->create(['user_id' => $user->id]);
+
+    Livewire::actingAs($user)
+        ->test(UserProfiles::class)
+        ->set('jurisdiction_id', $jurisdiction->id)
+        ->set('tax_id', 'NIF123456789')
+        ->set('address_id', (string) $address->id)
+        ->call('create')
+        ->assertHasNoErrors();
+
+    expect(UserProfile::query()->where('user_id', $user->id)->where('address_id', $address->id)->exists())->toBeTrue();
+});
+
 // --- Update Profile ---
 
 test('can update profile with valid data', function (): void {

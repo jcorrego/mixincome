@@ -105,7 +105,7 @@ describe('Integration Tests (End-to-End)', function (): void {
         expect($user->userProfiles)->toHaveCount(2)
             ->and($spainProfile->entities)->toHaveCount(1)
             ->and($usaProfile->entities)->toHaveCount(2);
-    })->skip();
+    });
 
     it('24.3 deleting profile cascades correctly to entities and addresses', function (): void {
         $profile = UserProfile::factory()->has(
@@ -119,7 +119,7 @@ describe('Integration Tests (End-to-End)', function (): void {
 
         expect(UserProfile::query()->find($profileId))->toBeNull()
             ->and(Entity::query()->whereIn('id', $entityIds)->count())->toBe(0);
-    })->skip();
+    });
 
     it('24.4 querying full hierarchy with eager loading is efficient (no N+1)', function (): void {
         UserProfile::factory(3)->create();
@@ -127,5 +127,5 @@ describe('Integration Tests (End-to-End)', function (): void {
         $profiles = UserProfile::with('user', 'jurisdiction', 'entities')->get();
 
         expect($profiles)->toHaveCount(3);
-    })->skip();
+    });
 });

@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\Jurisdiction;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 final class UpdateJurisdictionRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return auth()->check();
-    }
-
     /**
      * @return array<string, array<int|string, mixed>>
      */
     public function rules(): array
     {
-        $jurisdictionId = $this->input('jurisdiction_id') ?? ($this->route('jurisdiction') ? $this->route('jurisdiction')->id : null);
+        /** @var Jurisdiction|null $jurisdiction */
+        $jurisdiction = $this->route('jurisdiction');
+
+        $jurisdictionId = $this->input('jurisdiction_id') ?? $jurisdiction?->id;
 
         return [
             'name' => ['required', 'string', 'max:255'],

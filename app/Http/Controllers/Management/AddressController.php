@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Management;
 use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\UpdateAddressRequest;
 use App\Models\Address;
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,7 +33,10 @@ final class AddressController extends Controller
     {
         $this->authorize('viewAny', Address::class);
 
-        $addresses = auth()->user()->addresses()->get();
+        /** @var User $user */
+        $user = auth()->user();
+
+        $addresses = $user->addresses()->get();
 
         return response()->json($addresses);
     }
@@ -47,7 +51,10 @@ final class AddressController extends Controller
     {
         $this->authorize('create', Address::class);
 
-        $address = auth()->user()->addresses()->create($request->validated());
+        /** @var User $user */
+        $user = auth()->user();
+
+        $address = $user->addresses()->create($request->validated());
 
         return response()->json($address, 201);
     }

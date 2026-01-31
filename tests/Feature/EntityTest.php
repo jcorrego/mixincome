@@ -63,8 +63,8 @@ describe('Entity Creation', function (): void {
             'entity_type' => 'Individual',
             'tax_id' => '12-3456789',
             'status' => 'Active',
-        ]))->toThrow(Exception::class);
-    })->skip();
+        ]))->toThrow(ValueError::class);
+    });
 
     it('6.5 multiple entities can exist under same UserProfile', function (): void {
         $profile = UserProfile::factory()->create();
@@ -72,7 +72,7 @@ describe('Entity Creation', function (): void {
         Entity::factory(3)->create(['user_profile_id' => $profile->id]);
 
         expect($profile->entities)->toHaveCount(3);
-    })->skip();
+    });
 });
 
 describe('Entity Retrieval', function (): void {
@@ -98,7 +98,7 @@ describe('Entity Retrieval', function (): void {
         $entities = Entity::with('userProfile')->get();
 
         expect($entities)->toHaveCount(5);
-    })->skip();
+    });
 });
 
 describe('Entity Updates', function (): void {
@@ -128,18 +128,15 @@ describe('Entity Updates', function (): void {
 });
 
 describe('Entity Deletion', function (): void {
-    it('9.2 deleting Entity cascades to related Address if exists', function (): void {
-        $entity = Entity::factory()->create();
-        $address = Address::factory()->create([
-            'addressable_id' => $entity->id,
-            'addressable_type' => Entity::class,
-        ]);
+    it('9.2 deleting Entity does not delete the associated Address', function (): void {
+        $address = Address::factory()->create();
+        $entity = Entity::factory()->create(['address_id' => $address->id]);
 
         $addressId = $address->id;
         $entity->delete();
 
-        expect(Address::query()->find($addressId))->toBeNull();
-    })->skip();
+        expect(Address::query()->find($addressId))->not->toBeNull();
+    });
 
     it('9.4 deleting Entity does NOT cascade to UserProfile (parent not affected)', function (): void {
         $profile = UserProfile::factory()->create();
@@ -176,14 +173,11 @@ describe('Model Relationships - Entity', function (): void {
             ->and($entity->userProfile)->toBeInstanceOf(UserProfile::class);
     });
 
-    it('23.7 Entity.address returns morphOne(Address)', function (): void {
-        $entity = Entity::factory()->create();
-        $address = Address::factory()->create([
-            'addressable_id' => $entity->id,
-            'addressable_type' => Entity::class,
-        ]);
+    it('23.7 Entity.address returns belongsTo(Address)', function (): void {
+        $address = Address::factory()->create();
+        $entity = Entity::factory()->create(['address_id' => $address->id]);
 
         expect($entity->address->id)->toBe($address->id)
             ->and($entity->address)->toBeInstanceOf(Address::class);
-    })->skip();
+    });
 });

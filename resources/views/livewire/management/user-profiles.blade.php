@@ -68,6 +68,13 @@
 
             <flux:input wire:model="tax_id" :label="__('Tax ID')" placeholder="{{ __('e.g. NIF, SSN, RUT') }}" />
 
+            <flux:select wire:model="address_id" :label="__('Address')" placeholder="{{ __('No address') }}">
+                <flux:select.option value="">{{ __('No address') }}</flux:select.option>
+                @foreach ($this->addresses as $address)
+                    <flux:select.option :value="$address->id">{{ $address->street }}, {{ $address->city }}</flux:select.option>
+                @endforeach
+            </flux:select>
+
             <div class="flex">
                 <flux:spacer />
                 <flux:button type="submit" variant="primary">{{ __('Create') }}</flux:button>

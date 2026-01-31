@@ -7,7 +7,7 @@
 
         @unless ($editingId)
             <flux:modal.trigger name="create-entity">
-                <flux:button variant="primary" icon="plus">{{ __('Add Entity') }}</flux:button>
+                <flux:button variant="primary" icon="plus" :disabled="$this->profiles->isEmpty()">{{ __('Add Entity') }}</flux:button>
             </flux:modal.trigger>
         @endunless
     </div>
@@ -84,6 +84,13 @@
             </flux:select>
 
             <flux:input wire:model="tax_id" :label="__('Tax ID (EIN)')" placeholder="{{ __('e.g. 12-3456789') }}" />
+
+            <flux:select wire:model="address_id" :label="__('Address')" placeholder="{{ __('No address') }}">
+                <flux:select.option value="">{{ __('No address') }}</flux:select.option>
+                @foreach ($this->addresses as $address)
+                    <flux:select.option :value="$address->id">{{ $address->street }}, {{ $address->city }}</flux:select.option>
+                @endforeach
+            </flux:select>
 
             <div class="flex">
                 <flux:spacer />

@@ -42,7 +42,7 @@ describe('Database Constraints & Indexes', function (): void {
             'tax_id' => 'NIF999999999',
             'status' => 'Active',
         ]))->toThrow(Exception::class);
-    })->skip();
+    });
 
     it('20.3 migration creates entities table with correct columns', function (): void {
         expect(Schema::hasTable('entities'))->toBeTrue();
@@ -81,5 +81,5 @@ describe('Database Constraints & Indexes', function (): void {
         $profile->delete();
 
         expect(Entity::query()->find($entity->id))->toBeNull();
-    })->skip();
+    });
 });

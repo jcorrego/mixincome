@@ -7,6 +7,7 @@ namespace App\Livewire\Management;
 use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\UpdateAddressRequest;
 use App\Models\Address;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
@@ -33,7 +34,7 @@ final class Addresses extends Component
         /** @var array<string, mixed> $validated */
         $validated = $this->validate($storeRequest->rules(), $storeRequest->messages());
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = auth()->user();
 
         $user->addresses()->create($validated);
@@ -96,7 +97,7 @@ final class Addresses extends Component
     #[Computed]
     public function addresses(): Collection
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = auth()->user();
 
         return $user->addresses()->with(['userProfiles', 'entities'])->orderBy('street')->get();

@@ -36,9 +36,7 @@ final class EntityController extends Controller
         $this->authorize('viewAny', Entity::class);
 
         $entities = Entity::query()
-            ->whereHas('userProfile', function (Builder $query): Builder {
-                return $query->where('user_id', auth()->id());
-            })
+            ->whereHas('userProfile', fn (Builder $query): Builder => $query->where('user_id', auth()->id()))
             ->with(['userProfile', 'address'])
             ->get();
 
@@ -55,7 +53,7 @@ final class EntityController extends Controller
     {
         $this->authorize('create', Entity::class);
 
-        $entity = Entity::create($request->validated());
+        $entity = Entity::query()->create($request->validated());
 
         return response()->json($entity->load(['userProfile', 'address']), 201);
     }

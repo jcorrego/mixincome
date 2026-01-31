@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Management\AddressController;
+use App\Http\Controllers\Management\EntityController;
+use App\Http\Controllers\Management\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('management')->group(function (): void {
@@ -14,7 +17,7 @@ Route::middleware(['auth', 'verified'])->prefix('management')->group(function ()
 
 // API routes for management resources
 Route::middleware(['auth', 'verified'])->prefix('api/management')->group(function (): void {
-    Route::apiResource('user-profiles', App\Http\Controllers\Management\UserProfileController::class);
-    Route::apiResource('entities', App\Http\Controllers\Management\EntityController::class);
-    Route::apiResource('addresses', App\Http\Controllers\Management\AddressController::class);
+    Route::apiResource('user-profiles', UserProfileController::class);
+    Route::apiResource('entities', EntityController::class);
+    Route::apiResource('addresses', AddressController::class);
 });
