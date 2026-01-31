@@ -14,19 +14,7 @@ test('Address model casts country attribute to Country enum', function (): void 
         ->and($address->country)->toBe(Country::UnitedStates);
 });
 
-// --- 2.2 Address display_label accessor ---
-
-test('Address display_label accessor returns street, city (country_name) format', function (): void {
-    $address = Address::factory()->create([
-        'street' => '123 Main St',
-        'city' => 'Miami',
-        'country' => 'US',
-    ]);
-
-    expect($address->displayLabel())->toBe('123 Main St, Miami (United States)');
-});
-
-// --- Existing tests (updated to use displayLabel() method with country names) ---
+// --- 2.2 Address displayLabel() method ---
 
 test('displayLabel returns street, city (country_name) format', function (): void {
     $address = Address::factory()->create([

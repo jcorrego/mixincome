@@ -27,7 +27,7 @@ final class AddressFactory extends Factory
             'city' => $this->faker->city(),
             'state' => $this->faker->word(),
             'postal_code' => $this->faker->postcode(),
-            'country' => fake()->randomElement(Country::cases()),
+            'country' => $this->faker->randomElement(Country::cases()),
         ];
     }
 }

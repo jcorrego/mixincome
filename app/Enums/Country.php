@@ -293,7 +293,7 @@ enum Country: string
 
         ksort($priorityOptions);
 
-        return array_values([...$priorityOptions, ...$remainingOptions]);
+        return [...$priorityOptions, ...$remainingOptions];
     }
 
     /**
