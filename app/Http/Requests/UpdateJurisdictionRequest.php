@@ -19,7 +19,7 @@ final class UpdateJurisdictionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $jurisdictionId = $this->route('jurisdiction') ?? $this->input('jurisdiction_id');
+        $jurisdictionId = $this->input('jurisdiction_id') ?? ($this->route('jurisdiction') ? $this->route('jurisdiction')->id : null);
 
         return [
             'name' => ['required', 'string', 'max:255'],

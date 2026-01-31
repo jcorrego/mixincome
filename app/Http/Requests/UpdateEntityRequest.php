@@ -12,9 +12,17 @@ final class UpdateEntityRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $entity = $this->route('entity');
+        if (! auth()->check()) {
+            return false;
+        }
 
-        return auth()->check() && auth()->user()->id === $entity->userProfile->user_id;
+        $entity = $this->route('entity');
+        if ($entity) {
+            return auth()->user()->id === $entity->userProfile->user_id;
+        }
+
+        // For Livewire usage, authorization will be handled separately
+        return true;
     }
 
     /**

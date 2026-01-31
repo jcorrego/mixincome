@@ -11,9 +11,17 @@ final class UpdateUserProfileRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $profile = $this->route('userProfile');
+        if (! auth()->check()) {
+            return false;
+        }
 
-        return auth()->check() && auth()->user()->id === $profile->user_id;
+        $profile = $this->route('userProfile');
+        if ($profile) {
+            return auth()->user()->id === $profile->user_id;
+        }
+
+        // For Livewire usage, authorization will be handled separately
+        return true;
     }
 
     /**
@@ -22,6 +30,7 @@ final class UpdateUserProfileRequest extends FormRequest
     public function rules(): array
     {
         $profile = $this->route('userProfile');
+        $profileId = $profile?->id ?? $this->input('user_profile_id');
 
         return [
             'jurisdiction_id' => ['required', 'integer', 'exists:jurisdictions,id'],
@@ -29,7 +38,7 @@ final class UpdateUserProfileRequest extends FormRequest
                 'required',
                 'string',
                 Rule::unique('user_profiles')
-                    ->ignore($profile->id)
+                    ->ignore($profileId)
                     ->where('user_id', auth()->id())
                     ->where('jurisdiction_id', $this->input('jurisdiction_id')),
             ],

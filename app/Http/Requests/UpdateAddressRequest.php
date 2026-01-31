@@ -10,9 +10,17 @@ final class UpdateAddressRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $address = $this->route('address');
+        if (! auth()->check()) {
+            return false;
+        }
 
-        return auth()->check() && auth()->user()->id === $address->user_id;
+        $address = $this->route('address');
+        if ($address) {
+            return auth()->user()->id === $address->user_id;
+        }
+
+        // For Livewire usage, authorization will be handled separately
+        return true;
     }
 
     /**
