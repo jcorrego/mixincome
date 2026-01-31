@@ -1,9 +1,9 @@
 ## 1. Country Enum
 
-- [ ] 1.1 Create `App\Enums\Country` string-backed enum with all ISO 3166-1 alpha-2 codes, TitleCase case names, and `label()` method returning English country name
-- [ ] 1.2 Add `options(array $priority = [])` static method that returns `[['value' => string, 'label' => string], ...]` sorted alphabetically, with priority countries first
-- [ ] 1.3 Write failing tests for Country enum (tests 1.1–1.6) in `tests/Unit/Enums/CountryTest.php`
-- [ ] 1.4 Run tests, confirm green for group 1
+- [x] 1.1 Create `App\Enums\Country` string-backed enum with all ISO 3166-1 alpha-2 codes, TitleCase case names, and `label()` method returning English country name
+- [x] 1.2 Add `options(array $priority = [])` static method that returns `[['value' => string, 'label' => string], ...]` sorted alphabetically, with priority countries first
+- [x] 1.3 Write failing tests for Country enum (tests 1.1–1.6) in `tests/Unit/Enums/CountryTest.php`
+- [x] 1.4 Run tests, confirm green for group 1
       → Tests passing: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
 
 ## 2. Address Model Updates
