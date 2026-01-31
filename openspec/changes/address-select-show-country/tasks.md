@@ -1,16 +1,16 @@
 ## 1. TDD Red Phase — Write Failing Tests
 
-- [ ] 1.1 Create unit test for Address `display_label` accessor in `tests/Unit/Models/AddressTest.php`
+- [x] 1.1 Create unit test for Address `display_label` accessor in `tests/Unit/Models/AddressTest.php`
       → Tests: 1.1, 1.2 (must fail — accessor doesn't exist yet)
-- [ ] 1.2 Add/update feature tests for Entity Livewire component to assert address dropdown shows "street, city (country)" format in `tests/Feature/Livewire/Management/EntitiesTest.php`
+- [x] 1.2 Add/update feature tests for Entity Livewire component to assert address dropdown shows "street, city (country)" format in `tests/Feature/Livewire/Management/EntitiesTest.php`
       → Tests: 2.1, 2.2 (must fail — views still use old format)
-- [ ] 1.3 Add/update feature tests for UserProfiles Livewire component to assert address dropdown shows "street, city (country)" format in `tests/Feature/Livewire/Management/UserProfilesTest.php`
+- [x] 1.3 Add/update feature tests for UserProfiles Livewire component to assert address dropdown shows "street, city (country)" format in `tests/Feature/Livewire/Management/UserProfilesTest.php`
       → Tests: 3.1, 3.2 (must fail — views still use old format)
-- [ ] 1.4 Run all new tests, confirm they all FAIL (red phase verified)
+- [x] 1.4 Run all new tests, confirm they all FAIL (red phase verified)
 
 ## 2. TDD Green Phase — Implementation
 
-- [ ] 2.1 Add `display_label` attribute accessor to `app/Models/Address.php` returning `"{street}, {city} ({country})"`
+- [x] 2.1 Add `display_label` attribute accessor to `app/Models/Address.php` returning `"{street}, {city} ({country})"`
       → Tests passing: 1.1, 1.2
 - [ ] 2.2 Update `resources/views/livewire/management/entities.blade.php` — replace inline `{{ $address->street }}, {{ $address->city }}` with `{{ $address->display_label }}` in both create and edit form dropdowns
       → Tests passing: 2.1, 2.2

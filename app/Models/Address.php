@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Database\Factories\AddressFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User $user
+ * @property-read string $display_label
  * @property-read Collection<int, UserProfile> $userProfiles
  * @property-read Collection<int, Entity> $entities
  */
@@ -55,6 +57,16 @@ final class Address extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
+    }
+
+    /**
+     * @return Attribute<string, never>
+     */
+    protected function displayLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => "{$this->street}, {$this->city} ({$this->country})",
+        );
     }
 
     public function user(): BelongsTo

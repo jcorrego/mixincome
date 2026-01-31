@@ -1,7 +1,7 @@
 ## 1. Address Display Label Accessor
 
-- [ ] 1.1 [Unit] Address `display_label` returns "street, city (country)" format (Scenario: Display label format)
-- [ ] 1.2 [Unit] Address `display_label` handles all country codes correctly (edge case: various ISO codes)
+- [x] 1.1 [Unit] Address `display_label` returns "street, city (country)" format (Scenario: Display label format)
+- [x] 1.2 [Unit] Address `display_label` handles all country codes correctly (edge case: various ISO codes)
 
 ## 2. Entity Form Address Dropdown Display
 
