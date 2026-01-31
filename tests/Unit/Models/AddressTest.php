@@ -11,7 +11,7 @@ test('display_label returns street, city (country) format', function (): void {
         'country' => 'US',
     ]);
 
-    expect($address->display_label)->toBe('123 Main St, Miami (US)');
+    expect($address->displayLabel())->toBe('123 Main St, Miami (US)');
 });
 
 test('display_label handles various country codes correctly', function (string $country): void {
@@ -21,5 +21,5 @@ test('display_label handles various country codes correctly', function (string $
         'country' => $country,
     ]);
 
-    expect($address->display_label)->toBe("456 Oak Ave, Springfield ({$country})");
+    expect($address->displayLabel())->toBe("456 Oak Ave, Springfield ({$country})");
 })->with(['US', 'ES', 'CO', 'DE', 'FR']);

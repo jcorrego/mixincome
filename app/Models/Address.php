@@ -25,7 +25,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User $user
- * @property-read string $display_label
  * @property-read Collection<int, UserProfile> $userProfiles
  * @property-read Collection<int, Entity> $entities
  */
@@ -58,7 +57,7 @@ final class Address extends Model
         ];
     }
 
-    public function getDisplayLabelAttribute(): string
+    public function displayLabel(): string
     {
         return "{$this->street}, {$this->city} ({$this->country})";
     }
