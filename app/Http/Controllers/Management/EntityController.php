@@ -8,8 +8,10 @@ use App\Http\Requests\StoreEntityRequest;
 use App\Http\Requests\UpdateEntityRequest;
 use App\Models\Entity;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 /**
  * Manages legal entities (Entity CRUD operations).
@@ -17,8 +19,10 @@ use Illuminate\Http\Request;
  * Handles API operations for creating, reading, updating, and deleting legal entities
  * with proper authorization checks and eager loading of relationships.
  */
-final class EntityController
+final class EntityController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * List all entities belonging to the authenticated user's profiles.
      *

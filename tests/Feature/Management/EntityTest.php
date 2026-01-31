@@ -179,3 +179,92 @@ test('other user cannot delete entity', function (): void {
         ->call('delete', $entity->id)
         ->assertForbidden();
 });
+
+// --- API Endpoint Tests (for Controller Coverage) ---
+
+test('api index returns user entities', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+    $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
+
+    $this->actingAs($user)
+        ->getJson('/api/management/entities')
+        ->assertOk()
+        ->assertJsonCount(1);
+});
+
+test('api store creates entity', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson('/api/management/entities', [
+            'user_profile_id' => $profile->id,
+            'name' => 'API Entity',
+            'entity_type' => EntityType::LLC->value,
+            'tax_id' => 'API-EIN-123',
+        ])
+        ->assertCreated();
+});
+
+test('api show returns entity', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+    $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
+
+    $this->actingAs($user)
+        ->getJson("/api/management/entities/{$entity->id}")
+        ->assertOk();
+});
+
+test('api update modifies entity', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+    $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
+
+    $this->actingAs($user)
+        ->patchJson("/api/management/entities/{$entity->id}", [
+            'user_profile_id' => $profile->id,
+            'name' => 'Updated Entity',
+            'entity_type' => EntityType::SCorp->value,
+            'tax_id' => 'UPDATED-EIN',
+        ])
+        ->assertOk();
+});
+
+test('api destroy deletes entity', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+    $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
+
+    $this->actingAs($user)
+        ->deleteJson("/api/management/entities/{$entity->id}")
+        ->assertNoContent();
+});
+
+test('api unauthorized user cannot update entity', function (): void {
+    $owner = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $owner->id]);
+    $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
+
+    $this->actingAs($otherUser)
+        ->patchJson("/api/management/entities/{$entity->id}", [
+            'user_profile_id' => $profile->id,
+            'name' => 'Hacked Entity',
+            'entity_type' => EntityType::LLC->value,
+            'tax_id' => 'HACKER-EIN',
+        ])
+        ->assertForbidden();
+});
+
+test('api unauthorized user cannot destroy entity', function (): void {
+    $owner = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $owner->id]);
+    $entity = Entity::factory()->create(['user_profile_id' => $profile->id]);
+
+    $this->actingAs($otherUser)
+        ->deleteJson("/api/management/entities/{$entity->id}")
+        ->assertForbidden();
+});

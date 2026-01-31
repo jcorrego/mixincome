@@ -7,8 +7,10 @@ namespace App\Http\Controllers\Management;
 use App\Http\Requests\StoreUserProfileRequest;
 use App\Http\Requests\UpdateUserProfileRequest;
 use App\Models\UserProfile;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 /**
  * Manages User Tax Profiles (UserProfile CRUD operations).
@@ -16,8 +18,10 @@ use Illuminate\Http\Request;
  * Handles API operations for creating, reading, updating, and deleting user tax profiles
  * with proper authorization checks and eager loading of relationships.
  */
-final class UserProfileController
+final class UserProfileController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * List all user profiles with eager-loaded relationships.
      *

@@ -183,3 +183,82 @@ test('other user cannot delete profile', function (): void {
         ->call('delete', $profile->id)
         ->assertForbidden();
 });
+
+// --- API Endpoint Tests (for Controller Coverage) ---
+
+test('api index returns user profiles', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->getJson('/api/management/user-profiles')
+        ->assertOk()
+        ->assertJsonCount(1);
+});
+
+test('api store creates profile', function (): void {
+    $user = User::factory()->create();
+    $jurisdiction = Jurisdiction::factory()->create();
+
+    $this->actingAs($user)
+        ->postJson('/api/management/user-profiles', [
+            'jurisdiction_id' => $jurisdiction->id,
+            'tax_id' => 'API-TAX-ID',
+        ])
+        ->assertCreated();
+});
+
+test('api show returns profile', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->getJson("/api/management/user-profiles/{$profile->id}")
+        ->assertOk();
+});
+
+test('api update modifies profile', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+    $jurisdiction = Jurisdiction::factory()->create();
+
+    $this->actingAs($user)
+        ->patchJson("/api/management/user-profiles/{$profile->id}", [
+            'jurisdiction_id' => $jurisdiction->id,
+            'tax_id' => 'UPDATED-TAX',
+        ])
+        ->assertOk();
+});
+
+test('api destroy deletes profile', function (): void {
+    $user = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->deleteJson("/api/management/user-profiles/{$profile->id}")
+        ->assertNoContent();
+});
+
+test('api unauthorized user cannot update profile', function (): void {
+    $owner = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $owner->id]);
+    $jurisdiction = Jurisdiction::factory()->create();
+
+    $this->actingAs($otherUser)
+        ->patchJson("/api/management/user-profiles/{$profile->id}", [
+            'jurisdiction_id' => $jurisdiction->id,
+            'tax_id' => 'HACKER-TAX',
+        ])
+        ->assertForbidden();
+});
+
+test('api unauthorized user cannot destroy profile', function (): void {
+    $owner = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $profile = UserProfile::factory()->create(['user_id' => $owner->id]);
+
+    $this->actingAs($otherUser)
+        ->deleteJson("/api/management/user-profiles/{$profile->id}")
+        ->assertForbidden();
+});

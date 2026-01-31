@@ -7,8 +7,10 @@ namespace App\Http\Controllers\Management;
 use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\UpdateAddressRequest;
 use App\Models\Address;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 /**
  * Manages user addresses (Address CRUD operations).
@@ -16,8 +18,10 @@ use Illuminate\Http\Request;
  * Handles API operations for creating, reading, updating, and deleting addresses
  * with proper authorization checks and owner-based access control.
  */
-final class AddressController
+final class AddressController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * List all addresses belonging to the authenticated user.
      *

@@ -157,3 +157,88 @@ test('other user cannot delete address', function (): void {
         ->call('delete', $address->id)
         ->assertForbidden();
 });
+
+// --- API Endpoint Tests (for Controller Coverage) ---
+
+test('api index returns user addresses', function (): void {
+    $user = User::factory()->create();
+    $address = Address::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->getJson('/api/management/addresses')
+        ->assertOk()
+        ->assertJsonCount(1);
+});
+
+test('api store creates address', function (): void {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->postJson('/api/management/addresses', [
+            'street' => '456 Oak Ave',
+            'city' => 'Atlanta',
+            'state' => 'Georgia',
+            'postal_code' => '30303',
+            'country' => 'US',
+        ])
+        ->assertCreated();
+});
+
+test('api show returns address', function (): void {
+    $user = User::factory()->create();
+    $address = Address::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->getJson("/api/management/addresses/{$address->id}")
+        ->assertOk();
+});
+
+test('api update modifies address', function (): void {
+    $user = User::factory()->create();
+    $address = Address::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->patchJson("/api/management/addresses/{$address->id}", [
+            'street' => 'Updated Street',
+            'city' => 'Updated City',
+            'state' => 'Updated State',
+            'postal_code' => '99999',
+            'country' => 'US',
+        ])
+        ->assertOk();
+});
+
+test('api destroy deletes address', function (): void {
+    $user = User::factory()->create();
+    $address = Address::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->deleteJson("/api/management/addresses/{$address->id}")
+        ->assertNoContent();
+});
+
+test('api unauthorized user cannot update address', function (): void {
+    $owner = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $address = Address::factory()->create(['user_id' => $owner->id]);
+
+    $this->actingAs($otherUser)
+        ->patchJson("/api/management/addresses/{$address->id}", [
+            'street' => 'Hacked Street',
+            'city' => 'Hacked City',
+            'state' => 'Hacked State',
+            'postal_code' => '66666',
+            'country' => 'US',
+        ])
+        ->assertForbidden();
+});
+
+test('api unauthorized user cannot destroy address', function (): void {
+    $owner = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $address = Address::factory()->create(['user_id' => $owner->id]);
+
+    $this->actingAs($otherUser)
+        ->deleteJson("/api/management/addresses/{$address->id}")
+        ->assertForbidden();
+});
