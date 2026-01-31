@@ -26,11 +26,11 @@
 
 ## 4. Address CRUD Livewire Component
 
-- [ ] 4.1 Update `Addresses` Livewire component: add `Country` enum import, expose `Country::options(['US', 'ES', 'CO'])` for the view
-- [ ] 4.2 Update address create/edit form: replace `flux:input` for country with searchable `flux:select` populated from Country enum options
-- [ ] 4.3 Update address list table: display `$address->country->label()` instead of raw code
-- [ ] 4.4 Write/update feature tests for address CRUD with enum (tests 3.1–3.6)
-- [ ] 4.5 Run tests, confirm green for group 3
+- [x] 4.1 Update `Addresses` Livewire component: add `Country` enum import, expose `Country::options(['US', 'ES', 'CO'])` for the view
+- [x] 4.2 Update address create/edit form: replace `flux:input` for country with searchable `flux:select` populated from Country enum options
+- [x] 4.3 Update address list table: display `$address->country->label()` instead of raw code
+- [x] 4.4 Write/update feature tests for address CRUD with enum (tests 3.1–3.6)
+- [x] 4.5 Run tests, confirm green for group 3
       → Tests passing: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6
 
 ## 5. Address Display in Entity/Profile Forms

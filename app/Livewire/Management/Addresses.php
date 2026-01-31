@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Management;
 
+use App\Enums\Country;
 use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\UpdateAddressRequest;
 use App\Models\Address;
@@ -54,7 +55,7 @@ final class Addresses extends Component
         $this->city = $address->city;
         $this->state = $address->state;
         $this->postal_code = $address->postal_code;
-        $this->country = $address->country;
+        $this->country = $address->country->value;
 
         $this->dispatch('modal-show', name: 'edit-address');
     }
@@ -89,6 +90,15 @@ final class Addresses extends Component
     {
         $this->dispatch('modal-close', name: 'edit-address');
         $this->resetForm();
+    }
+
+    /**
+     * @return array<int, array{value: string, label: string}>
+     */
+    #[Computed]
+    public function countryOptions(): array
+    {
+        return Country::options(['US', 'ES', 'CO']);
     }
 
     /**

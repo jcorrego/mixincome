@@ -31,7 +31,7 @@
                     <flux:table.cell>{{ $address->city }}</flux:table.cell>
                     <flux:table.cell>{{ $address->state }}</flux:table.cell>
                     <flux:table.cell>{{ $address->postal_code }}</flux:table.cell>
-                    <flux:table.cell>{{ $address->country }}</flux:table.cell>
+                    <flux:table.cell>{{ $address->country->label() }}</flux:table.cell>
                     <flux:table.cell>
                         @php
                             $usageCount = $address->userProfiles->count() + $address->entities->count();
@@ -65,7 +65,11 @@
             <flux:input wire:model="city" :label="__('City')" placeholder="{{ __('e.g. Miami') }}" />
             <flux:input wire:model="state" :label="__('State / Province')" placeholder="{{ __('e.g. Florida') }}" />
             <flux:input wire:model="postal_code" :label="__('Postal Code')" placeholder="{{ __('e.g. 33101') }}" />
-            <flux:input wire:model="country" :label="__('Country')" placeholder="{{ __('e.g. US') }}" />
+            <flux:select wire:model="country" :label="__('Country')" placeholder="{{ __('Select a country') }}">
+                @foreach ($this->countryOptions as $option)
+                    <flux:select.option :value="$option['value']">{{ $option['label'] }}</flux:select.option>
+                @endforeach
+            </flux:select>
 
             <div class="flex">
                 <flux:spacer />
@@ -86,7 +90,11 @@
             <flux:input wire:model="city" :label="__('City')" />
             <flux:input wire:model="state" :label="__('State / Province')" />
             <flux:input wire:model="postal_code" :label="__('Postal Code')" />
-            <flux:input wire:model="country" :label="__('Country')" />
+            <flux:select wire:model="country" :label="__('Country')" placeholder="{{ __('Select a country') }}">
+                @foreach ($this->countryOptions as $option)
+                    <flux:select.option :value="$option['value']">{{ $option['label'] }}</flux:select.option>
+                @endforeach
+            </flux:select>
 
             <div class="flex gap-2">
                 <flux:spacer />
