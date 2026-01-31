@@ -35,10 +35,10 @@
 
 ## 5. Address Display in Entity/Profile Forms
 
-- [ ] 5.1 Update entity form: replace inline `{{ $address->street }}, {{ $address->city }}` with `{{ $address->display_label }}`
-- [ ] 5.2 Update user-profile form: same display_label replacement
-- [ ] 5.3 Write/update feature tests for entity and profile dropdown display (tests 5.1–5.2)
-- [ ] 5.4 Run tests, confirm green for group 5
+- [x] 5.1 Update entity form: replace inline `{{ $address->street }}, {{ $address->city }}` with `{{ $address->display_label }}`
+- [x] 5.2 Update user-profile form: same display_label replacement
+- [x] 5.3 Write/update feature tests for entity and profile dropdown display (tests 5.1–5.2)
+- [x] 5.4 Run tests, confirm green for group 5
       → Tests passing: 5.1, 5.2
 
 ## 6. Existing Tests & Quality
