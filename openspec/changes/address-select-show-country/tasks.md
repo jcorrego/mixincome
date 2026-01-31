@@ -19,7 +19,7 @@
 
 ## 3. Verify & Cleanup
 
-- [ ] 3.1 Run all affected tests, confirm all GREEN
-- [ ] 3.2 Run full test suite (`php artisan test --compact`) to check for regressions
-- [ ] 3.3 Run `vendor/bin/pint --dirty` for code formatting
-- [ ] 3.4 Run PHPStan to verify type coverage (`vendor/bin/phpstan analyse`)
+- [x] 3.1 Run all affected tests, confirm all GREEN
+- [x] 3.2 Run full test suite (`php artisan test --compact`) to check for regressions
+- [x] 3.3 Run `vendor/bin/pint --dirty` for code formatting
+- [x] 3.4 Run PHPStan to verify type coverage (`vendor/bin/phpstan analyse`)

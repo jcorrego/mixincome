@@ -6,7 +6,6 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Database\Factories\AddressFactory;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -59,14 +58,9 @@ final class Address extends Model
         ];
     }
 
-    /**
-     * @return Attribute<string, never>
-     */
-    protected function displayLabel(): Attribute
+    public function getDisplayLabelAttribute(): string
     {
-        return Attribute::make(
-            get: fn (): string => "{$this->street}, {$this->city} ({$this->country})",
-        );
+        return "{$this->street}, {$this->city} ({$this->country})";
     }
 
     public function user(): BelongsTo
