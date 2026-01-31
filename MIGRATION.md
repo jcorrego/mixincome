@@ -192,12 +192,12 @@ create_addresses_table
 **Enums to Create:**
 - `EntityType` (LLC, SCorp, CCorp, Partnership, Trust, Other) — NO Individual
 
-#### 1.2 User Interface — UserProfile, Entity, Address CRUD (FASE 1.2 - PRÓXIMA)
+#### 1.2 User Interface — UserProfile, Entity, Address CRUD (FASE 1.2 - ✅ COMPLETADA)
 Dependencias: UserProfile, Entity, Address models (✅ Fase 1.1)
 
 **Objetivo:** Validar modelos en contexto real, proporcionar interfaz para gestionar perfiles, entidades y direcciones.
 
-**OpenSpec Change:** TBD (crear con `/opsx:new`)
+**OpenSpec Change:** `phase-1-2-user-interface-crud` (5/5 artifacts complete, 45/45 tasks complete, 174 tests passing)
 
 **Rutas & Páginas a crear:**
 - UserProfile Management
@@ -434,8 +434,8 @@ create_document_tags_table
 ```
 1. Jurisdictions        ✅ HECHO
 2. UserProfiles + Entities + Addresses    ✅ IMPLEMENTADO (Fase 1.1)
-3. UserInterface (CRUD + Forms)           ← PRÓXIMO (Fase 1.2)
-4. Currencies + FxRates                   ← Después de 3 (Fase 2.1)
+3. UserInterface (CRUD + Forms)           ✅ COMPLETADO (Fase 1.2)
+4. Currencies + FxRates                   ← PRÓXIMO (Fase 2.1)
 5. Accounts + TransactionCategories       ← Después de 4 (Fase 2.2)
 6. Transactions + TransactionImports      ← Después de 5 (Fase 2.2)
 7. Assets + AssetValuations + YearEndValues ← Después de 4 (Fase 2.3)
@@ -482,19 +482,20 @@ NOTA: TaxYear eliminado. Filing apunta directamente a UserProfile/Entity con cam
 | **Fase 0.5: UI Base** | ✅ | Logo animado, Jurisdictions CRUD |
 | **Fase 1.1: OpenSpec Design** | ✅ | `phase-1-1-user-profiles-entities-addresses` (5/5 artifacts) |
 | **Fase 1.1: Implementation** | ✅ | UserProfile, Entity, Address models + migrations + factories + 151 tests passing |
+| **Fase 1.2: OpenSpec Design** | ✅ | `phase-1-2-user-interface-crud` (5/5 artifacts, 45 tasks) |
+| **Fase 1.2: Implementation** | ✅ | Controllers, Policies, Form Requests, Livewire components, Routes, Views + 174 tests passing |
 
 ### 📋 Próximo Paso
 
-**Fase 1.2: User Interface — UserProfile, Entity, Address CRUD** (Después de 1.1)
+**Fase 2.1: Finance Schema — Currencies & Exchange Rates** (Después de 1.2)
 
 Esto creará:
-- Rutas y Controllers (CRUD para UserProfile, Entity, Address)
-- Livewire/Volt components (Forms, Lists)
-- Form Requests (validation)
-- Feature & component tests
-- Flux UI components + Tailwind styling
+- Currency model + migrations
+- FxRate model para tasas de cambio históricas
+- Seeder para monedas base (USD, EUR, COP, CAD, GBP)
+- FxRateService para cálculos y sincronización ECB
 
-**Objetivo:** Validar modelos en contexto real y proporcionar interfaz funcional antes de continuar con Finance Schema (Fase 2).
+**Objetivo:** Establecer sistema multi-moneda con soporte para conversión histórica de divisas.
 
 ---
 
