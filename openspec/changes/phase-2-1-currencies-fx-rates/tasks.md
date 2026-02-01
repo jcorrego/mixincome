@@ -44,8 +44,8 @@
 - [x] 7.1 Create EcbApiService in `app/Services/`
 - [x] 7.2 Implement fetchRate(from, to, date) with ECB SDMX endpoint
 - [x] 7.3 Implement response parsing for ECB XML/JSON format
-- [x] 7.4 Add inverse rate calculation for non-EUR base
-- [x] 7.5 Add cross-rate calculation for non-EUR pairs (via EUR)
+- [ ] 7.4 Add inverse rate calculation for non-EUR base (DEFERRED - not in scope for MVP)
+- [ ] 7.5 Add cross-rate calculation for non-EUR pairs (via EUR) (DEFERRED - not in scope for MVP)
 - [x] 7.6 Add retry logic with exponential backoff (3 attempts)
 - [x] 7.7 Add proper exception handling (FxRateException)
       → Tests passing: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 8.10
@@ -61,9 +61,9 @@
 ## 9. FxRateService - Replication
 
 - [x] 9.1 Implement replicateRate(from, to, date) method
-- [x] 9.2 Add 7-day lookback search for previous rate
+- [x] 9.2 Add lookback search for previous rate (no limit in MVP)
 - [x] 9.3 Create replicated FxRate with is_replicated=true and replicated_from_date set
-- [x] 9.4 Return null when no rate within 7 days
+- [x] 9.4 Throw FxRateException when no source rate exists
       → Tests passing: 4.2, 5.1, 5.2, 5.3, 5.4
 
 ## 10. FxRateService - Calculations

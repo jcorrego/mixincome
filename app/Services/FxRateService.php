@@ -74,15 +74,19 @@ final readonly class FxRateService
         $fromCurrency = Currency::query()->where('code', $fromCode)->firstOrFail();
         $toCurrency = Currency::query()->where('code', $toCode)->firstOrFail();
 
-        return FxRate::query()->create([
-            'from_currency_id' => $fromCurrency->id,
-            'to_currency_id' => $toCurrency->id,
-            'date' => $apiResult['date'],
-            'rate' => number_format($apiResult['rate'], 8, '.', ''),
-            'source' => 'ecb',
-            'is_replicated' => false,
-            'replicated_from_date' => null,
-        ]);
+        return FxRate::query()->firstOrCreate(
+            [
+                'from_currency_id' => $fromCurrency->id,
+                'to_currency_id' => $toCurrency->id,
+                'date' => $apiResult['date'],
+            ],
+            [
+                'rate' => number_format($apiResult['rate'], 8, '.', ''),
+                'source' => 'ecb',
+                'is_replicated' => false,
+                'replicated_from_date' => null,
+            ]
+        );
     }
 
     /**

@@ -24,6 +24,10 @@ final class EcbApiService
     /**
      * Get exchange rate from ECB API.
      *
+     * Note: ECB publishes EUR-based rates only. The $toCurrency is
+     * currently used for validation and cache keys; cross-rate
+     * calculations are deferred for the MVP.
+     *
      * @return array{rate: float, date: string}
      *
      * @throws FxRateException
@@ -57,7 +61,7 @@ final class EcbApiService
      */
     private function fetchFromApi(string $fromCurrency, CarbonInterface $date): array
     {
-        // ECB publishes EUR-based rates, so we need to calculate cross rates
+        // ECB publishes EUR-based rates only (cross-rate calculation deferred)
         $url = $this->buildUrl($fromCurrency, $date);
 
         try {
