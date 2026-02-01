@@ -1,4 +1,6 @@
 <div>
+    <flux:heading size="xl">{{ $currency->name }} ({{ $currency->code }})</flux:heading>
+
     <flux:header :heading="$currency->name . ' (' . $currency->code . ')'" :back-link="route('management.currencies.index')">
         <flux:subheading>
             Manage exchange rates for {{ $currency->symbol }} {{ $currency->code }}
