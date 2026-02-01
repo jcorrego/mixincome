@@ -102,11 +102,14 @@ final class ExchangeRateApiService
      */
     private function parseResponse(array $data, CarbonInterface $date): array
     {
-        throw_if(
-            ! isset($data['result']) || $data['result'] !== 'success',
-            FxRateException::class,
-            'ExchangeRate-API error: '.($data['error-type'] ?? 'Unknown error')
-        );
+        /** @var mixed $result */
+        $result = $data['result'] ?? null;
+        if ($result !== 'success') {
+            $error = $data['error-type'] ?? 'Unknown error';
+            /** @phpstan-ignore-next-line cast.string */
+            $errorMsg = (string) $error;
+            throw new FxRateException('ExchangeRate-API error: '.$errorMsg);
+        }
 
         throw_if(
             ! isset($data['conversion_rate']),

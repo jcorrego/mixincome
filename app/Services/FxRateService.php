@@ -224,8 +224,9 @@ final readonly class FxRateService
 
         // Always touch to update timestamp even if values didn't change
         $rate->touch();
+        $rate->refresh();
 
-        return $rate->refresh() ?? $rate;
+        return $rate;
     }
 
     /**

@@ -201,3 +201,14 @@ test('getRate formats date correctly in cache key', function (): void {
 
     Http::assertSentCount(1); // Same date, should be cached
 });
+
+test('getRate throws exception when result is not success', function (): void {
+    Http::fake([
+        'v6.exchangerate-api.com/*' => Http::response([
+            'result' => 'error',
+            'error-type' => 'unsupported-code',
+        ], 200),
+    ]);
+
+    $this->service->getRate('COP', 'EUR', Date::parse('2024-06-14'));
+})->throws(FxRateException::class, 'ExchangeRate-API error: unsupported-code');
