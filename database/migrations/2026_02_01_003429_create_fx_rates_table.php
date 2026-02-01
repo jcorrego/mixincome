@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fx_rates', function (Blueprint $table) {
+        Schema::create('fx_rates', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('from_currency_id')->constrained('currencies')->restrictOnDelete();
             $table->foreignId('to_currency_id')->constrained('currencies')->restrictOnDelete();

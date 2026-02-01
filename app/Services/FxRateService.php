@@ -7,12 +7,12 @@ namespace App\Services;
 use App\Exceptions\FxRateException;
 use App\Models\Currency;
 use App\Models\FxRate;
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 
-final class FxRateService
+final readonly class FxRateService
 {
     public function __construct(
-        private readonly EcbApiService $ecbApiService,
+        private EcbApiService $ecbApiService,
     ) {}
 
     /**
@@ -20,21 +20,21 @@ final class FxRateService
      * Falls back to most recent rate if exact date not available.
      * Returns identity rate (1.0) for same currency.
      */
-    public function findRate(string $fromCode, string $toCode, Carbon $date): ?FxRate
+    public function findRate(string $fromCode, string $toCode, CarbonInterface $date): ?FxRate
     {
         if ($fromCode === $toCode) {
             return $this->createIdentityRate($fromCode, $date);
         }
 
-        $fromCurrency = Currency::where('code', $fromCode)->first();
-        $toCurrency = Currency::where('code', $toCode)->first();
+        $fromCurrency = Currency::query()->where('code', $fromCode)->first();
+        $toCurrency = Currency::query()->where('code', $toCode)->first();
 
         if ($fromCurrency === null || $toCurrency === null) {
             return null;
         }
 
         // Try exact date first
-        $rate = FxRate::where('from_currency_id', $fromCurrency->id)
+        $rate = FxRate::query()->where('from_currency_id', $fromCurrency->id)
             ->where('to_currency_id', $toCurrency->id)
             ->whereDate('date', $date)
             ->first();
@@ -44,7 +44,7 @@ final class FxRateService
         }
 
         // Fall back to most recent rate before the date
-        return FxRate::where('from_currency_id', $fromCurrency->id)
+        return FxRate::query()->where('from_currency_id', $fromCurrency->id)
             ->where('to_currency_id', $toCurrency->id)
             ->whereDate('date', '<=', $date)
             ->orderBy('date', 'desc')
@@ -56,7 +56,7 @@ final class FxRateService
      *
      * @throws FxRateException
      */
-    public function fetchRate(string $fromCode, string $toCode, Carbon $date): FxRate
+    public function fetchRate(string $fromCode, string $toCode, CarbonInterface $date): FxRate
     {
         if ($fromCode === $toCode) {
             return $this->createIdentityRate($fromCode, $date);
@@ -64,17 +64,17 @@ final class FxRateService
 
         // Check if already cached locally
         $existingRate = $this->findRate($fromCode, $toCode, $date);
-        if ($existingRate !== null && $existingRate->date->toDateString() === $date->toDateString()) {
+        if ($existingRate instanceof FxRate && $existingRate->date->toDateString() === $date->toDateString()) {
             return $existingRate;
         }
 
         // Fetch from API
         $apiResult = $this->ecbApiService->getRate($fromCode, $toCode, $date);
 
-        $fromCurrency = Currency::where('code', $fromCode)->firstOrFail();
-        $toCurrency = Currency::where('code', $toCode)->firstOrFail();
+        $fromCurrency = Currency::query()->where('code', $fromCode)->firstOrFail();
+        $toCurrency = Currency::query()->where('code', $toCode)->firstOrFail();
 
-        return FxRate::create([
+        return FxRate::query()->create([
             'from_currency_id' => $fromCurrency->id,
             'to_currency_id' => $toCurrency->id,
             'date' => $apiResult['date'],
@@ -90,23 +90,21 @@ final class FxRateService
      *
      * @throws FxRateException
      */
-    public function replicateRate(string $fromCode, string $toCode, Carbon $targetDate): FxRate
+    public function replicateRate(string $fromCode, string $toCode, CarbonInterface $targetDate): FxRate
     {
-        $fromCurrency = Currency::where('code', $fromCode)->firstOrFail();
-        $toCurrency = Currency::where('code', $toCode)->firstOrFail();
+        $fromCurrency = Currency::query()->where('code', $fromCode)->firstOrFail();
+        $toCurrency = Currency::query()->where('code', $toCode)->firstOrFail();
 
         // Find the most recent rate before target date
-        $sourceRate = FxRate::where('from_currency_id', $fromCurrency->id)
+        $sourceRate = FxRate::query()->where('from_currency_id', $fromCurrency->id)
             ->where('to_currency_id', $toCurrency->id)
             ->where('date', '<', $targetDate->toDateString())
             ->orderBy('date', 'desc')
             ->first();
 
-        if ($sourceRate === null) {
-            throw new FxRateException("No source rate available to replicate for {$fromCode}/{$toCode}");
-        }
+        throw_if($sourceRate === null, FxRateException::class, "No source rate available to replicate for {$fromCode}/{$toCode}");
 
-        return FxRate::create([
+        return FxRate::query()->create([
             'from_currency_id' => $fromCurrency->id,
             'to_currency_id' => $toCurrency->id,
             'date' => $targetDate->toDateString(),
@@ -122,7 +120,7 @@ final class FxRateService
      *
      * @throws FxRateException
      */
-    public function convert(float $amount, string $fromCode, string $toCode, Carbon $date): float
+    public function convert(float $amount, string $fromCode, string $toCode, CarbonInterface $date): float
     {
         if ($fromCode === $toCode) {
             return $amount;
@@ -130,11 +128,11 @@ final class FxRateService
 
         $rate = $this->findRate($fromCode, $toCode, $date);
 
-        if ($rate === null) {
+        if (! $rate instanceof FxRate) {
             throw new FxRateException("No rate available for {$fromCode}/{$toCode} on {$date->toDateString()}");
         }
 
-        $toCurrency = Currency::where('code', $toCode)->firstOrFail();
+        $toCurrency = Currency::query()->where('code', $toCode)->firstOrFail();
         $result = $amount * (float) $rate->rate;
 
         return round($result, $toCurrency->decimal_places);
@@ -143,9 +141,9 @@ final class FxRateService
     /**
      * Create a virtual identity rate for same-currency conversions.
      */
-    private function createIdentityRate(string $currencyCode, Carbon $date): FxRate
+    private function createIdentityRate(string $currencyCode, CarbonInterface $date): FxRate
     {
-        $currency = Currency::where('code', $currencyCode)->first();
+        $currency = Currency::query()->where('code', $currencyCode)->first();
         $currencyId = $currency !== null ? $currency->id : 0;
 
         return new FxRate([

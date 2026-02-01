@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Currency;
 use App\Models\FxRate;
+use Carbon\CarbonInterface;
 use Illuminate\Database\QueryException;
 
 test('FxRate has required fields including rate with 8 decimal precision', function (): void {
@@ -14,7 +15,7 @@ test('FxRate has required fields including rate with 8 decimal precision', funct
     expect($fxRate)->toBeInstanceOf(FxRate::class)
         ->and($fxRate->from_currency_id)->toBeInt()
         ->and($fxRate->to_currency_id)->toBeInt()
-        ->and($fxRate->date)->toBeInstanceOf(Carbon\CarbonInterface::class)
+        ->and($fxRate->date)->toBeInstanceOf(CarbonInterface::class)
         ->and($fxRate->rate)->toBeString()
         ->and($fxRate->source)->toBeString()
         ->and($fxRate->is_replicated)->toBeBool();
@@ -102,7 +103,7 @@ test('replicated rate has is_replicated=true and valid replicated_from_date', fu
     $fxRate = FxRate::factory()->replicated()->create();
 
     expect($fxRate->is_replicated)->toBeTrue()
-        ->and($fxRate->replicated_from_date)->toBeInstanceOf(Carbon\CarbonInterface::class);
+        ->and($fxRate->replicated_from_date)->toBeInstanceOf(CarbonInterface::class);
 });
 
 test('FxRate belongs to source currency', function (): void {

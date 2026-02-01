@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Carbon\CarbonInterface;
 use Database\Factories\CurrencyFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,8 +19,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int $decimal_places
  * @property-read CarbonInterface $created_at
  * @property-read CarbonInterface $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, FxRate> $sourceFxRates
- * @property-read \Illuminate\Database\Eloquent\Collection<int, FxRate> $targetFxRates
+ * @property-read Collection<int, FxRate> $sourceFxRates
+ * @property-read Collection<int, FxRate> $targetFxRates
  */
 final class Currency extends Model
 {

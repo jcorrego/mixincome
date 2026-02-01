@@ -34,7 +34,7 @@ final class FxRateFactory extends Factory
      */
     public function replicated(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes): array {
             /** @var string $date */
             $date = $attributes['date'] ?? now()->toDateString();
 

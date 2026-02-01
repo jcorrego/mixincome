@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Currency;
 use App\Models\FxRate;
+use Database\Seeders\CurrencySeeder;
 use Illuminate\Database\QueryException;
 
 test('currency has required fields: code, name, symbol, decimal_places', function (): void {
@@ -23,9 +24,9 @@ test('currency code is unique and rejects duplicates', function (): void {
 })->throws(QueryException::class);
 
 test('USD currency has correct metadata', function (): void {
-    $this->seed(\Database\Seeders\CurrencySeeder::class);
+    $this->seed(CurrencySeeder::class);
 
-    $usd = Currency::where('code', 'USD')->firstOrFail();
+    $usd = Currency::query()->where('code', 'USD')->firstOrFail();
 
     expect($usd->code)->toBe('USD')
         ->and($usd->name)->toBe('United States Dollar')
@@ -34,9 +35,9 @@ test('USD currency has correct metadata', function (): void {
 });
 
 test('EUR currency has correct metadata', function (): void {
-    $this->seed(\Database\Seeders\CurrencySeeder::class);
+    $this->seed(CurrencySeeder::class);
 
-    $eur = Currency::where('code', 'EUR')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
 
     expect($eur->code)->toBe('EUR')
         ->and($eur->name)->toBe('Euro')
@@ -45,9 +46,9 @@ test('EUR currency has correct metadata', function (): void {
 });
 
 test('COP currency has correct metadata with 0 decimals', function (): void {
-    $this->seed(\Database\Seeders\CurrencySeeder::class);
+    $this->seed(CurrencySeeder::class);
 
-    $cop = Currency::where('code', 'COP')->firstOrFail();
+    $cop = Currency::query()->where('code', 'COP')->firstOrFail();
 
     expect($cop->code)->toBe('COP')
         ->and($cop->name)->toBe('Colombian Peso')
