@@ -252,20 +252,30 @@ Dependencias: UserProfile, Entity, Address models (✅ Fase 1.1)
 
 **Nota sobre TaxYear:** Eliminado del roadmap. Filing (Fase 3.2) apunta directamente a UserProfile/Entity con campo `year` (int). No hay tabla TaxYear intermedia.
 
-#### 2.1 Currencies & Exchange Rates (`currencies`, `fx_rates`)
+#### 2.1 Currencies & Exchange Rates (`currencies`, `fx_rates`) — OpenSpec: `phase-2-1-currencies-fx-rates`
 Dependencias: Ninguna
 
+**OpenSpec Change:** `phase-2-1-currencies-fx-rates` (5/5 artifacts complete)
+- Location: `openspec/changes/phase-2-1-currencies-fx-rates/`
+- Schema: tdd-driven
+- Status: Ready for implementation (`/opsx:apply`)
+
 Modelos a crear:
-- `Currency` — Moneda (USD, EUR, COP, etc.)
-  - Relaciones: hasMany(FxRate as source), hasMany(FxRate as target)
-  - Campos: code (ISO 4217), name, symbol, is_primary
-  - Factory + Seeder (precargado: USD, EUR, COP, CAD, GBP)
+- `Currency` — Moneda (solo USD, EUR, COP)
+  - Relaciones: hasMany(FxRate as sourceFxRates), hasMany(FxRate as targetFxRates)
+  - Campos: code (VARCHAR 3, unique), name, symbol, decimal_places (TINYINT, default 2)
+  - Factory + Seeder (USD, EUR, COP)
+  - Enum helper: `Currency` enum con decimals() y symbol()
 
 - `FxRate` — Tasa de cambio histórica
-  - Relaciones: belongsTo(Currency, 'source_currency_id'), belongsTo(Currency, 'target_currency_id')
-  - Campos: source_currency_id, target_currency_id, date, rate, source (Enum: ECB, Manual, API)
+  - Relaciones: belongsTo(Currency, 'from_currency_id'), belongsTo(Currency, 'to_currency_id')
+  - Campos: from_currency_id, to_currency_id, date, rate (DECIMAL 12,8), source (VARCHAR 50), is_replicated (BOOLEAN), replicated_from_date (DATE nullable)
   - Factory + Tests
-  - Índices: (source_currency_id, target_currency_id, date) unique
+  - Índice único: (from_currency_id, to_currency_id, date)
+
+**Services a crear:**
+- `FxRateService` — findOrFetchRate, replicateFromPreviousDay, syncRates, convert
+- `EcbApiService` — fetchRate from ECB SDMX API
 
 **Database Migrations to Create:**
 ```
@@ -273,8 +283,17 @@ create_currencies_table
 create_fx_rates_table
 ```
 
-**Enums to Create:**
-- `FxRateSource` (ECB, Manual, YNAB, Mercury, BancoSantander, Bancolombia)
+**Decisiones clave (Fase 2.1):**
+
+| Decisión | Justificación |
+|----------|---------------|
+| Solo 3 monedas (USD, EUR, COP) | Hard-coded, cubre 100% casos actuales |
+| `source` es VARCHAR, no enum | Extensible para futuras APIs (Fed, BoE, etc.) |
+| Sin `FxRateSource` enum | Rates siempre de fuentes oficiales, override manual en Transaction |
+| `is_replicated` + `replicated_from_date` | Auditoría de weekend/holiday gap-fill |
+| DECIMAL(12,8) para rate | Precisión para rates pequeños (COP→USD ≈ 0.00025) |
+| Una rate por fecha | UNIQUE(from, to, date) — last write wins |
+| Replicación max 7 días | Buscar hasta 7 días atrás si ECB no tiene data |
 
 ---
 
@@ -506,7 +525,9 @@ NOTA: TaxYear eliminado. Filing apunta directamente a UserProfile/Entity con cam
 ---
 
 ### Fase 2: Services Layer (Después de modelos)
-- [ ] FxRateService (cálculo de conversión, sincronización ECB)
+- [x] FxRateService (Fase 2.1 — find/fetch/replicate rates, ECB sync)
+- [x] EcbApiService (Fase 2.1 — ECB SDMX API integration)
+- [ ] CurrencyConversionService (Fase 2.2 — convert Transaction amounts)
 - [ ] TransactionImportService (parseo CSV/PDF/QIF, detección duplicados)
 - [ ] TransactionCategorizationService (rules engine, manual override)
 - [ ] Migrar parsers (CSV/PDF)
@@ -529,7 +550,7 @@ NOTA: TaxYear eliminado. Filing apunta directamente a UserProfile/Entity con cam
 
 ---
 
-## Estado Actual (31 Enero 2026)
+## Estado Actual (1 Febrero 2026)
 
 ### ✅ Completado
 
@@ -541,18 +562,22 @@ NOTA: TaxYear eliminado. Filing apunta directamente a UserProfile/Entity con cam
 | **Fase 1.1: Implementation** | ✅ | UserProfile, Entity, Address models + migrations + factories + 151 tests passing |
 | **Fase 1.2: OpenSpec Design** | ✅ | `phase-1-2-user-interface-crud` (5/5 artifacts, 45 tasks) |
 | **Fase 1.2: Implementation** | ✅ | Controllers, Policies, Form Requests, Livewire components, Routes, Views + 174 tests passing |
+| **Fase 2.1: OpenSpec Design** | ✅ | `phase-2-1-currencies-fx-rates` (5/5 artifacts, 43 tests, 27 tasks) |
 
 ### 📋 Próximo Paso
 
-**Fase 2.1: Finance Schema — Currencies & Exchange Rates** (Después de 1.2)
+**Fase 2.1: Implementation — Currencies & Exchange Rates**
+
+OpenSpec change `phase-2-1-currencies-fx-rates` está listo para `/opsx:apply`.
 
 Esto creará:
-- Currency model + migrations
-- FxRate model para tasas de cambio históricas
-- Seeder para monedas base (USD, EUR, COP, CAD, GBP)
-- FxRateService para cálculos y sincronización ECB
+- Currency model + enum + seeder (USD, EUR, COP)
+- FxRate model con replication tracking
+- FxRateService (find, fetch, replicate, sync)
+- EcbApiService (ECB SDMX integration)
+- 43 tests
 
-**Objetivo:** Establecer sistema multi-moneda con soporte para conversión histórica de divisas.
+**Objetivo:** Establecer sistema multi-moneda con conversión histórica vía ECB.
 
 ---
 
