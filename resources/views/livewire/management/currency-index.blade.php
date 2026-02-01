@@ -1,10 +1,12 @@
-<div>
-    <flux:header heading="Currency Management">
-        <flux:subheading>
-            Manage currencies and exchange rates
-        </flux:subheading>
-    </flux:header>
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <flux:heading size="xl">{{ __('Currencies') }}</flux:heading>
+            <flux:text class="mt-1">{{ __('Manage currencies and exchange rates.') }}</flux:text>
+        </div>
+    </div>
 
+    {{-- Currencies Table --}}
     <flux:table>
         <flux:table.columns>
             <flux:table.column>Code</flux:table.column>
