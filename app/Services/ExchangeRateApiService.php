@@ -61,6 +61,7 @@ final class ExchangeRateApiService
 
         throw_if(empty($apiKey), FxRateException::class, 'ExchangeRate-API key not configured');
 
+        /** @var string $apiKey */
         $url = $this->buildUrl($apiKey, $fromCurrency, $toCurrency);
 
         try {
@@ -73,6 +74,7 @@ final class ExchangeRateApiService
             $data = $response->json();
             throw_if($data === null, FxRateException::class, 'ExchangeRate-API returned invalid JSON');
 
+            /** @var array<string, mixed> $data */
             return $this->parseResponse($data, $date);
 
         } catch (ConnectionException $e) {
@@ -103,7 +105,7 @@ final class ExchangeRateApiService
         throw_if(
             ! isset($data['result']) || $data['result'] !== 'success',
             FxRateException::class,
-            'ExchangeRate-API error: '.($data['error-type'] ?? 'Unknown error')
+            'ExchangeRate-API error: '.(string) ($data['error-type'] ?? 'Unknown error')
         );
 
         throw_if(
@@ -112,8 +114,11 @@ final class ExchangeRateApiService
             'No rate found in ExchangeRate-API response'
         );
 
+        /** @var float|string|int $conversionRate */
+        $conversionRate = $data['conversion_rate'];
+
         return [
-            'rate' => (float) $data['conversion_rate'],
+            'rate' => (float) $conversionRate,
             'date' => $date->toDateString(),
         ];
     }
