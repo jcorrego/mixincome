@@ -151,7 +151,7 @@ final readonly class FxRateService
 
     /**
      * Manually fetch a new rate for a specific date (admin operation).
-     * Throws exception if rate already exists or if ECB has no data.
+     * Throws exception if rate already exists or if the appropriate API (ECB or ExchangeRate-API) has no data for the requested date.
      */
     public function fetchRateManual(Currency $from, Currency $to, CarbonInterface $date): FxRate
     {
@@ -195,8 +195,8 @@ final readonly class FxRateService
     }
 
     /**
-     * Re-fetch an existing rate from ECB (admin operation).
-     * Updates the rate value and replication status if ECB has new data.
+     * Re-fetch an existing rate from the appropriate API service (admin operation).
+     * Updates the rate value and replication status if the API has new data.
      */
     public function refetchRate(FxRate $rate): FxRate
     {

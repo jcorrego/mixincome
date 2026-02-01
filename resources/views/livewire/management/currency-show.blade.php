@@ -1,6 +1,4 @@
 <div>
-    <flux:heading size="xl">{{ $currency->name }} ({{ $currency->code }})</flux:heading>
-
     <flux:header :heading="$currency->name . ' (' . $currency->code . ')'" :back-link="route('management.currencies.index')">
         <flux:subheading>
             Manage exchange rates for {{ $currency->symbol }} {{ $currency->code }}
@@ -18,6 +16,7 @@
         @enderror
 
         <x-action-message on="rate-fetched" class="mb-4 text-green-600 dark:text-green-400 font-medium">
+            Rate fetched successfully.
         </x-action-message>
 
         <form wire:submit="fetchRate">
@@ -71,6 +70,7 @@
         @enderror
 
         <x-action-message on="rate-refetched" class="mb-4 text-green-600 dark:text-green-400 font-medium">
+            Rate refetched successfully.
         </x-action-message>
 
         @if ($currency->sourceFxRates->isEmpty())
@@ -97,7 +97,7 @@
                                 </flux:badge>
                             </flux:table.cell>
                             <flux:table.cell align="end">
-                                @if ($rate->source === 'ecb')
+                                @if (in_array($rate->source, ['ecb', 'exchangerate-api']))
                                     <flux:button
                                         size="sm"
                                         variant="ghost"
@@ -149,7 +149,7 @@
                                 </flux:badge>
                             </flux:table.cell>
                             <flux:table.cell align="end">
-                                @if ($rate->source === 'ecb')
+                                @if (in_array($rate->source, ['ecb', 'exchangerate-api']))
                                     <flux:button
                                         size="sm"
                                         variant="ghost"

@@ -35,7 +35,7 @@ test('getRate fetches rate successfully from API', function (): void {
         ->and($result['date'])->toBeString();
 });
 
-test('getRate constructs correct API URL', function (): void {
+test('getRate constructs correct API URL for historical date', function (): void {
     Http::fake([
         'v6.exchangerate-api.com/*' => Http::response($this->validResponse, 200),
     ]);
@@ -45,8 +45,37 @@ test('getRate constructs correct API URL', function (): void {
     Http::assertSent(function ($request): bool {
         $url = $request->url();
 
+        return str_contains($url, 'v6.exchangerate-api.com/v6/test-api-key/history/COP/2024-06-14/EUR');
+    });
+});
+
+test('getRate constructs correct API URL for current date', function (): void {
+    Http::fake([
+        'v6.exchangerate-api.com/*' => Http::response($this->validResponse, 200),
+    ]);
+
+    $this->service->getRate('COP', 'EUR', Date::today());
+
+    Http::assertSent(function ($request): bool {
+        $url = $request->url();
+
         return str_contains($url, 'v6.exchangerate-api.com/v6/test-api-key/pair/COP/EUR');
     });
+});
+
+test('getRate parses history endpoint response correctly', function (): void {
+    Http::fake([
+        'v6.exchangerate-api.com/*' => Http::response([
+            'result' => 'success',
+            'conversion_rates' => [
+                'EUR' => 0.93,
+            ],
+        ], 200),
+    ]);
+
+    $result = $this->service->getRate('COP', 'EUR', Date::parse('2024-06-14'));
+
+    expect($result['rate'])->toBe(0.93);
 });
 
 test('getRate caches response for same request', function (): void {

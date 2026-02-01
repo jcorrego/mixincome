@@ -65,7 +65,7 @@ final class CurrencyShow extends Component
     }
 
     /**
-     * Re-fetch an existing exchange rate from ECB.
+     * Re-fetch an existing exchange rate from the appropriate external provider.
      */
     public function refetchRate(int $fxRateId, FxRateService $fxRateService): void
     {
@@ -78,7 +78,7 @@ final class CurrencyShow extends Component
             if ((float) $oldRate !== (float) $updatedRate->rate) {
                 $message = "Rate updated from {$oldRate} to {$updatedRate->rate}";
             } else {
-                $message = 'Rate unchanged, ECB value matches existing rate';
+                $message = 'Rate unchanged, API value matches existing rate';
             }
 
             $this->dispatch('rate-refetched', message: $message);

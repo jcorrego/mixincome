@@ -9,6 +9,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 
 final class ExchangeRateApiService
@@ -62,7 +63,7 @@ final class ExchangeRateApiService
         throw_if(empty($apiKey), FxRateException::class, 'ExchangeRate-API key not configured');
 
         /** @var string $apiKey */
-        $url = $this->buildUrl($apiKey, $fromCurrency, $toCurrency);
+        $url = $this->buildUrl($apiKey, $fromCurrency, $toCurrency, $date);
 
         try {
             $response = Http::retry(self::RETRY_ATTEMPTS, 1000, throw: false)
@@ -75,7 +76,7 @@ final class ExchangeRateApiService
             throw_if($data === null, FxRateException::class, 'ExchangeRate-API returned invalid JSON');
 
             /** @var array<string, mixed> $data */
-            return $this->parseResponse($data, $date);
+            return $this->parseResponse($data, $date, $toCurrency);
 
         } catch (ConnectionException $e) {
             throw new FxRateException('ExchangeRate-API connection failed: '.$e->getMessage());
@@ -86,21 +87,28 @@ final class ExchangeRateApiService
 
     /**
      * Build the URL for ExchangeRate-API.
+     * Uses /history endpoint for past dates, /pair endpoint for today.
      */
-    private function buildUrl(string $apiKey, string $fromCurrency, string $toCurrency): string
+    private function buildUrl(string $apiKey, string $fromCurrency, string $toCurrency, CarbonInterface $date): string
     {
-        return self::BASE_URL."/{$apiKey}/pair/{$fromCurrency}/{$toCurrency}";
+        $today = Date::today();
+        if ($date->isSameDay($today)) {
+            return self::BASE_URL."/{$apiKey}/pair/{$fromCurrency}/{$toCurrency}";
+        }
+
+        return self::BASE_URL."/{$apiKey}/history/{$fromCurrency}/{$date->toDateString()}/{$toCurrency}";
     }
 
     /**
-     * Parse JSON response from ExchangeRate-API.
+     * Parse ExchangeRate-API response.
+     * Handles both /pair endpoint (current rates) and /history endpoint (historical rates).
      *
      * @param  array<string, mixed>  $data
      * @return array{rate: float, date: string}
      *
      * @throws FxRateException
      */
-    private function parseResponse(array $data, CarbonInterface $date): array
+    private function parseResponse(array $data, CarbonInterface $date, string $toCurrency = ''): array
     {
         /** @var mixed $result */
         $result = $data['result'] ?? null;
@@ -111,14 +119,19 @@ final class ExchangeRateApiService
             throw new FxRateException('ExchangeRate-API error: '.$errorMsg);
         }
 
+        // For history endpoint, the rate is in conversion_rates object; for /pair endpoint, it's conversion_rate
+        $conversionRateValue = $data['conversion_rate'] ?? null;
+        if ($conversionRateValue === null && isset($data['conversion_rates']) && is_array($data['conversion_rates'])) {
+            $conversionRateValue = $data['conversion_rates'][$toCurrency] ?? null;
+        }
         throw_if(
-            ! isset($data['conversion_rate']),
+            $conversionRateValue === null,
             FxRateException::class,
             'No rate found in ExchangeRate-API response'
         );
 
         /** @var float|string|int $conversionRate */
-        $conversionRate = $data['conversion_rate'];
+        $conversionRate = $conversionRateValue;
 
         return [
             'rate' => (float) $conversionRate,
