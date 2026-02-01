@@ -123,14 +123,15 @@ final class EcbApiService
 
         $observations = $xml->xpath('//generic:Obs');
 
-        if ($observations === false || count($observations) === 0) {
+        if (! is_array($observations) || count($observations) === 0) {
             throw new FxRateException('No rate found in ECB response');
         }
 
         $obs = $observations[0];
-        $value = (string) $obs->xpath('generic:ObsValue/@value')[0] ?? null;
+        $valueNodes = $obs->xpath('generic:ObsValue/@value');
+        $value = is_array($valueNodes) && isset($valueNodes[0]) ? (string) $valueNodes[0] : '';
 
-        if ($value === null || $value === '') {
+        if ($value === '') {
             throw new FxRateException('No rate value in ECB response');
         }
 

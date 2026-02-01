@@ -146,16 +146,16 @@ final class FxRateService
     private function createIdentityRate(string $currencyCode, Carbon $date): FxRate
     {
         $currency = Currency::where('code', $currencyCode)->first();
+        $currencyId = $currency !== null ? $currency->id : 0;
 
-        $rate = new FxRate;
-        $rate->from_currency_id = $currency?->id ?? 0;
-        $rate->to_currency_id = $currency?->id ?? 0;
-        $rate->date = $date;
-        $rate->rate = '1.00000000';
-        $rate->source = 'identity';
-        $rate->is_replicated = false;
-        $rate->replicated_from_date = null;
-
-        return $rate;
+        return new FxRate([
+            'from_currency_id' => $currencyId,
+            'to_currency_id' => $currencyId,
+            'date' => $date,
+            'rate' => '1.00000000',
+            'source' => 'identity',
+            'is_replicated' => false,
+            'replicated_from_date' => null,
+        ]);
     }
 }

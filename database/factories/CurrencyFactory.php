@@ -17,9 +17,12 @@ final class CurrencyFactory extends Factory
      */
     public function definition(): array
     {
+        /** @var string $words */
+        $words = fake()->words(2, true);
+
         return [
             'code' => mb_strtoupper(fake()->unique()->lexify('???')),
-            'name' => fake()->words(2, true).' Currency',
+            'name' => $words.' Currency',
             'symbol' => fake()->randomElement(['$', '€', '£', '¥']),
             'decimal_places' => 2,
         ];
