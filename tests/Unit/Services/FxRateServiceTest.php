@@ -324,7 +324,7 @@ test('fetchRateManual throws exception when ECB has no data', function (): void 
     ]);
 
     $this->fxRateService->fetchRateManual($usd, $eur, $saturdayDate);
-})->throws(FxRateException::class, 'ECB has no rate for this date');
+})->throws(FxRateException::class, 'API has no rate for this date');
 
 // Test 7.1: Re-fetch existing rate
 test('refetchRate updates existing rate with new ECB value', function (): void {
@@ -420,7 +420,7 @@ test('refetchRate throws exception when ECB still has no data', function (): voi
     ]);
 
     $this->fxRateService->refetchRate($rate);
-})->throws(FxRateException::class, 'ECB has no rate for this date');
+})->throws(FxRateException::class, 'API has no rate for this date');
 
 // Test 7.5: Re-fetch returns same value
 test('refetchRate updates timestamp even when rate value unchanged', function (): void {

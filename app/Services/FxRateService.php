@@ -13,6 +13,7 @@ final readonly class FxRateService
 {
     public function __construct(
         private EcbApiService $ecbApiService,
+        private ExchangeRateApiService $exchangeRateApiService,
     ) {}
 
     /**
@@ -68,8 +69,14 @@ final readonly class FxRateService
             return $existingRate;
         }
 
-        // Fetch from API
-        $apiResult = $this->ecbApiService->getRate($fromCode, $toCode, $date);
+        // Fetch from API (choose appropriate service based on currency pair)
+        if ($this->isCopPair($fromCode, $toCode)) {
+            $apiResult = $this->exchangeRateApiService->getRate($fromCode, $toCode, $date);
+            $source = 'exchangerate-api';
+        } else {
+            $apiResult = $this->ecbApiService->getRate($fromCode, $toCode, $date);
+            $source = 'ecb';
+        }
 
         $fromCurrency = Currency::query()->where('code', $fromCode)->firstOrFail();
         $toCurrency = Currency::query()->where('code', $toCode)->firstOrFail();
@@ -82,7 +89,7 @@ final readonly class FxRateService
             ],
             [
                 'rate' => number_format($apiResult['rate'], 8, '.', ''),
-                'source' => 'ecb',
+                'source' => $source,
                 'is_replicated' => false,
                 'replicated_from_date' => null,
             ]
@@ -159,12 +166,18 @@ final readonly class FxRateService
             throw new FxRateException('Rate already exists for this currency pair and date');
         }
 
-        // Try to fetch from ECB
+        // Try to fetch from appropriate API
         try {
-            $ecbResult = $this->ecbApiService->getRate($from->code, $to->code, $date);
-            $rate = $ecbResult['rate'];
+            if ($this->isCopPair($from->code, $to->code)) {
+                $apiResult = $this->exchangeRateApiService->getRate($from->code, $to->code, $date);
+                $source = 'exchangerate-api';
+            } else {
+                $apiResult = $this->ecbApiService->getRate($from->code, $to->code, $date);
+                $source = 'ecb';
+            }
+            $rate = $apiResult['rate'];
         } catch (FxRateException $e) {
-            throw new FxRateException('ECB has no rate for this date. Rate would be replicated.');
+            throw new FxRateException('API has no rate for this date. Rate would be replicated.');
         }
 
         // Create the rate
@@ -176,7 +189,7 @@ final readonly class FxRateService
             ],
             [
                 'rate' => $rate,
-                'source' => 'ecb',
+                'source' => $source,
                 'is_replicated' => false,
                 'replicated_from_date' => null,
             ]
@@ -192,12 +205,16 @@ final readonly class FxRateService
         $fromCurrency = $rate->fromCurrency;
         $toCurrency = $rate->toCurrency;
 
-        // Try to fetch fresh data from ECB
+        // Try to fetch fresh data from appropriate API
         try {
-            $ecbResult = $this->ecbApiService->getRate($fromCurrency->code, $toCurrency->code, $rate->date);
-            $newRateValue = $ecbResult['rate'];
+            if ($this->isCopPair($fromCurrency->code, $toCurrency->code)) {
+                $apiResult = $this->exchangeRateApiService->getRate($fromCurrency->code, $toCurrency->code, $rate->date);
+            } else {
+                $apiResult = $this->ecbApiService->getRate($fromCurrency->code, $toCurrency->code, $rate->date);
+            }
+            $newRateValue = $apiResult['rate'];
         } catch (FxRateException $e) {
-            throw new FxRateException('ECB has no rate for this date');
+            throw new FxRateException('API has no rate for this date');
         }
 
         // Update the rate
@@ -211,6 +228,14 @@ final readonly class FxRateService
         $rate->touch();
 
         return $rate->fresh();
+    }
+
+    /**
+     * Determine if currency pair involves COP.
+     */
+    private function isCopPair(string $fromCode, string $toCode): bool
+    {
+        return $fromCode === 'COP' || $toCode === 'COP';
     }
 
     /**
