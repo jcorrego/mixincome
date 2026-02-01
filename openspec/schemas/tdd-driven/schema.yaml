@@ -171,7 +171,7 @@ artifacts:
       ## 3. Refactor & Cleanup
 
       - [ ] 3.1 Extract shared logic into trait/concern
-      - [ ] 3.2 Run full test suite, verify all green
+      - [ ] 3.2 Run full suite: `composer test` (includes type coverage)
       - [ ] 3.3 Run `composer lint` (Pint + Rector + Prettier)
       ```
 
@@ -222,9 +222,10 @@ apply:
     - Commit after each group: `git commit -m "feat: <description>"`
 
     ### 4. Refactor Phase
-    - Run full test suite: `composer test`
+    - Run full suite: `composer test` (includes type coverage)
     - Run linting: `composer lint`
     - **🚫 GATE: `composer test` MUST exit 0 (all tests green, PHPStan clean, lint clean, type coverage 100%).**
+    - **🚫 GATE: Apply is NOT complete without `composer test` passing.**
       - If anything fails, fix it without breaking existing green tests.
       - Re-run `composer test` until fully green.
     - Commit: `git commit -m "refactor: cleanup <change-id>"`
