@@ -82,4 +82,4 @@
 - [x] 12.1 Run full test suite, verify all tests green (290 tests, 622 assertions)
 - [x] 12.2 Run `vendor/bin/pint --dirty` to fix formatting
 - [x] 12.3 Run `vendor/bin/phpstan analyse` (Larastan level 9 passes)
-- [ ] 12.4 Update MIGRATION.md to mark Phase 2.1 as complete
+- [x] 12.4 Update MIGRATION.md to mark Phase 2.1 as complete

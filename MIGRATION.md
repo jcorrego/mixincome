@@ -252,13 +252,13 @@ Dependencias: UserProfile, Entity, Address models (✅ Fase 1.1)
 
 **Nota sobre TaxYear:** Eliminado del roadmap. Filing (Fase 3.2) apunta directamente a UserProfile/Entity con campo `year` (int). No hay tabla TaxYear intermedia.
 
-#### 2.1 Currencies & Exchange Rates (`currencies`, `fx_rates`) — OpenSpec: `phase-2-1-currencies-fx-rates`
+#### 2.1 Currencies & Exchange Rates (`currencies`, `fx_rates`) — ✅ COMPLETADA
 Dependencias: Ninguna
 
-**OpenSpec Change:** `phase-2-1-currencies-fx-rates` (5/5 artifacts complete)
+**OpenSpec Change:** `phase-2-1-currencies-fx-rates` (5/5 artifacts complete, 36/41 tasks complete, 296 tests passing)
 - Location: `openspec/changes/phase-2-1-currencies-fx-rates/`
 - Schema: tdd-driven
-- Status: Ready for implementation (`/opsx:apply`)
+- Status: **✅ COMPLETADA** - Core functionality implemented and tested. Deferred features: cross-rate calculations (7.4, 7.5), batch sync (11.1, 11.2)
 
 Modelos a crear:
 - `Currency` — Moneda (solo USD, EUR, COP)
