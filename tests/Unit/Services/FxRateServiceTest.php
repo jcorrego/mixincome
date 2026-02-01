@@ -58,6 +58,12 @@ test('findRate returns null when no rate exists', function (): void {
     expect($rate)->toBeNull();
 });
 
+test('findRate returns null when currency code is unknown', function (): void {
+    $rate = $this->fxRateService->findRate('XXX', 'USD', Carbon::parse('2024-06-14'));
+
+    expect($rate)->toBeNull();
+});
+
 test('findRate returns identity rate 1.0 for same currency', function (): void {
     $rate = $this->fxRateService->findRate('USD', 'USD', Carbon::parse('2024-06-14'));
 
@@ -149,6 +155,19 @@ test('fetchRate returns cached rate when available', function (): void {
 
     expect($rate)->toBeInstanceOf(FxRate::class)
         ->and((float) $rate->rate)->toBe(0.85);
+
+    Http::assertNothingSent();
+});
+
+test('fetchRate returns identity rate for same currency', function (): void {
+    Http::fake();
+
+    $rate = $this->fxRateService->fetchRate('USD', 'USD', Carbon::parse('2024-06-14'));
+
+    expect($rate)->toBeInstanceOf(FxRate::class)
+        ->and((float) $rate->rate)->toBe(1.0)
+        ->and($rate->source)->toBe('identity')
+        ->and($rate->is_replicated)->toBeFalse();
 
     Http::assertNothingSent();
 });

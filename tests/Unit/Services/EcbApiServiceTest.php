@@ -82,9 +82,59 @@ test('handles malformed XML response', function (): void {
     $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
 })->throws(App\Exceptions\FxRateException::class);
 
+test('handles response with no observations', function (): void {
+    $noObservations = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<message:GenericData xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:generic="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic">
+    <message:DataSet>
+    </message:DataSet>
+</message:GenericData>
+XML;
+
+    Http::fake([
+        'data-api.ecb.europa.eu/*' => Http::response($noObservations, 200),
+    ]);
+
+    $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
+})->throws(App\Exceptions\FxRateException::class, 'No rate found');
+
+test('handles response with missing rate value', function (): void {
+    $missingValue = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<message:GenericData xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:generic="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic">
+    <message:DataSet>
+        <generic:Obs>
+            <generic:ObsDimension value="2024-06-14"/>
+            <generic:ObsValue />
+        </generic:Obs>
+    </message:DataSet>
+</message:GenericData>
+XML;
+
+    Http::fake([
+        'data-api.ecb.europa.eu/*' => Http::response($missingValue, 200),
+    ]);
+
+    $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
+})->throws(App\Exceptions\FxRateException::class, 'No rate value');
+
 test('handles unsupported currency pair', function (): void {
     $this->ecbApiService->getRate('XXX', 'YYY', Carbon::parse('2024-06-14'));
 })->throws(App\Exceptions\FxRateException::class, 'Unsupported currency');
+
+test('handles request exceptions', function (): void {
+    Http::fake([
+        'data-api.ecb.europa.eu/*' => function () {
+            $response = new Illuminate\Http\Client\Response(
+                new GuzzleHttp\Psr7\Response(500)
+            );
+
+            throw new Illuminate\Http\Client\RequestException($response);
+        },
+    ]);
+
+    $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
+})->throws(App\Exceptions\FxRateException::class, 'ECB API error');
 
 test('retries on temporary failure', function (): void {
     $callCount = 0;

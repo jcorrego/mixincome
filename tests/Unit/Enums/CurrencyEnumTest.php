@@ -21,3 +21,9 @@ test('currency enum symbol() returns correct symbols', function (): void {
         ->and(Currency::Eur->symbol())->toBe('€')
         ->and(Currency::Cop->symbol())->toBe('$');
 });
+
+test('currency enum name() returns correct names', function (): void {
+    expect(Currency::Usd->name())->toBe('United States Dollar')
+        ->and(Currency::Eur->name())->toBe('Euro')
+        ->and(Currency::Cop->name())->toBe('Colombian Peso');
+});
