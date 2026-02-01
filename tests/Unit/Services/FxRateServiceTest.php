@@ -277,3 +277,167 @@ test('convert rounds to target currency decimal places', function (): void {
     // COP has 0 decimal places
     expect($result)->toBe(400012.0);
 });
+
+// Test 6.1: Fetch new rate manually
+test('fetchRateManual creates new rate when none exists', function (): void {
+    $usd = Currency::query()->where('code', 'USD')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $date = Date::parse('2024-06-14');
+
+    Http::fake([
+        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+    ]);
+
+    $rate = $this->fxRateService->fetchRateManual($usd, $eur, $date);
+
+    expect($rate)->toBeInstanceOf(FxRate::class)
+        ->and($rate->from_currency_id)->toBe($usd->id)
+        ->and($rate->to_currency_id)->toBe($eur->id)
+        ->and($rate->source)->toBe('ecb')
+        ->and($rate->is_replicated)->toBeFalse();
+});
+
+// Test 6.2: Prevent duplicate manual fetch
+test('fetchRateManual throws exception when rate already exists', function (): void {
+    $usd = Currency::query()->where('code', 'USD')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $date = Date::parse('2024-06-14');
+
+    FxRate::factory()->create([
+        'from_currency_id' => $usd->id,
+        'to_currency_id' => $eur->id,
+        'date' => $date,
+        'rate' => '0.85000000',
+    ]);
+
+    $this->fxRateService->fetchRateManual($usd, $eur, $date);
+})->throws(FxRateException::class, 'Rate already exists for this currency pair and date');
+
+// Test 6.3: Manual fetch for replicated rate
+test('fetchRateManual throws exception when ECB has no data', function (): void {
+    $usd = Currency::query()->where('code', 'USD')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $saturdayDate = Date::parse('2024-06-15'); // Saturday
+
+    Http::fake([
+        '*' => Http::response('', 404),
+    ]);
+
+    $this->fxRateService->fetchRateManual($usd, $eur, $saturdayDate);
+})->throws(FxRateException::class, 'ECB has no rate for this date');
+
+// Test 7.1: Re-fetch existing rate
+test('refetchRate updates existing rate with new ECB value', function (): void {
+    $usd = Currency::query()->where('code', 'USD')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $date = Date::parse('2024-06-14');
+
+    $existingRate = FxRate::factory()->create([
+        'from_currency_id' => $usd->id,
+        'to_currency_id' => $eur->id,
+        'date' => $date,
+        'rate' => '0.85000000',
+    ]);
+
+    Http::fake([
+        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+    ]);
+
+    $updatedRate = $this->fxRateService->refetchRate($existingRate);
+
+    expect($updatedRate->id)->toBe($existingRate->id)
+        ->and($updatedRate->updated_at->isAfter($existingRate->updated_at))->toBeTrue();
+});
+
+// Test 7.2: Re-fetch updates rate value
+test('refetchRate updates rate value when ECB returns different value', function (): void {
+    $usd = Currency::query()->where('code', 'USD')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $date = Date::parse('2024-06-14');
+
+    $existingRate = FxRate::factory()->create([
+        'from_currency_id' => $usd->id,
+        'to_currency_id' => $eur->id,
+        'date' => $date,
+        'rate' => '0.85000000',
+    ]);
+
+    Http::fake([
+        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+    ]);
+
+    $updatedRate = $this->fxRateService->refetchRate($existingRate);
+
+    expect($updatedRate->id)->toBe($existingRate->id)
+        ->and((float) $updatedRate->rate)->not->toBe(0.85);
+});
+
+// Test 7.3: Re-fetch updates replication status
+test('refetchRate updates replicated rate to ECB-sourced', function (): void {
+    $usd = Currency::query()->where('code', 'USD')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $date = Date::parse('2024-06-14');
+
+    $replicatedRate = FxRate::factory()->create([
+        'from_currency_id' => $usd->id,
+        'to_currency_id' => $eur->id,
+        'date' => $date,
+        'rate' => '0.85000000',
+        'is_replicated' => true,
+        'replicated_from_date' => Date::parse('2024-06-13'),
+    ]);
+
+    Http::fake([
+        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+    ]);
+
+    $updatedRate = $this->fxRateService->refetchRate($replicatedRate);
+
+    expect($updatedRate->is_replicated)->toBeFalse()
+        ->and($updatedRate->replicated_from_date)->toBeNull();
+});
+
+// Test 7.4: Re-fetch when ECB still has no data
+test('refetchRate throws exception when ECB still has no data', function (): void {
+    $usd = Currency::query()->where('code', 'USD')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $saturdayDate = Date::parse('2024-06-15'); // Saturday
+
+    $rate = FxRate::factory()->create([
+        'from_currency_id' => $usd->id,
+        'to_currency_id' => $eur->id,
+        'date' => $saturdayDate,
+        'rate' => '0.85000000',
+    ]);
+
+    Http::fake([
+        '*' => Http::response('', 404),
+    ]);
+
+    $this->fxRateService->refetchRate($rate);
+})->throws(FxRateException::class, 'ECB has no rate for this date');
+
+// Test 7.5: Re-fetch returns same value
+test('refetchRate updates timestamp even when rate value unchanged', function (): void {
+    $usd = Currency::query()->where('code', 'USD')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $date = Date::parse('2024-06-14');
+
+    $existingRate = FxRate::factory()->create([
+        'from_currency_id' => $usd->id,
+        'to_currency_id' => $eur->id,
+        'date' => $date,
+        'rate' => '0.92640000',
+    ]);
+
+    $oldTimestamp = $existingRate->updated_at;
+
+    Http::fake([
+        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+    ]);
+
+    $updatedRate = $this->fxRateService->refetchRate($existingRate);
+
+    expect($updatedRate->updated_at->isAfter($oldTimestamp))->toBeTrue()
+        ->and((float) $updatedRate->rate)->toBe(0.9264);
+});
