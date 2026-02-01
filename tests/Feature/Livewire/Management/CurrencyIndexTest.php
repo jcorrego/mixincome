@@ -19,7 +19,7 @@ test('component renders with all currencies', function (): void {
         ->assertSee('USD')
         ->assertSee('EUR')
         ->assertSee('COP')
-        ->assertSee('US Dollar')
+        ->assertSee('United States Dollar')
         ->assertSee('Euro')
         ->assertSee('Colombian Peso');
 });

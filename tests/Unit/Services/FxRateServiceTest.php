@@ -285,7 +285,7 @@ test('fetchRateManual creates new rate when none exists', function (): void {
     $date = Date::parse('2024-06-14');
 
     Http::fake([
-        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+        '*' => Http::response(file_get_contents(__DIR__.'/../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
     ]);
 
     $rate = $this->fxRateService->fetchRateManual($usd, $eur, $date);
@@ -339,14 +339,19 @@ test('refetchRate updates existing rate with new ECB value', function (): void {
         'rate' => '0.85000000',
     ]);
 
+    $oldTimestamp = $existingRate->updated_at;
+
+    // Wait to ensure timestamp difference
+    $this->travel(1)->seconds();
+
     Http::fake([
-        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+        '*' => Http::response(file_get_contents(__DIR__.'/../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
     ]);
 
     $updatedRate = $this->fxRateService->refetchRate($existingRate);
 
     expect($updatedRate->id)->toBe($existingRate->id)
-        ->and($updatedRate->updated_at->isAfter($existingRate->updated_at))->toBeTrue();
+        ->and($updatedRate->updated_at->isAfter($oldTimestamp))->toBeTrue();
 });
 
 // Test 7.2: Re-fetch updates rate value
@@ -363,7 +368,7 @@ test('refetchRate updates rate value when ECB returns different value', function
     ]);
 
     Http::fake([
-        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+        '*' => Http::response(file_get_contents(__DIR__.'/../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
     ]);
 
     $updatedRate = $this->fxRateService->refetchRate($existingRate);
@@ -388,7 +393,7 @@ test('refetchRate updates replicated rate to ECB-sourced', function (): void {
     ]);
 
     Http::fake([
-        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+        '*' => Http::response(file_get_contents(__DIR__.'/../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
     ]);
 
     $updatedRate = $this->fxRateService->refetchRate($replicatedRate);
@@ -432,8 +437,11 @@ test('refetchRate updates timestamp even when rate value unchanged', function ()
 
     $oldTimestamp = $existingRate->updated_at;
 
+    // Wait to ensure timestamp difference
+    $this->travel(1)->seconds();
+
     Http::fake([
-        '*' => Http::response(file_get_contents(__DIR__.'/../../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
+        '*' => Http::response(file_get_contents(__DIR__.'/../../Fixtures/ecb_usd_eur_2024-06-14.xml'), 200),
     ]);
 
     $updatedRate = $this->fxRateService->refetchRate($existingRate);

@@ -143,6 +143,77 @@ final readonly class FxRateService
     }
 
     /**
+     * Manually fetch a new rate for a specific date (admin operation).
+     * Throws exception if rate already exists or if ECB has no data.
+     */
+    public function fetchRateManual(Currency $from, Currency $to, CarbonInterface $date): FxRate
+    {
+        // Check if rate already exists
+        $existing = FxRate::query()
+            ->where('from_currency_id', $from->id)
+            ->where('to_currency_id', $to->id)
+            ->whereDate('date', $date)
+            ->first();
+
+        if ($existing !== null) {
+            throw new FxRateException('Rate already exists for this currency pair and date');
+        }
+
+        // Try to fetch from ECB
+        try {
+            $ecbResult = $this->ecbApiService->getRate($from->code, $to->code, $date);
+            $rate = $ecbResult['rate'];
+        } catch (FxRateException $e) {
+            throw new FxRateException('ECB has no rate for this date. Rate would be replicated.');
+        }
+
+        // Create the rate
+        return FxRate::query()->firstOrCreate(
+            [
+                'from_currency_id' => $from->id,
+                'to_currency_id' => $to->id,
+                'date' => $date,
+            ],
+            [
+                'rate' => $rate,
+                'source' => 'ecb',
+                'is_replicated' => false,
+                'replicated_from_date' => null,
+            ]
+        );
+    }
+
+    /**
+     * Re-fetch an existing rate from ECB (admin operation).
+     * Updates the rate value and replication status if ECB has new data.
+     */
+    public function refetchRate(FxRate $rate): FxRate
+    {
+        $fromCurrency = $rate->fromCurrency;
+        $toCurrency = $rate->toCurrency;
+
+        // Try to fetch fresh data from ECB
+        try {
+            $ecbResult = $this->ecbApiService->getRate($fromCurrency->code, $toCurrency->code, $rate->date);
+            $newRateValue = $ecbResult['rate'];
+        } catch (FxRateException $e) {
+            throw new FxRateException('ECB has no rate for this date');
+        }
+
+        // Update the rate
+        $rate->update([
+            'rate' => number_format($newRateValue, 8, '.', ''),
+            'is_replicated' => false,
+            'replicated_from_date' => null,
+        ]);
+
+        // Always touch to update timestamp even if values didn't change
+        $rate->touch();
+
+        return $rate->fresh();
+    }
+
+    /**
      * Create a virtual identity rate for same-currency conversions.
      */
     private function createIdentityRate(string $currencyCode, CarbonInterface $date): FxRate
