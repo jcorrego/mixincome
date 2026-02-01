@@ -279,7 +279,7 @@ create_fx_rates_table
 ---
 
 #### 2.2 Accounts & Transactions (`accounts`, `transactions`, `transaction_categories`, `transaction_imports`)
-Dependencias: Entity, TaxYear, Currency
+Dependencias: Entity, Currency (Fase 2.1)
 
 Modelos a crear:
 - `Account` — Cuenta financiera (Bank, Credit Card, Crypto wallet, etc.)
@@ -292,19 +292,15 @@ Modelos a crear:
   - Campos: code, name, category_type (Enum: Income, Expense, Transfer, Other), description
   - Seeder (precargado con ~40 categorías estándar)
 
-- `Transaction` — Transacción financiera
+- `Transaction` — Transacción financiera (DISEÑO REFINADO)
   - Relaciones: belongsTo(Account), belongsTo(TransactionCategory, nullable), belongsTo(TransactionImport), morphMany(Document)
-  - Campos: account_id, category_id, import_id, date, description, amount_original, currency_original_id, amount_converted, currency_converted_id, exchange_rate, fx_rate_id (nullable), notes, metadata
   - Factory + Tests
-  - Índices: (account_id, date), (category_id, date)
+  - Índices: (account_id, date), (date, category_id)
 
 - `TransactionImport` — Lote de importación (CSV, QIF, API)
   - Relaciones: belongsTo(Entity), hasMany(Transaction), hasMany(Document)
   - Campos: entity_id, import_type (Enum), file_name, import_date, row_count, status (Enum: Processing, Imported, Failed, Duplicate), error_message
   - Factory + Tests
-
-- `ImportBatch` — Batch antiguo si existe, o renombrar a TransactionImport
-  - Deprecated: Mover lógica a TransactionImport
 
 **Database Migrations to Create:**
 ```
@@ -319,6 +315,67 @@ create_transaction_imports_table
 - `TransactionCategoryType` (Income, Expense, Transfer, Tax, Other)
 - `ImportType` (CSV, QIF, PDF, YNABSync, MercuryAPI, SantanderCSV, BancolombiaSFTP)
 - `ImportStatus` (Processing, Imported, Failed, Duplicate, Review)
+
+##### Decisiones de Diseño: Transaction (Fase 2.2)
+
+**Arquitectura Multi-Moneda Simplificada:**
+
+Las transacciones usan **3 columnas hard-coded** en lugar de normalización:
+
+```sql
+CREATE TABLE transactions (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  account_id BIGINT UNSIGNED NOT NULL,
+  category_id BIGINT UNSIGNED NULL,
+  import_id BIGINT UNSIGNED NULL,
+  date DATE NOT NULL,
+  description TEXT NOT NULL,
+  
+  -- Monedas (lazy-filled, nullable)
+  amount_usd DECIMAL(15, 2) NULL,
+  amount_eur DECIMAL(15, 2) NULL,
+  amount_cop DECIMAL(15, 0) NULL,  -- COP sin decimales
+  
+  original_currency VARCHAR(3) NOT NULL,  -- 'USD', 'EUR', 'COP'
+  
+  notes TEXT NULL,
+  created_at TIMESTAMP NULL,
+  updated_at TIMESTAMP NULL
+);
+```
+
+**Decisiones clave:**
+
+| Decisión | Justificación |
+|----------|---------------|
+| 3 columnas fijas (USD, EUR, COP) | Simple, no extensible, pero cubre 100% de casos actuales |
+| `original_currency` explícito | Auditable: saber moneda original de la transacción |
+| Lazy-fill de conversiones | Columnas se llenan cuando un reporte las necesita |
+| Manual override en Transaction | Usuario edita `amount_X` directamente, NO en fx_rates |
+| Sin metadata de conversión | No hay JSON de trazabilidad; auditoría via fx_rates table |
+| COP sin decimales | `DECIMAL(15, 0)` - peso colombiano no usa centavos |
+
+**Flujo de conversión:**
+
+```
+1. Transaction creada con amount_eur = 1500.00, original_currency = 'EUR'
+2. Reporte España necesita EUR → Ya está (original)
+3. Reporte USA necesita USD:
+   → CurrencyConversionService::convert($transaction, 'USD')
+   → Busca/crea FxRate para EUR→USD en transaction.date
+   → Calcula: 1500 * 1.08 = 1620.00
+   → Actualiza: amount_usd = 1620.00
+4. Usuario puede editar amount_usd manualmente si desea override
+```
+
+**Qué NO se hace:**
+- ❌ No hay `fx_rate_id` en Transaction (era diseño anterior)
+- ❌ No hay `conversion_metadata` JSON
+- ❌ No hay columnas extensibles (solo USD/EUR/COP)
+- ❌ Agregar nuevas monedas requiere migration
+
+**Service a crear en Fase 2.2:**
+- `CurrencyConversionService::convert(Transaction, targetCurrency)` - usa FxRateService de Fase 2.1
 
 ---
 
