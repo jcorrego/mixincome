@@ -8,11 +8,22 @@ use Illuminate\Support\Facades\Http;
 
 beforeEach(function (): void {
     $this->ecbApiService = app(EcbApiService::class);
+    $this->validEcbResponse = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<message:GenericData xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:generic="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic">
+    <message:DataSet>
+        <generic:Obs>
+            <generic:ObsDimension value="2024-06-14"/>
+            <generic:ObsValue value="0.85"/>
+        </generic:Obs>
+    </message:DataSet>
+</message:GenericData>
+XML;
 });
 
 test('constructs valid SDMX URL for currency pair and date', function (): void {
     Http::fake([
-        'data-api.ecb.europa.eu/*' => Http::response($this->getValidEcbResponse(), 200),
+        'data-api.ecb.europa.eu/*' => Http::response($this->validEcbResponse, 200),
     ]);
 
     $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
@@ -28,7 +39,7 @@ test('constructs valid SDMX URL for currency pair and date', function (): void {
 
 test('parses ECB SDMX response correctly', function (): void {
     Http::fake([
-        'data-api.ecb.europa.eu/*' => Http::response($this->getValidEcbResponse(), 200),
+        'data-api.ecb.europa.eu/*' => Http::response($this->validEcbResponse, 200),
     ]);
 
     $result = $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
@@ -45,7 +56,7 @@ test('handles HTTP 404 for missing date', function (): void {
     ]);
 
     $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-15'));
-})->throws(\App\Exceptions\FxRateException::class, 'No rate available');
+})->throws(App\Exceptions\FxRateException::class, 'No rate available');
 
 test('handles HTTP 500 server error', function (): void {
     Http::fake([
@@ -53,15 +64,15 @@ test('handles HTTP 500 server error', function (): void {
     ]);
 
     $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
-})->throws(\App\Exceptions\FxRateException::class, 'ECB API error');
+})->throws(App\Exceptions\FxRateException::class, 'ECB API error');
 
 test('handles network timeout', function (): void {
     Http::fake([
-        'data-api.ecb.europa.eu/*' => fn () => throw new \Illuminate\Http\Client\ConnectionException('Timeout'),
+        'data-api.ecb.europa.eu/*' => fn () => throw new Illuminate\Http\Client\ConnectionException('Timeout'),
     ]);
 
     $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
-})->throws(\App\Exceptions\FxRateException::class);
+})->throws(App\Exceptions\FxRateException::class);
 
 test('handles malformed XML response', function (): void {
     Http::fake([
@@ -69,11 +80,11 @@ test('handles malformed XML response', function (): void {
     ]);
 
     $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
-})->throws(\App\Exceptions\FxRateException::class);
+})->throws(App\Exceptions\FxRateException::class);
 
 test('handles unsupported currency pair', function (): void {
     $this->ecbApiService->getRate('XXX', 'YYY', Carbon::parse('2024-06-14'));
-})->throws(\App\Exceptions\FxRateException::class, 'Unsupported currency');
+})->throws(App\Exceptions\FxRateException::class, 'Unsupported currency');
 
 test('retries on temporary failure', function (): void {
     $callCount = 0;
@@ -84,7 +95,7 @@ test('retries on temporary failure', function (): void {
             return Http::response('Server Error', 500);
         }
 
-        return Http::response($this->getValidEcbResponse(), 200);
+        return Http::response($this->validEcbResponse, 200);
     });
 
     $result = $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
@@ -95,7 +106,7 @@ test('retries on temporary failure', function (): void {
 
 test('caches response for same request', function (): void {
     Http::fake([
-        'data-api.ecb.europa.eu/*' => Http::response($this->getValidEcbResponse(), 200),
+        'data-api.ecb.europa.eu/*' => Http::response($this->validEcbResponse, 200),
     ]);
 
     $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
@@ -110,22 +121,4 @@ test('respects ECB API rate limits', function (): void {
     ]);
 
     $this->ecbApiService->getRate('USD', 'EUR', Carbon::parse('2024-06-14'));
-})->throws(\App\Exceptions\FxRateException::class, 'rate limit');
-
-/**
- * Helper to get a valid ECB SDMX XML response.
- */
-function getValidEcbResponse(): string
-{
-    return <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<message:GenericData xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message">
-    <message:DataSet>
-        <generic:Obs>
-            <generic:ObsDimension value="2024-06-14"/>
-            <generic:ObsValue value="0.85"/>
-        </generic:Obs>
-    </message:DataSet>
-</message:GenericData>
-XML;
-}
+})->throws(App\Exceptions\FxRateException::class, 'rate limit');

@@ -39,10 +39,12 @@ test('fx_rates table has correct columns', function (): void {
 });
 
 test('CurrencySeeder creates exactly 3 currencies', function (): void {
-    $this->seed(\Database\Seeders\CurrencySeeder::class);
+    $this->seed(Database\Seeders\CurrencySeeder::class);
+
+    $codes = Currency::pluck('code')->sort()->values()->toArray();
 
     expect(Currency::count())->toBe(3)
-        ->and(Currency::pluck('code')->toArray())->toBe(['USD', 'EUR', 'COP']);
+        ->and($codes)->toBe(['COP', 'EUR', 'USD']);
 });
 
 test('fx_rates foreign key constraints work correctly', function (): void {
@@ -52,5 +54,5 @@ test('fx_rates foreign key constraints work correctly', function (): void {
     ]);
 
     // Deleting referenced currency should fail due to foreign key
-    expect(fn () => $currency->delete())->toThrow(\Illuminate\Database\QueryException::class);
+    expect(fn () => $currency->delete())->toThrow(Illuminate\Database\QueryException::class);
 });

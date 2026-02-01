@@ -6,9 +6,10 @@ use App\Models\Currency;
 use App\Models\FxRate;
 use App\Services\FxRateService;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 
 beforeEach(function (): void {
-    $this->seed(\Database\Seeders\CurrencySeeder::class);
+    $this->seed(Database\Seeders\CurrencySeeder::class);
     $this->fxRateService = app(FxRateService::class);
 });
 
@@ -65,15 +66,21 @@ test('findRate returns identity rate 1.0 for same currency', function (): void {
 });
 
 test('fetchRate calls API when no local rate exists', function (): void {
-    $this->mock(\App\Services\EcbApiService::class, function ($mock): void {
-        $mock->shouldReceive('getRate')
-            ->once()
-            ->with('USD', 'EUR', \Mockery::type(Carbon::class))
-            ->andReturn([
-                'rate' => 0.85,
-                'date' => '2024-06-14',
-            ]);
-    });
+    $validResponse = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<message:GenericData xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:generic="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic">
+    <message:DataSet>
+        <generic:Obs>
+            <generic:ObsDimension value="2024-06-14"/>
+            <generic:ObsValue value="0.85"/>
+        </generic:Obs>
+    </message:DataSet>
+</message:GenericData>
+XML;
+
+    Http::fake([
+        'data-api.ecb.europa.eu/*' => Http::response($validResponse, 200),
+    ]);
 
     $fxRateService = app(FxRateService::class);
     $rate = $fxRateService->fetchRate('USD', 'EUR', Carbon::parse('2024-06-14'));
@@ -83,14 +90,21 @@ test('fetchRate calls API when no local rate exists', function (): void {
 });
 
 test('fetchRate stores rate locally after API call', function (): void {
-    $this->mock(\App\Services\EcbApiService::class, function ($mock): void {
-        $mock->shouldReceive('getRate')
-            ->once()
-            ->andReturn([
-                'rate' => 0.85,
-                'date' => '2024-06-14',
-            ]);
-    });
+    $validResponse = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<message:GenericData xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:generic="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic">
+    <message:DataSet>
+        <generic:Obs>
+            <generic:ObsDimension value="2024-06-14"/>
+            <generic:ObsValue value="0.85"/>
+        </generic:Obs>
+    </message:DataSet>
+</message:GenericData>
+XML;
+
+    Http::fake([
+        'data-api.ecb.europa.eu/*' => Http::response($validResponse, 200),
+    ]);
 
     $fxRateService = app(FxRateService::class);
     $fxRateService->fetchRate('USD', 'EUR', Carbon::parse('2024-06-14'));
@@ -100,7 +114,7 @@ test('fetchRate stores rate locally after API call', function (): void {
 
     $storedRate = FxRate::where('from_currency_id', $usd->id)
         ->where('to_currency_id', $eur->id)
-        ->where('date', '2024-06-14')
+        ->whereDate('date', '2024-06-14')
         ->first();
 
     expect($storedRate)->not->toBeNull()
@@ -108,15 +122,13 @@ test('fetchRate stores rate locally after API call', function (): void {
 });
 
 test('fetchRate throws exception when API fails', function (): void {
-    $this->mock(\App\Services\EcbApiService::class, function ($mock): void {
-        $mock->shouldReceive('getRate')
-            ->once()
-            ->andThrow(new \App\Exceptions\FxRateException('ECB API unavailable'));
-    });
+    Http::fake([
+        'data-api.ecb.europa.eu/*' => Http::response('Server Error', 500),
+    ]);
 
     $fxRateService = app(FxRateService::class);
     $fxRateService->fetchRate('USD', 'EUR', Carbon::parse('2024-06-14'));
-})->throws(\App\Exceptions\FxRateException::class);
+})->throws(App\Exceptions\FxRateException::class);
 
 test('fetchRate returns cached rate when available', function (): void {
     $usd = Currency::where('code', 'USD')->firstOrFail();
@@ -125,20 +137,20 @@ test('fetchRate returns cached rate when available', function (): void {
     FxRate::factory()->create([
         'from_currency_id' => $usd->id,
         'to_currency_id' => $eur->id,
-        'date' => '2024-06-14',
+        'date' => Carbon::parse('2024-06-14'),
         'rate' => '0.85000000',
     ]);
 
-    // API should not be called
-    $this->mock(\App\Services\EcbApiService::class, function ($mock): void {
-        $mock->shouldNotReceive('getRate');
-    });
+    // Rate exists in DB, so HTTP should not be called
+    Http::fake();
 
     $fxRateService = app(FxRateService::class);
     $rate = $fxRateService->fetchRate('USD', 'EUR', Carbon::parse('2024-06-14'));
 
     expect($rate)->toBeInstanceOf(FxRate::class)
         ->and((float) $rate->rate)->toBe(0.85);
+
+    Http::assertNothingSent();
 });
 
 test('replicateRate fills weekend gap with Friday rate', function (): void {
@@ -171,7 +183,7 @@ test('replicateRate fills weekend gap with Friday rate', function (): void {
 test('replicateRate throws exception when no source rate exists', function (): void {
     $saturday = Carbon::parse('2024-06-15');
     $this->fxRateService->replicateRate('USD', 'EUR', $saturday);
-})->throws(\App\Exceptions\FxRateException::class);
+})->throws(App\Exceptions\FxRateException::class);
 
 test('replicateRate tracks replicated_from_date correctly', function (): void {
     $usd = Currency::where('code', 'USD')->firstOrFail();
@@ -221,20 +233,25 @@ test('convert returns same amount for same currency', function (): void {
 
 test('convert throws exception when no rate available', function (): void {
     $this->fxRateService->convert(100.00, 'USD', 'EUR', Carbon::parse('2024-06-14'));
-})->throws(\App\Exceptions\FxRateException::class);
+})->throws(App\Exceptions\FxRateException::class);
 
 test('convert rounds to target currency decimal places', function (): void {
+    // Ensure seeder created currencies
+    expect(Currency::count())->toBe(3);
+
     $usd = Currency::where('code', 'USD')->firstOrFail();
     $cop = Currency::where('code', 'COP')->firstOrFail();
 
     FxRate::factory()->create([
         'from_currency_id' => $usd->id,
         'to_currency_id' => $cop->id,
-        'date' => '2024-06-14',
+        'date' => Carbon::parse('2024-06-14'),
         'rate' => '4000.12345678',
     ]);
 
-    $result = $this->fxRateService->convert(100.00, 'USD', 'COP', Carbon::parse('2024-06-14'));
+    // Use a fresh service instance
+    $service = app(FxRateService::class);
+    $result = $service->convert(100.00, 'USD', 'COP', Carbon::parse('2024-06-14'));
 
     // COP has 0 decimal places
     expect($result)->toBe(400012.0);
