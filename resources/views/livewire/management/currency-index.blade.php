@@ -27,7 +27,7 @@
                         </flux:button>
                     </flux:table.cell>
                 </flux:table.row>
-            @endforeach>
+            @endforeach
         </flux:table.rows>
     </flux:table>
 </div>
