@@ -70,7 +70,10 @@ final class ExchangeRateApiService
 
             throw_if(! $response->successful(), FxRateException::class, 'ExchangeRate-API error: HTTP '.$response->status());
 
-            return $this->parseResponse($response->json(), $date);
+            $data = $response->json();
+            throw_if($data === null, FxRateException::class, 'ExchangeRate-API returned invalid JSON');
+
+            return $this->parseResponse($data, $date);
 
         } catch (ConnectionException $e) {
             throw new FxRateException('ExchangeRate-API connection failed: '.$e->getMessage());
