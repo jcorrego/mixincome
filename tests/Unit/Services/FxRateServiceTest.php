@@ -449,3 +449,76 @@ test('refetchRate updates timestamp even when rate value unchanged', function ()
     expect($updatedRate->updated_at->isAfter($oldTimestamp))->toBeTrue()
         ->and((float) $updatedRate->rate)->toBe(0.9264);
 });
+
+// Test COP pairs routing to ExchangeRate-API
+test('fetchRate uses ExchangeRate-API for COP to EUR pair', function (): void {
+    Http::fake([
+        'v6.exchangerate-api.com/*' => Http::response([
+            'result' => 'success',
+            'conversion_rate' => 0.00023,
+        ], 200),
+    ]);
+
+    $rate = $this->fxRateService->fetchRate('COP', 'EUR', Date::parse('2024-06-14'));
+
+    expect($rate)->toBeInstanceOf(FxRate::class)
+        ->and($rate->source)->toBe('exchangerate-api');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), 'exchangerate-api.com'));
+});
+
+test('fetchRate uses ExchangeRate-API for EUR to COP pair', function (): void {
+    Http::fake([
+        'v6.exchangerate-api.com/*' => Http::response([
+            'result' => 'success',
+            'conversion_rate' => 4300.50,
+        ], 200),
+    ]);
+
+    $rate = $this->fxRateService->fetchRate('EUR', 'COP', Date::parse('2024-06-14'));
+
+    expect($rate)->toBeInstanceOf(FxRate::class)
+        ->and($rate->source)->toBe('exchangerate-api');
+});
+
+test('fetchRateManual uses ExchangeRate-API for COP pair', function (): void {
+    $cop = Currency::query()->where('code', 'COP')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $date = Date::parse('2024-06-14');
+
+    Http::fake([
+        'v6.exchangerate-api.com/*' => Http::response([
+            'result' => 'success',
+            'conversion_rate' => 0.00023,
+        ], 200),
+    ]);
+
+    $rate = $this->fxRateService->fetchRateManual($cop, $eur, $date);
+
+    expect($rate)->toBeInstanceOf(FxRate::class)
+        ->and($rate->source)->toBe('exchangerate-api');
+});
+
+test('refetchRate uses ExchangeRate-API for COP pair', function (): void {
+    $cop = Currency::query()->where('code', 'COP')->firstOrFail();
+    $eur = Currency::query()->where('code', 'EUR')->firstOrFail();
+    $date = Date::parse('2024-06-14');
+
+    $existingRate = FxRate::factory()->create([
+        'from_currency_id' => $cop->id,
+        'to_currency_id' => $eur->id,
+        'date' => $date,
+        'rate' => '0.00023000',
+    ]);
+
+    Http::fake([
+        'v6.exchangerate-api.com/*' => Http::response([
+            'result' => 'success',
+            'conversion_rate' => 0.00024,
+        ], 200),
+    ]);
+
+    $updatedRate = $this->fxRateService->refetchRate($existingRate);
+
+    expect((float) $updatedRate->rate)->toBe(0.00024);
+});

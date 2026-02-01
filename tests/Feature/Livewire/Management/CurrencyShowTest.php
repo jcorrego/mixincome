@@ -173,3 +173,22 @@ test('refetchRate updates replicated rate to ECB-sourced', function (): void {
     $replicatedRate->refresh();
     expect($replicatedRate->is_replicated)->toBeFalse();
 });
+
+// Test 12.13: refetchRate handles API failure
+test('refetchRate handles API failure gracefully', function (): void {
+    $existingRate = FxRate::factory()->create([
+        'from_currency_id' => $this->eur->id,
+        'to_currency_id' => $this->usd->id,
+        'date' => Date::parse('2024-06-14'),
+        'rate' => '1.08000000',
+    ]);
+
+    Http::fake([
+        '*' => Http::response('', 500),
+    ]);
+
+    Livewire::actingAs($this->user)
+        ->test(CurrencyShow::class, ['currency' => $this->eur])
+        ->call('refetchRate', $existingRate->id)
+        ->assertHasErrors(['refetchRate']);
+});
