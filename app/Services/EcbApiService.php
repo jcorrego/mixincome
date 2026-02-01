@@ -15,7 +15,7 @@ final class EcbApiService
 {
     private const string BASE_URL = 'https://data-api.ecb.europa.eu/service/data/EXR';
 
-    private const array SUPPORTED_CURRENCIES = ['USD', 'EUR', 'COP'];
+    private const array SUPPORTED_CURRENCIES = ['USD', 'EUR'];
 
     private const int CACHE_TTL_SECONDS = 86400; // 24 hours
 

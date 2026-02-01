@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<message:GenericData xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:generic="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic">
+    <message:DataSet>
+        <generic:Obs>
+            <generic:ObsDimension value="2024-06-14"/>
+            <generic:ObsValue value="0.92640000"/>
+        </generic:Obs>
+    </message:DataSet>
+</message:GenericData>

@@ -72,4 +72,12 @@ final class Currency extends Model
     {
         return $this->hasMany(FxRate::class, 'to_currency_id');
     }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'code';
+    }
 }

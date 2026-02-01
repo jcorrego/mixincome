@@ -13,6 +13,7 @@ final readonly class FxRateService
 {
     public function __construct(
         private EcbApiService $ecbApiService,
+        private ExchangeRateApiService $exchangeRateApiService,
     ) {}
 
     /**
@@ -68,8 +69,14 @@ final readonly class FxRateService
             return $existingRate;
         }
 
-        // Fetch from API
-        $apiResult = $this->ecbApiService->getRate($fromCode, $toCode, $date);
+        // Fetch from API (choose appropriate service based on currency pair)
+        if ($this->isCopPair($fromCode, $toCode)) {
+            $apiResult = $this->exchangeRateApiService->getRate($fromCode, $toCode, $date);
+            $source = 'exchangerate-api';
+        } else {
+            $apiResult = $this->ecbApiService->getRate($fromCode, $toCode, $date);
+            $source = 'ecb';
+        }
 
         $fromCurrency = Currency::query()->where('code', $fromCode)->firstOrFail();
         $toCurrency = Currency::query()->where('code', $toCode)->firstOrFail();
@@ -82,7 +89,7 @@ final readonly class FxRateService
             ],
             [
                 'rate' => number_format($apiResult['rate'], 8, '.', ''),
-                'source' => 'ecb',
+                'source' => $source,
                 'is_replicated' => false,
                 'replicated_from_date' => null,
             ]
@@ -140,6 +147,94 @@ final readonly class FxRateService
         $result = $amount * (float) $rate->rate;
 
         return round($result, $toCurrency->decimal_places);
+    }
+
+    /**
+     * Manually fetch a new rate for a specific date (admin operation).
+     * Throws exception if rate already exists or if the appropriate API (ECB or ExchangeRate-API) has no data for the requested date.
+     */
+    public function fetchRateManual(Currency $from, Currency $to, CarbonInterface $date): FxRate
+    {
+        // Check if rate already exists
+        $existing = FxRate::query()
+            ->where('from_currency_id', $from->id)
+            ->where('to_currency_id', $to->id)
+            ->whereDate('date', $date)
+            ->first();
+
+        throw_if($existing !== null, FxRateException::class, 'Rate already exists for this currency pair and date');
+
+        // Try to fetch from appropriate API
+        try {
+            if ($this->isCopPair($from->code, $to->code)) {
+                $apiResult = $this->exchangeRateApiService->getRate($from->code, $to->code, $date);
+                $source = 'exchangerate-api';
+            } else {
+                $apiResult = $this->ecbApiService->getRate($from->code, $to->code, $date);
+                $source = 'ecb';
+            }
+            $rate = $apiResult['rate'];
+        } catch (FxRateException) {
+            throw new FxRateException('API has no rate for this date. Rate would be replicated.');
+        }
+
+        // Create the rate
+        return FxRate::query()->firstOrCreate(
+            [
+                'from_currency_id' => $from->id,
+                'to_currency_id' => $to->id,
+                'date' => $date,
+            ],
+            [
+                'rate' => $rate,
+                'source' => $source,
+                'is_replicated' => false,
+                'replicated_from_date' => null,
+            ]
+        );
+    }
+
+    /**
+     * Re-fetch an existing rate from the appropriate API service (admin operation).
+     * Updates the rate value and replication status if the API has new data.
+     */
+    public function refetchRate(FxRate $rate): FxRate
+    {
+        $fromCurrency = $rate->fromCurrency;
+        $toCurrency = $rate->toCurrency;
+
+        // Try to fetch fresh data from appropriate API
+        try {
+            if ($this->isCopPair($fromCurrency->code, $toCurrency->code)) {
+                $apiResult = $this->exchangeRateApiService->getRate($fromCurrency->code, $toCurrency->code, $rate->date);
+            } else {
+                $apiResult = $this->ecbApiService->getRate($fromCurrency->code, $toCurrency->code, $rate->date);
+            }
+            $newRateValue = $apiResult['rate'];
+        } catch (FxRateException) {
+            throw new FxRateException('API has no rate for this date');
+        }
+
+        // Update the rate
+        $rate->update([
+            'rate' => number_format($newRateValue, 8, '.', ''),
+            'is_replicated' => false,
+            'replicated_from_date' => null,
+        ]);
+
+        // Always touch to update timestamp even if values didn't change
+        $rate->touch();
+        $rate->refresh();
+
+        return $rate;
+    }
+
+    /**
+     * Determine if currency pair involves COP.
+     */
+    private function isCopPair(string $fromCode, string $toCode): bool
+    {
+        return $fromCode === 'COP' || $toCode === 'COP';
     }
 
     /**

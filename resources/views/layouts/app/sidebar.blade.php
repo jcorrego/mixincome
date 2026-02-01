@@ -30,6 +30,9 @@
                     <flux:sidebar.item icon="map-pin" :href="route('management.addresses')" :current="request()->routeIs('management.addresses')" wire:navigate>
                         {{ __('Addresses') }}
                     </flux:sidebar.item>
+                    <flux:sidebar.item icon="currency-dollar" :href="route('management.currencies.index')" :current="request()->routeIs('management.currencies.*')" wire:navigate>
+                        {{ __('Currencies') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
