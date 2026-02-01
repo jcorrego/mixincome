@@ -103,7 +103,7 @@ final class ExchangeRateApiService
         throw_if(
             ! isset($data['result']) || $data['result'] !== 'success',
             FxRateException::class,
-            'ExchangeRate-API error: '.(string) ($data['error-type'] ?? 'Unknown error')
+            'ExchangeRate-API error: '.($data['error-type'] ?? 'Unknown error')
         );
 
         throw_if(

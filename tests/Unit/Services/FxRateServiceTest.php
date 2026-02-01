@@ -464,7 +464,7 @@ test('fetchRate uses ExchangeRate-API for COP to EUR pair', function (): void {
     expect($rate)->toBeInstanceOf(FxRate::class)
         ->and($rate->source)->toBe('exchangerate-api');
 
-    Http::assertSent(fn ($request) => str_contains($request->url(), 'exchangerate-api.com'));
+    Http::assertSent(fn ($request): bool => str_contains((string) $request->url(), 'exchangerate-api.com'));
 });
 
 test('fetchRate uses ExchangeRate-API for EUR to COP pair', function (): void {

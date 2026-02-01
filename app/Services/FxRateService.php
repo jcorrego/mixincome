@@ -162,9 +162,7 @@ final readonly class FxRateService
             ->whereDate('date', $date)
             ->first();
 
-        if ($existing !== null) {
-            throw new FxRateException('Rate already exists for this currency pair and date');
-        }
+        throw_if($existing !== null, FxRateException::class, 'Rate already exists for this currency pair and date');
 
         // Try to fetch from appropriate API
         try {
@@ -176,7 +174,7 @@ final readonly class FxRateService
                 $source = 'ecb';
             }
             $rate = $apiResult['rate'];
-        } catch (FxRateException $e) {
+        } catch (FxRateException) {
             throw new FxRateException('API has no rate for this date. Rate would be replicated.');
         }
 
@@ -213,7 +211,7 @@ final readonly class FxRateService
                 $apiResult = $this->ecbApiService->getRate($fromCurrency->code, $toCurrency->code, $rate->date);
             }
             $newRateValue = $apiResult['rate'];
-        } catch (FxRateException $e) {
+        } catch (FxRateException) {
             throw new FxRateException('API has no rate for this date');
         }
 
