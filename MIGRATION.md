@@ -563,21 +563,19 @@ NOTA: TaxYear eliminado. Filing apunta directamente a UserProfile/Entity con cam
 | **Fase 1.2: OpenSpec Design** | ✅ | `phase-1-2-user-interface-crud` (5/5 artifacts, 45 tasks) |
 | **Fase 1.2: Implementation** | ✅ | Controllers, Policies, Form Requests, Livewire components, Routes, Views + 174 tests passing |
 | **Fase 2.1: OpenSpec Design** | ✅ | `phase-2-1-currencies-fx-rates` (5/5 artifacts, 43 tests, 27 tasks) |
+| **Fase 2.1: Implementation** | ✅ | Currency enum/model, FxRate model, EcbApiService, FxRateService + 290 tests passing |
 
 ### 📋 Próximo Paso
 
-**Fase 2.1: Implementation — Currencies & Exchange Rates**
+**Fase 2.2: Accounts & Financial Structure**
 
-OpenSpec change `phase-2-1-currencies-fx-rates` está listo para `/opsx:apply`.
+Próxima fase a diseñar con OpenSpec:
+- Account model (bank accounts, investment accounts, etc.)
+- Account categories and types
+- Account-Entity relationships
+- Account CRUD interface
 
-Esto creará:
-- Currency model + enum + seeder (USD, EUR, COP)
-- FxRate model con replication tracking
-- FxRateService (find, fetch, replicate, sync)
-- EcbApiService (ECB SDMX integration)
-- 43 tests
-
-**Objetivo:** Establecer sistema multi-moneda con conversión histórica vía ECB.
+**Objetivo:** Establecer estructura de cuentas financieras para tracking de transacciones.
 
 ---
 
