@@ -9,6 +9,15 @@
     <flux:card class="mb-6">
         <flux:heading size="lg" class="mb-4">Fetch New Exchange Rate</flux:heading>
 
+        @error('fetchRate')
+            <flux:callout variant="danger" icon="x-circle" class="mb-4">
+                {{ $message }}
+            </flux:callout>
+        @enderror
+
+        <x-action-message on="rate-fetched" class="mb-4 text-green-600 dark:text-green-400 font-medium">
+        </x-action-message>
+
         <form wire:submit="fetchRate">
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <flux:field>
@@ -52,6 +61,15 @@
         <flux:heading size="lg" class="mb-4">
             Exchange Rates FROM {{ $currency->code }}
         </flux:heading>
+
+        @error('refetchRate')
+            <flux:callout variant="danger" icon="x-circle" class="mb-4">
+                {{ $message }}
+            </flux:callout>
+        @enderror
+
+        <x-action-message on="rate-refetched" class="mb-4 text-green-600 dark:text-green-400 font-medium">
+        </x-action-message>
 
         @if ($currency->sourceFxRates->isEmpty())
             <flux:text class="text-zinc-500">No exchange rates found where {{ $currency->code }} is the source currency.</flux:text>

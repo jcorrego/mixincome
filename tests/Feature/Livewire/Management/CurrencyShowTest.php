@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Exceptions\FxRateException;
 use App\Livewire\Management\CurrencyShow;
 use App\Models\Currency;
 use App\Models\FxRate;
 use App\Models\User;
-use App\Services\FxRateService;
 use Database\Seeders\CurrencySeeder;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
@@ -69,7 +67,7 @@ test('fetchRate shows error for duplicate rate', function (): void {
         ->set('toCurrencyId', $this->usd->id)
         ->set('date', '2024-06-14')
         ->call('fetchRate')
-        ->assertDispatched('notify');
+        ->assertHasErrors(['fetchRate']);
 });
 
 // Test 12.7: fetchRate with future date
@@ -108,7 +106,7 @@ test('fetchRate handles ECB failure gracefully', function (): void {
         ->set('toCurrencyId', $this->usd->id)
         ->set('date', '2024-06-14')
         ->call('fetchRate')
-        ->assertDispatched('notify');
+        ->assertHasErrors(['fetchRate']);
 });
 
 // Test 12.10: refetchRate with different ECB value
@@ -127,7 +125,7 @@ test('refetchRate updates rate successfully', function (): void {
     Livewire::actingAs($this->user)
         ->test(CurrencyShow::class, ['currency' => $this->eur])
         ->call('refetchRate', $existingRate->id)
-        ->assertDispatched('notify');
+        ->assertDispatched('rate-refetched');
 
     $existingRate->refresh();
     expect($existingRate->updated_at)->not->toBeNull();
@@ -149,7 +147,7 @@ test('refetchRate handles unchanged rate value', function (): void {
     Livewire::actingAs($this->user)
         ->test(CurrencyShow::class, ['currency' => $this->eur])
         ->call('refetchRate', $existingRate->id)
-        ->assertDispatched('notify');
+        ->assertDispatched('rate-refetched');
 });
 
 // Test 12.12: refetchRate updating replicated rate
@@ -170,7 +168,7 @@ test('refetchRate updates replicated rate to ECB-sourced', function (): void {
     Livewire::actingAs($this->user)
         ->test(CurrencyShow::class, ['currency' => $this->eur])
         ->call('refetchRate', $replicatedRate->id)
-        ->assertDispatched('notify');
+        ->assertDispatched('rate-refetched');
 
     $replicatedRate->refresh();
     expect($replicatedRate->is_replicated)->toBeFalse();

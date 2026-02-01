@@ -50,10 +50,7 @@ final class CurrencyShow extends Component
 
             $rate = $fxRateService->fetchRateManual($fromCurrency, $toCurrency, $date);
 
-            $this->dispatch('notify', [
-                'type' => 'success',
-                'message' => "Rate fetched successfully: {$rate->rate} on {$rate->date->toDateString()}",
-            ]);
+            $this->dispatch('rate-fetched', message: "Rate fetched successfully: {$rate->rate} on {$rate->date->toDateString()}");
 
             // Refresh the currency with updated rates
             $this->currency->refresh()->load(['sourceFxRates.toCurrency', 'targetFxRates.fromCurrency']);
@@ -63,10 +60,7 @@ final class CurrencyShow extends Component
             $this->fromCurrencyId = $this->currency->id;
             $this->date = Date::today()->toDateString();
         } catch (FxRateException $e) {
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => $e->getMessage(),
-            ]);
+            $this->addError('fetchRate', $e->getMessage());
         }
     }
 
@@ -87,18 +81,12 @@ final class CurrencyShow extends Component
                 $message = 'Rate unchanged, ECB value matches existing rate';
             }
 
-            $this->dispatch('notify', [
-                'type' => 'success',
-                'message' => $message,
-            ]);
+            $this->dispatch('rate-refetched', message: $message);
 
             // Refresh the currency with updated rates
             $this->currency->refresh()->load(['sourceFxRates.toCurrency', 'targetFxRates.fromCurrency']);
         } catch (FxRateException $e) {
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => $e->getMessage(),
-            ]);
+            $this->addError('refetchRate', $e->getMessage());
         }
     }
 
