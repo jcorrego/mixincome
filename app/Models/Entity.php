@@ -10,6 +10,7 @@ use Database\Factories\EntityFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Legal entity (LLC, Corp, Partnership, etc.) belonging to a user profile.
@@ -65,5 +66,21 @@ final class Entity extends Model
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
+    }
+
+    /**
+     * Get all accounts for this entity.
+     */
+    public function accounts(): HasMany
+    {
+        return $this->hasMany(Account::class);
+    }
+
+    /**
+     * Get all transaction imports for this entity.
+     */
+    public function transactionImports(): HasMany
+    {
+        return $this->hasMany(TransactionImport::class);
     }
 }
